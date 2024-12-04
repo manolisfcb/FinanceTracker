@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block head_title %}
+            Personal Finance Tracker
+        {% endblock %}
+    </title>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <!-- Custom files -->
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+
+    {% block extra_head %}
+    {% endblock %}
+</head>
+<body>
+
+    <nav class="bg-blue-500 p-4">
+        <div class="max-w-screen-lg mx-auto flex justify-between items-center">
+            <a href="{{ url_for('home') }}" class="text-white
+    <div class="max-w-screen-lg mx-auto p-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+    
+</body>
+</html>
