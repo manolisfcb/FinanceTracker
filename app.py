@@ -23,16 +23,25 @@ env = {
 app = flask.Flask(__name__)
 app.config.from_object(ENVIROMENT)
 app.template_folder = app.config['TEMPLATES_PATH']
-
+app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config["DEBUG"] = True
+app.config["version"] = "0.0.1"
+app.config["OPENAPI_VERSION"] = "3.0.3"
+app.config["OPENAPI_URL_PREFIX"] = "/doc"
+app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger_ui"
+app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
+
+
 jwt = JWTManager(app)
 
 
 from src.routes import main
-
+from src.routes import auth
 
 
 app.register_blueprint(main.main_bp)
+
+
 
 db.init_app(app)
 migration.init_app(app, db)
