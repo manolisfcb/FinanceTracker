@@ -5,6 +5,9 @@ import dotenv
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
+
+
 
 db = SQLAlchemy()
 migration = Migrate()
@@ -22,16 +25,14 @@ app.config.from_object(ENVIROMENT)
 app.template_folder = app.config['TEMPLATES_PATH']
 
 app.config["DEBUG"] = True
+jwt = JWTManager(app)
 
 
-@app.route('/', methods=['GET'])
-def home():
-    return "<h1>API</h1><p>This is an API for the project.</p>"
+from src.routes import main
 
 
-@app.route('/home', methods=['GET'])
-def home_page():
-    return render_template('index.html')
+
+app.register_blueprint(main.main_bp)
 
 db.init_app(app)
 migration.init_app(app, db)

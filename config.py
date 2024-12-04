@@ -1,6 +1,9 @@
 import os
 from dotenv import load_dotenv, find_dotenv
 
+if os.path.exists('.env'):
+    load_dotenv(find_dotenv())
+
 
 class Config(object):
     DEBUG = False
@@ -10,7 +13,7 @@ class Config(object):
     OUTPUT_PATH = os.path.join(BASE_PATH, 'output')
     TEMPLATES_PATH = os.path.join(BASE_PATH, 'src/templates')
     STATICS_PATH = os.path.join(BASE_PATH, 'src/static')
-    
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'xxx')  # Replace with a secure key for production
     SECRET_KEY = os.environ.get('SECRET_KEY', 'xxx')  # Replace with a secure key for production
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
