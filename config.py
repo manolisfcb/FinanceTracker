@@ -8,20 +8,41 @@ class Config(object):
     # caminhos padrão
     BASE_PATH = os.path.dirname(os.path.abspath(__file__))
     OUTPUT_PATH = os.path.join(BASE_PATH, 'output')
-    TEMPLATES_PATH = os.path.join(BASE_PATH, 'app/templates')
-    STATICS_PATH = os.path.join(BASE_PATH, 'app/static')
+    TEMPLATES_PATH = os.path.join(BASE_PATH, 'src/templates')
+    STATICS_PATH = os.path.join(BASE_PATH, 'src/static')
     
     SECRET_KEY = os.environ.get('SECRET_KEY', 'xxx')  # Replace with a secure key for production
-    DEBUG = False
-    TESTING = False
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
-    DEBUG = os.getenv("DEBUG")
+    DEBUG = True
+    HOST = os.getenv("HOST")
+    PORT = os.getenv("PORT")
+    ENV = os.getenv("ENV")
+    TESTING = False
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///finance.db")
+
+
+    ROUTING_KEY = 'file_unzip_only'
+
+
+class ProductionConfig(Config):
+    DEVELOPMENT = False
+    DEBUG = False
     HOST = os.getenv("HOST")
     PORT = os.getenv("PORT")
     ENV = os.getenv("ENV")
     TESTING = False
 
+class TestingConfig(Config):
+    TESTING = True
+    DEBUG = True
+    HOST = os.getenv("HOST")
+    PORT = os.getenv("PORT")
+    ENV = os.getenv("ENV")
     ROUTING_KEY = 'file_unzip_only'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = True
