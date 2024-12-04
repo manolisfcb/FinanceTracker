@@ -18,7 +18,7 @@ env = {
 
 # Create the application instance and load the configuration
 app = flask.Flask(__name__)
-app.config.from_object(env[ENVIROMENT])
+app.config.from_object(ENVIROMENT)
 app.template_folder = app.config['TEMPLATES_PATH']
 
 app.config["DEBUG"] = True
