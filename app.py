@@ -21,11 +21,13 @@ env = {
     "production": "config.ProductionConfig",
     "testing": "config.TestingConfig"
 }
+from src.models import UserModel, TransactionModel, Category
 
 # Create the application instance and load the configuration
 app = flask.Flask(__name__)
 app.config.from_object(ENVIROMENT)
 app.template_folder = app.config['TEMPLATES_PATH']
+app.static_folder = app.config['STATICS_PATH']
 app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config["DEBUG"] = True
 app.config["version"] = "0.0.1"
@@ -62,7 +64,6 @@ def create_app():
     app.config["DEBUG"] = True
     return app
 
-from src.models import UserModel
 
 if __name__ == '__main__':
     app.run(debug=True)

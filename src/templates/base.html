@@ -9,6 +9,8 @@
             Personal Finance Tracker
         {% endblock %}
     </title>
+    {% include 'nav.html' %}
+
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
@@ -18,6 +20,24 @@
 
     <!-- Custom files -->
     <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+
+    <!-- <div class="join">
+        <div>
+          <div>
+            <input class="input input-bordered join-item" placeholder="Search" />
+          </div>
+        </div>
+        <select class="select select-bordered join-item">
+          <option disabled selected>Filter</option>
+          <option>Sci-fi</option>
+          <option>Drama</option>
+          <option>Action</option>
+        </select>
+        <div class="indicator">
+          <span class="indicator-item badge badge-secondary">new</span>
+          <button class="btn join-item">Search</button>
+        </div>
+      </div> -->
 
     {% block extra_head %}
     {% endblock %}
@@ -34,6 +54,12 @@
 
     <div class="max-w-screen-lg mx-auto p-4">
         {% block content %}
+
+
+
+
+        
+
         {% endblock %}
     </div>
     

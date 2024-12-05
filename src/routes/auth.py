@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, render_template, flash, redirect, url_for
 from .main import main_bp
 from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
 from src.forms.UserRegistratioForm import NamerForm
@@ -42,7 +42,6 @@ def register():
     return render_template('register.html', name=None, form=form, users= all_users)
 
 
-
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -51,11 +50,12 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user)
             flash('Logged in successfully.', 'success')
-            return render_template('index.html', form=form)
-        flash('Invalid login', 'error')
-        return render_template('login.html', form=form)
-    flash('Login to continue', 'info')
-    return render_template('login.html', form=form)
+            return redirect(url_for('main.home_page'))  # Redirige al home después de iniciar sesión
+        else:
+            flash('Invalid login', 'error')  # Mensaje si el login es inválido
+    elif request.method == 'POST':  # Mensaje solo en intentos fallidos de inicio de sesión
+        flash('Login to continue', 'info')
+    return render_template('login.html', form=form)  # Muestra el formulario
 
 
 @main_bp.route('/logout')
@@ -63,4 +63,4 @@ def login():
 def logout():
     logout_user()
     flash('Logged out successfully.', 'success')
-    return render_template('login.html')
+    return render_template('index.html')

@@ -1,0 +1,40 @@
+<nav>
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="{{ url_for('main.home_page') }}" class="flex items-center">
+        <span>
+            <img class="w-10 h-10 mr-2" src="{{ url_for('static', filename='images/money-with-wings.svg') }}" />
+        </span>
+        <span class="self-center text-2xl font-semibold whitespace-nowrap">Finance Tracker</span>
+      </a>
+      <!-- Menu toggle button and other elements -->
+      <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+        <ul class="font-medium flex flex-col p-4 md:p-0 my-1 md:my-2 rounded-lg md:flex-row md:space-x-8">
+        
+        {% if current_user.is_authenticated %}
+            <li>
+                <a href="{{ url_for('main.logout') }}" 
+                    class="block py-2 pl-3 pr-4 text-white rounded md:p-0" 
+                    aria-current="page">
+                        Logout
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ url_for('main.login') }}" 
+                    class="block py-2 pl-3 pr-4 text-white rounded md:p-0" 
+                    aria-current="page">
+                        Login
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('main.register') }}" 
+                    class="block py-2 pl-3 pr-4 text-white rounded md:p-0" 
+                    aria-current="page">
+                        Sign Up
+                </a>
+            </li>
+        {% endif %}
+        </ul>
+      </div>
+    </div>
+</nav>

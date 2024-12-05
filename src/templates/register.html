@@ -3,7 +3,6 @@
 {% block head_title %}
     Register | Personal Finance Tracker
 {% endblock %}
-
 {% block content %}
 {% for categ, message in get_flashed_messages(with_categories = true) %}
 <div class="alert alert-{{categ}}" style="position: relative;">
@@ -41,7 +40,7 @@
         
         {{ form.name.label(class="form-label") }} 
         
-        {{ form.name(class="form-control") }}
+        {{ form.name( class="grow") }}
 
         {{ form.email.label(class="form-label") }} 
         
