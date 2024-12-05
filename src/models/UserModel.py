@@ -32,3 +32,7 @@ class UserModel(db.Model, UserMixin):
             'email': self.email,
             'added_on': self.added_on
         }
+        
+    def save(self):
+        db.session.add(self)
+        db.session.commit()

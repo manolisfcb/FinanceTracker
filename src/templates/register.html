@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block content %}
-{% for message in get_flashed_messages() %}
-<div class="alert alert-success" style="position: relative;">
+{% for categ, message in get_flashed_messages(with_categories = true) %}
+<div class="alert alert-{{categ}}" style="position: relative;">
     <span>{{ message }}</span>
     <button type="button" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; right: 0; background: none; border: none;">
         <svg
@@ -36,7 +36,7 @@
     <p> Please register</p>
 
     <br>
-    <form method="post" class="form-control">
+    <form method="POST" class="form-control">
         {{ form.hidden_tag() }}
         
         {{ form.name.label(class="form-label") }} 
@@ -61,7 +61,22 @@
     </form>
 
 {% endif %}
+<p>Here is a list of users:</p>
+{% if users %}
+<table class="table table-hover table-bordered table-striped">
 
+        {% for user in users %}
+            <tr>
+                <td>
+                {{ user.username }} - {{ user.email }} <br/>
+                </td>
+            </tr>
+        {% endfor %}
+
+</table>
+{% else %}
+    <p>No users found</p>
+{% endif %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
 {% endblock %}

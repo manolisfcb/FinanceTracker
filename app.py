@@ -6,11 +6,14 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-
+from flask_login import LoginManager
 
 
 db = SQLAlchemy()
 migration = Migrate()
+login_manager = LoginManager()
+
+
 ENVIROMENT = os.getenv("ENV")
 
 env = {
@@ -36,7 +39,7 @@ jwt = JWTManager(app)
 
 
 from src.routes import main
-from src.routes import auth
+from src.routes import auth, dash
 
 
 app.register_blueprint(main.main_bp)
@@ -45,6 +48,12 @@ app.register_blueprint(main.main_bp)
 
 db.init_app(app)
 migration.init_app(app, db)
+login_manager.init_app(app)
+login_manager.login_view = 'main.login'
+@login_manager.user_loader
+def load_user(user_id):
+    return UserModel.query.get(user_id)
+
 
 def create_app():
     app = flask.Flask(__name__)
