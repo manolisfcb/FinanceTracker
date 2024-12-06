@@ -18,6 +18,13 @@
                         Logout
                 </a>
             </li>
+
+            <li>
+                <a href="{{ url_for('main.transactions') }}" 
+                    class="block py-2 pl-3 pr-4 text-white rounded md:p-0" 
+                    aria-current="page">
+                        Transactions
+                </a>
         {% else %}
             <li>
                 <a href="{{ url_for('main.login') }}" 
@@ -33,6 +40,24 @@
                         Sign Up
                 </a>
             </li>
+                    <!-- <div class="join">
+                        <div>
+                        <div>
+                            <input class="input input-bordered join-item" placeholder="Search" />
+                        </div>
+                        </div>
+                        <select class="select select-bordered join-item">
+                        <option disabled selected>Filter</option>
+                        <option>Sci-fi</option>
+                        <option>Drama</option>
+                        <option>Action</option>
+                        </select>
+                        <div class="indicator">
+                        <span class="indicator-item badge badge-secondary">new</span>
+                        <button class="btn join-item">Search</button>
+                        </div>
+                    </div>
+                </a> -->
         {% endif %}
         </ul>
       </div>

@@ -26,6 +26,8 @@ class DevelopmentConfig(Config):
     ENV = os.getenv("ENV")
     TESTING = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///finance.db")
+    FLASK_DEBUG=1
+
 
 
     ROUTING_KEY = 'file_unzip_only'

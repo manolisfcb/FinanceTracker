@@ -63,4 +63,4 @@ def login():
 def logout():
     logout_user()
     flash('Logged out successfully.', 'success')
-    return render_template('index.html')
+    return redirect(url_for('main.home_page'))  # Redirige al home después de cerrar sesión

@@ -35,3 +35,15 @@ class TransactionModel(db.Model):
     
     def __repr__(self):
         return f"<Transaction(id={self.id}, amount={self.amount}, type={self.type})>"
+
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'amount': self.amount,
+            'type': self.type.value,
+            'category_id': self.category.name if self.category else None,
+            'description': self.description,
+            'date': self.date
+        }
