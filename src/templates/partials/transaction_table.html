@@ -1,7 +1,4 @@
-
-
-{% if transactions %}
-<table class="table">
+<table class="table" id="transaction-container">
     <thead class="text-xs text-white uppercase">
         <tr>
             <th class="px-6 py-3">Date</th>
@@ -11,16 +8,19 @@
         </tr>
     </thead>
     <tbody>
-        {% for transaction in transactions %}
-        <tr class="text-sm">
-            <td class="px-6 py-4">{{ transaction.date.strftime('%Y-%m-%d') }}</td>
-            <td class="px-6 py-4">{{ transaction.category_id }}</td>
-            <td class="px-6 py-4">{{ transaction.type }}</td>
-            <td class="px-6 py-4">{{ transaction.amount }}</td>
-        </tr>
-        {% endfor %}
+        {% if transactions %}
+            {% for transaction in transactions %}
+            <tr class="text-sm">
+                <td class="px-6 py-4">{{ transaction.date.strftime('%Y-%m-%d') }}</td>
+                <td class="px-6 py-4">{{ transaction.category_id }}</td>
+                <td class="px-6 py-4">{{ transaction.type }}</td>
+                <td class="px-6 py-4">{{ transaction.amount }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4" class="text-center text-gray-500 py-4">No transactions available.</td>
+            </tr>
+        {% endif %}
     </tbody>
 </table>
-{% else %}
-<p class="text-white">No transactions found.</p>
-{% endif %}

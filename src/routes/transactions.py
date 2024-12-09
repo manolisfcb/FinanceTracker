@@ -9,7 +9,7 @@ from src.models.Transaction import TransactionModel, Category
 from sqlalchemy import or_
 from src.utils.filter import filter
 from sqlalchemy.orm import joinedload
-
+from app import htmx
 
 # @main_bp.route('/transactions', methods=['GET', 'POST'])
 # @login_required
@@ -50,7 +50,6 @@ def transactions():
     }
     print(context)
     
-    if request.headers.get('HX-Request'):
-        return render_template('partials/transaction_table.html', **context)
-    
+    if htmx:
+        return render_template('partials/transaction_table.html', **context, htmx=htmx)    
     return render_template('transactions.html', **context)

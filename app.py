@@ -7,12 +7,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_login import LoginManager
+from flask_htmx import HTMX
 
-
+app = flask.Flask(__name__)
 db = SQLAlchemy()
 migration = Migrate()
 login_manager = LoginManager()
-
+htmx = HTMX(app)
 
 ENVIROMENT = os.getenv("ENV")
 
@@ -24,7 +25,6 @@ env = {
 from src.models import UserModel, TransactionModel, Category
 
 # Create the application instance and load the configuration
-app = flask.Flask(__name__)
 app.config.from_object(ENVIROMENT)
 app.template_folder = app.config['TEMPLATES_PATH']
 app.static_folder = app.config['STATICS_PATH']

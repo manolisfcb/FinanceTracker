@@ -23,32 +23,7 @@
         <div class = "flex flex-col-reverse md:grid md:grid-cols-4 md:gap4">
              <!-- 3 de cuatro columnas para la tabla   -->
              <div class = "col-span-3 me-4">
-                {% if transactions %}
-                        <table class = "table"   id="transaction-container">
-                            <thead class = "text-xs text-white uppercase">
-                            <tr>
-                                <th class="px-6 py-3" >Date</th>
-                                <th class="px-6 py-3" >Category</th>
-                                <th class="px-6 py-3" >Type</th>
-                                <th class="px-6 py-3" >Amount</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                {% for transaction in transactions %}
-                                    <tr class="text-sm">
-                                        <td class="px-6 py-4">{{ transaction.date.strftime('%Y-%m-%d') }}</td>
-                                        <td class="px-6 py-4">{{ transaction.category_id }}</td>
-                                        <td class="px-6 py-4">{{ transaction.type }}</td>
-                                        <td class="px-6 py-4">{{ transaction.amount }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-            
-                        </table>   
-                {% else %}
-                    <p class="text-white">No transactions found.</p>
-            
-                {% endif %}
+                {% include 'partials/transaction_table.html' %}
             </div>
 
 
