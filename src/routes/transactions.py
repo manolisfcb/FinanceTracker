@@ -51,5 +51,5 @@ def transactions():
     print(context)
     
     if htmx:
-        return render_template('partials/transaction_table.html', **context, htmx=htmx)    
-    return render_template('transactions.html', **context)
+        return render_template('partials/transaction_table.html', **context, htmx=htmx), 200    
+    return render_template('transactions.html', **context), 200

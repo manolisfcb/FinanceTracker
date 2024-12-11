@@ -41,9 +41,11 @@ class TransactionModel(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'amount': self.amount,
+            'amount': round(self.amount, 2),
             'type': self.type.value,
             'category_id': self.category.name if self.category else None,
             'description': self.description,
             'date': self.date
         }
+        
+    
