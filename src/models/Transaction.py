@@ -49,3 +49,11 @@ class TransactionModel(db.Model):
         }
         
     
+    def get_total_amount(user_id):
+        return TransactionModel.query.filter_by(user_id=user_id).with_entities(db.func.sum(TransactionModel.amount)).scalar() or 0.0
+    
+    def get_total_income(user_id):
+        return TransactionModel.query.filter_by(user_id=user_id, type=TransactionType.INCOME).with_entities(db.func.sum(TransactionModel.amount)).scalar() or 0.0
+    
+    def get_total_expense(user_id):
+        return TransactionModel.query.filter_by(user_id=user_id, type=TransactionType.EXPENSE).with_entities(db.func.sum(TransactionModel.amount)).scalar() or 0.0
