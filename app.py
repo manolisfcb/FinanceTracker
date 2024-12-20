@@ -56,6 +56,12 @@ login_manager.login_view = 'main.login'
 def load_user(user_id):
     return UserModel.query.get(user_id)
 
+@app.template_filter('currency')
+def format_currency_filter(value):
+    if value is None:
+        return "0.00"
+    return f"{value:,.2f}"
+
 
 def create_app():
     app = flask.Flask(__name__)

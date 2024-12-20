@@ -1,4 +1,32 @@
-<table class="table" id="transaction-container">
+
+<div id="transaction-container">
+<h1 class="mt-4 mb-6 prose prose-2x1 text-white">
+    Totals
+</h1>
+
+<table class="table">
+    <thead class="text-xs text-white uppercase">
+        <tr>
+            <th class="px-6 py-3">Income</th>
+            <th class="px-6 py-3">Expense</th>
+            <th class="px-6 py-3">Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="text-sm">
+            <td class="px-6 py-4">$ {{ totals.total_income|currency }}</td>
+            <td class="px-6 py-4">$ {{ totals.total_expenses|currency }}</td>
+            <td class="px-6 py-4">$ {{ totals.total_amount|currency }}</td>
+        </tr>
+</table>
+
+<br>
+
+<h1 class="mt-8 mb-6 prose prose-2x1 text-white">
+    Transactions
+</h1>
+
+<table class="table">
     <thead class="text-xs text-white uppercase">
         <tr>
             <th class="px-6 py-3">Date</th>
@@ -24,3 +52,4 @@
         {% endif %}
     </tbody>
 </table>
+</div>

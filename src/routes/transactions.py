@@ -5,15 +5,19 @@ from src.forms.UserRegistratioForm import NamerForm
 from src.forms.LoginForm import LoginForm
 from flask import Blueprint, render_template, request
 from app import db
-from src.models.Transaction import TransactionModel, Category
-from sqlalchemy import or_
-from src.utils.filter import filter
+from src.models.Transaction import TransactionModel, Category, TransactionType
+from sqlalchemy import or_, and_, case, func
+from src.utils.filter import filter, get_totals
 from sqlalchemy.orm import joinedload
 from app import htmx
+from sqlalchemy import text
+
 
 # @main_bp.route('/transactions', methods=['GET', 'POST'])
 # @login_required
 # def transactions():
+
+
     
 @main_bp.route('/transactions', methods=['GET'])
 def transactions():
@@ -22,9 +26,9 @@ def transactions():
     date = request.args.get('date', '').strip()
     transaction_type = request.args.get('type', '').strip()
 
-    print(request.args)
-    print(category)
+
     query = TransactionModel.query.join(Category)
+    
     
   # Aplicar filtros dinámicamente
     filters = []
@@ -37,18 +41,15 @@ def transactions():
 
     # Aplicar todos los filtros
     query = query.filter(*filters)
+   
 
-    # Obtener los resultados
-    transactions = query.options(joinedload(TransactionModel.category)).all()
-
-    # # Renderizar los resultados
-    # return render_template("partials/transaction_table.html", transactions=transactions)
+    totals = get_totals(query)
 
     transactions = [transaction.serialize() for transaction in query]
     context = {
-        'transactions': transactions
+        'transactions': transactions,
+        "totals": totals,
     }
-    print(context)
     
     if htmx:
         return render_template('partials/transaction_table.html', **context, htmx=htmx), 200    

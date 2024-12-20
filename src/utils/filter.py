@@ -1,4 +1,5 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, case, func
+from src.models.Transaction import TransactionModel, TransactionType
 
 
 def filter(model, filter, relation=None):
@@ -31,3 +32,35 @@ def filter(model, filter, relation=None):
             query = query.join(rel_model).filter(rel_model.name == value)
             
     return query
+
+def get_totals(query):
+    # Calcular totales en una sola consulta
+
+    totals = query.with_entities(
+        func.sum(TransactionModel.amount).label('total_amount'),
+        func.sum(
+            case(
+                (TransactionModel.type == TransactionType.INCOME, TransactionModel.amount),
+                else_=0
+            )
+        ).label('total_income'),
+        func.sum(
+            case(
+                (TransactionModel.type == TransactionType.EXPENSE, TransactionModel.amount),
+                else_=0
+            )
+        ).label('total_expenses')
+    ).first()
+
+        # Extraer resultados de los agregados
+    total_income = round(totals.total_income, 2) if totals.total_income else 0.0
+    total_expenses = round(totals.total_expenses, 2) if totals.total_expenses else 0.0
+
+    total_amount = total_income - total_expenses
+
+    totals = {
+        'total_amount': round(total_amount),
+        'total_income': total_income,
+        'total_expenses': total_expenses
+    }
+    return totals
