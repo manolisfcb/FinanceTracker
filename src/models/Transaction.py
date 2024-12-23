@@ -13,10 +13,9 @@ class Category(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    type = db.Column(db.Enum(TransactionType), nullable=False)
     
     def __repr__(self):
-        return f"<Category(name={self.name}, type={self.type})>"
+        return f"<Category(name={self.name}"
 
 # Modelo TransactionModel
 class TransactionModel(db.Model):
