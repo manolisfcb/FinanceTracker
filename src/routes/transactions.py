@@ -89,5 +89,6 @@ def add_transactions():
             db.session.add(transaction_model)
         db.session.commit()
                
-    flash('Transactions added successfully', 'success')
+        flash('Transactions added successfully', 'success')
+        return render_template('add_transactions.html'), 200
     return render_template('add_transactions.html'), 200
