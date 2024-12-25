@@ -26,8 +26,6 @@ def transactions():
     date = request.args.get('date', '').strip()
     transaction_type = request.args.get('type', '').strip()
 
-    
-
     query = TransactionModel.query.join(Category)
     
     
@@ -57,20 +55,20 @@ def transactions():
     return render_template('transactions.html', **context), 200
 
 
-@main_bp.route('/transactions/add', methods=['GET', 'POST'])
-def add_transactions():
+@main_bp.route('/transactions/upload', methods=['GET', 'POST'])
+def upload_transactions():
     if request.method == "POST":
         
         file = request.files['file']
         if not file.filename.endswith('.csv'):
             flash('Invalid file format, please upload a CSV file', 'error')
-            return redirect(url_for('main.add_transactions'))
+            return redirect(url_for('main.upload_transactions'))
         
         
         bank_name = request.form['bank']
         if bank_name not in allowed_banks:
             flash('Invalid bank name', 'error')
-            return redirect(url_for('main.add_transactions'))
+            return redirect(url_for('main.upload_transactions'))
         
         csv_file = TextIOWrapper(request.files['file'].stream, encoding='utf-8')
         
@@ -81,7 +79,7 @@ def add_transactions():
             transactions = transactions.create_transaction()
         except ValueError as e:
             flash(f'Error processing CSV file: {e}', 'error')
-            return redirect(url_for('main.add_transactions'))
+            return redirect(url_for('main.upload_transactions'))
         
         for transaction in transactions:
             transaction['user_id'] = current_user.id
@@ -90,5 +88,39 @@ def add_transactions():
         db.session.commit()
                
         flash('Transactions added successfully', 'success')
-        return render_template('add_transactions.html'), 200
-    return render_template('add_transactions.html'), 200
+        return render_template('upload_transactions.html'), 200
+    return render_template('upload_transactions.html'), 200
+
+@main_bp.route('/transactions/add', methods=['GET', 'POST'])
+def add_transactions():
+    if request.method == "POST":
+        category = request.form['category']
+        amount = request.form['amount']
+        type = request.form['type'].lower()
+        type = TransactionType.EXPENSE if type == 'expense' else TransactionType.INCOME
+        description = request.form['description']
+        date = request.form['date']
+        date = datetime.strptime(date, '%Y-%m-%d')
+        
+        category = Category.query.filter_by(name=category).first()
+        if not category:
+            category = Category(name=category)
+            db.session.add(category)
+            db.session.commit()
+        
+        transaction = {
+            'category_id': category.id, 
+            'user_id': current_user.id,
+            'amount': amount,
+            'type': type,
+            'description': description,
+            'date': date
+            
+        }
+        print(transaction)
+        transaction_model = TransactionModel(**transaction)
+        db.session.add(transaction_model)
+        db.session.commit()
+        flash('Transaction added successfully', 'success')
+        return redirect(url_for('main.transactions'))    
+    return render_template('add_transaction.html'), 200
