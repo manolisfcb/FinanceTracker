@@ -12,8 +12,7 @@ from werkzeug.utils import secure_filename
 from io import TextIOWrapper
 import csv
 from datetime import datetime
-from src.resources.TransactionFactory import TransactionFactory
-
+from src.resources.TransactionFactory import TransactionFactory, allowed_banks
 # @main_bp.route('/transactions', methods=['GET', 'POST'])
 # @login_required
 # def transactions():
@@ -62,17 +61,33 @@ def transactions():
 def add_transactions():
     if request.method == "POST":
         
+        file = request.files['file']
+        if not file.filename.endswith('.csv'):
+            flash('Invalid file format, please upload a CSV file', 'error')
+            return redirect(url_for('main.add_transactions'))
+        
+        
+        bank_name = request.form['bank']
+        if bank_name not in allowed_banks:
+            flash('Invalid bank name', 'error')
+            return redirect(url_for('main.add_transactions'))
+        
         csv_file = TextIOWrapper(request.files['file'].stream, encoding='utf-8')
+        
+        
         csv_reader = csv.DictReader(csv_file)
-        transactions = TransactionFactory().create_transaction('Nu').convert_to_transaction(csv_reader)
-        print(transactions)
+        transactions = TransactionFactory(csv_reader, bank_name)
+        try:
+            transactions = transactions.create_transaction()
+        except ValueError as e:
+            flash(f'Error processing CSV file: {e}', 'error')
+            return redirect(url_for('main.add_transactions'))
+        
         for transaction in transactions:
             transaction['user_id'] = current_user.id
             transaction_model = TransactionModel(**transaction)
             db.session.add(transaction_model)
         db.session.commit()
-            
-            
-            
-    
+               
+    flash('Transactions added successfully', 'success')
     return render_template('add_transactions.html'), 200

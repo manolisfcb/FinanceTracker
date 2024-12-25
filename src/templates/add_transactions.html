@@ -6,6 +6,25 @@
 
 {% block content %}
 
+{% for categ, message in get_flashed_messages(with_categories = true) %}
+<div class="alert alert-{{categ}}" style="position: relative;">
+    <span>{{ message }}</span>
+    <button type="button" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; right: 0; background: none; border: none;">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+</div>
+{% endfor %}
 
     <h1 class="mt-4 mb-6 text-2xl leading-none tracking-tight text-white md:text-3xl lg:text-4xl flex item-center mb-4">
         <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -21,8 +40,16 @@
         <div class="flex flex-col-reverse md:grid md:grid-cols-4 md:gap4">
             <!-- 3 de cuatro columnas para la tabla   -->
                 <form method="POST"  hx-swap="outerHTML" enctype="multipart/form-data">
+                    <label for ="bank" class="text-white text-sm">Select Bank</label>
+                    <select name="bank" id="bank" class="form-select">
+                        <option value="Nu">Nubank</option>
+                        <option value="It">Itau*</option>
+                        <option value="Bb">Banco do Brasil*</option>
+                        <option value="Br">Bradesco*</option>
+                        <option value="Rc">Rico*</option>
+                    </select>
                         <label for="file" class="text-white text-sm">Please inport only csv files</label>
-                        <input type="file" name="file" id="file" />
+                        <input type="file" name="file" id="file" required/>
 
                     <button type="submit" class="btn btn-neutral mt-4">Import</button>
                 </form>
