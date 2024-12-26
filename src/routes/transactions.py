@@ -12,6 +12,7 @@ from io import TextIOWrapper
 import csv
 from datetime import datetime
 from src.resources.TransactionFactory import TransactionFactory, allowed_banks
+from src.utils.filter import filter_by_columns_ilike
 # @main_bp.route('/transactions', methods=['GET', 'POST'])
 # @login_required
 # def transactions():
@@ -32,15 +33,15 @@ def transactions():
     query = TransactionModel.query.join(Category)
 
     # Aplicar filtros dinámicamente
-    filters = []
-    filters.append(TransactionModel.user_id == current_user.id)  # Filtra por usuario actual
-    if category:
-        filters.append(Category.name.ilike(f"%{category}%"))  # Filtra por nombre de categoría
-    if date:
-        filters.append(TransactionModel.date.ilike(f"%{date}%"))  # Filtra por fecha como texto
-    if transaction_type:
-        filters.append(TransactionModel.type.ilike(f"%{transaction_type}%"))  # Filtra por tipo de transacción
-
+    filterss=[
+        {'column': 'user_id', 'value': current_user.id, 'model': TransactionModel},
+        {'column': 'name', 'value': category, 'model': Category},
+        {'column': 'date', 'value': date, 'model': TransactionModel},
+        {'column': 'type', 'value': transaction_type, 'model': TransactionType}
+    ]
+    
+    filters = filter_by_columns_ilike(filterss)
+    
     # Aplicar todos los filtros
     query = query.filter(*filters)
 
