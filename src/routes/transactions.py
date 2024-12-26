@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, make_response
 from .main import main_bp
 from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
 
@@ -25,6 +25,7 @@ def transactions():
     category = request.args.get('category', '').strip()
     date = request.args.get('date', '').strip()
     transaction_type = request.args.get('type', '').strip()
+
 
     query = TransactionModel.query.join(Category)
     
@@ -54,7 +55,7 @@ def transactions():
         return render_template('partials/transaction_table.html', **context, htmx=htmx), 200    
     return render_template('transactions.html', **context), 200
 
-
+## -- Upload transactions
 @main_bp.route('/transactions/upload', methods=['GET', 'POST'])
 def upload_transactions():
     if request.method == "POST":
@@ -91,6 +92,8 @@ def upload_transactions():
         return render_template('upload_transactions.html'), 200
     return render_template('upload_transactions.html'), 200
 
+
+## -- Add transactions
 @main_bp.route('/transactions/add', methods=['GET', 'POST'])
 def add_transactions():
     if request.method == "POST":
@@ -101,6 +104,9 @@ def add_transactions():
         description = request.form['description']
         date = request.form['date']
         date = datetime.strptime(date, '%Y-%m-%d')
+        if date > datetime.now():
+            flash('Invalid date, please select a date in the past or today', 'error')
+            return redirect(url_for('main.add_transactions')) 
         
         category = Category.query.filter_by(name=category).first()
         if not category:
@@ -124,3 +130,54 @@ def add_transactions():
         flash('Transaction added successfully', 'success')
         return redirect(url_for('main.transactions'))    
     return render_template('add_transaction.html'), 200
+
+## -- Edit transactions
+@main_bp.route('/transactions/edit/<int:id>', methods=['GET', 'PUT'])
+def edit_transactions(id):
+    if request.method == 'PUT':
+        transaction = TransactionModel.query.get(id)
+        if not transaction:
+            return {'message': 'Transaction not found'}, 404
+        
+        
+        data = request.form
+        category = Category.query.filter_by(name=data['category']).first()
+        if not category:
+            category = Category(name=data['category'])
+            db.session.add(category)
+            db.session.commit()
+        
+        transaction.category_id = category.id
+        transaction.amount = data['amount']
+        transaction.type = data['type']
+        transaction.description = data['description']
+        transaction.date = data['date']
+        
+        db.session.commit()
+        flash('Transaction updated successfully', 'success')
+        return redirect(url_for('main.transactions'))
+    else:
+        transaction = TransactionModel.query.get(id)
+        if not transaction:
+            return {'message': 'Transaction not found'}, 404
+        
+        context = {
+            'transaction': transaction.serialize()
+        }
+        return render_template('edit_transaction.html', **context), 200
+
+
+@main_bp.route('/transactions/delete/<int:id>', methods=['DELETE'])
+def delete_transactions(id):
+    transaction = TransactionModel.query.get(id)
+    if not transaction:
+        return {'message': 'Transaction not found'}, 404
+    
+    db.session.delete(transaction)
+    db.session.commit()
+    
+    response = '', 204  # Respuesta vacía con código 204
+    response = make_response(response)
+    response.headers['HX-Redirect'] = url_for('main.transactions')  # Redirigir a /transactions
+    flash('Transaction deleted successfully', 'success')
+    return response
