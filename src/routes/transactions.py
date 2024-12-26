@@ -32,6 +32,8 @@ def transactions():
     
   # Aplicar filtros dinámicamente
     filters = []
+    filters.append(TransactionModel.user_id == current_user.id)
+    
     if category:
         filters.append(Category.name.ilike(f"%{category}%"))  # Filtra por nombre de categoría
     if date:
@@ -59,7 +61,9 @@ def transactions():
 @main_bp.route('/transactions/upload', methods=['GET', 'POST'])
 def upload_transactions():
     if request.method == "POST":
-        
+        if not 'file' in request.files:
+            flash('No file part', 'error')
+            return redirect(url_for('main.upload_transactions'))
         file = request.files['file']
         if not file.filename.endswith('.csv'):
             flash('Invalid file format, please upload a CSV file', 'error')

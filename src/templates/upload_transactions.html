@@ -32,16 +32,16 @@
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
           </svg> -->
 
-        INPORT TRANSACTIONS
+        IMPORT YOUR TRANSACTIONS
     </h1>
 
 
-    <div class="relative overflow-x-auto text-white">
+    <div class="flex text-white">
 
-        <div class="flex flex-col-reverse md:grid md:grid-cols-4 md:gap4">
             <!-- 3 de cuatro columnas para la tabla   -->
                 <form method="POST"  hx-swap="outerHTML" enctype="multipart/form-data">
-                    <label for ="bank" class="text-white text-sm">Select Bank</label>
+                    <div>
+                    <label for ="bank" class="text-white">Select Bank</label>
                     <select name="bank" id="bank" class="select select-bordered mt-2 mb-2">
                         <option value="Nu">Nubank</option>
                         <option value="It">Itau*</option>
@@ -49,10 +49,15 @@
                         <option value="Br">Bradesco*</option>
                         <option value="Rc">Rico*</option>
                     </select>
+                    </div>
                     <br>
                     <br>
-                        <label for="file" class="text-white text-sm">Please import only .csv files</label>
-                        <input type="file" class="file-input file-input-bordered w-full max-w-xs" />
+                    <div>
+                        <label for="file" class="text-white">Please import only csv files</label>
+                    </div>
+                    <div>
+                        <input type="file" class="file-input file-input-bordered" required />
+                    </div>
                     <button type="submit" class="btn btn-neutral mt-4">Import</button>
                 </form>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
