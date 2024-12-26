@@ -43,6 +43,7 @@ jwt = JWTManager(app)
 from src.routes import main
 from src.routes import auth, dash
 from src.routes import transactions
+from src.routes import transactions_charts
 
 app.register_blueprint(main.main_bp)
 

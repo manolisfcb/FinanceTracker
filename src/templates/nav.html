@@ -25,6 +25,14 @@
                     aria-current="page">
                         Transactions
                 </a>
+            </li>
+            <li>
+                <a href="{{ url_for('main.transactions_charts') }}" 
+                    class="block py-2 pl-3 pr-4 text-white rounded md:p-0" 
+                    aria-current="page">
+                        Charts
+                </a>
+            </li>
         {% else %}
             <li>
                 <a href="{{ url_for('main.login') }}" 

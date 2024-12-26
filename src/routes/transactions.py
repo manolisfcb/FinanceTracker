@@ -1,12 +1,11 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, make_response
+from flask import  render_template, flash, redirect, url_for, make_response
 from .main import main_bp
 from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
 
-from flask import Blueprint, render_template, request
+from flask import  render_template, request
 from app import db
 from src.models.Transaction import TransactionModel, Category, TransactionType
-from sqlalchemy import or_, and_, case, func
-from src.utils.filter import filter, get_totals
+from src.utils.filter import  get_totals
 from app import htmx
 from werkzeug.utils import secure_filename
 from io import TextIOWrapper
@@ -20,20 +19,21 @@ from src.resources.TransactionFactory import TransactionFactory, allowed_banks
 
     
 @main_bp.route('/transactions', methods=['GET'])
+@main_bp.route('/transactions', methods=['GET'])
 def transactions():
     # Recuperar filtros enviados por el formulario
     category = request.args.get('category', '').strip()
     date = request.args.get('date', '').strip()
     transaction_type = request.args.get('type', '').strip()
+    page = request.args.get('page', 1, type=int)  # Página actual, predeterminado: 1
+    per_page = 20  # Número de elementos por página
 
-
+    # Construir la consulta base
     query = TransactionModel.query.join(Category)
-    
-    
-  # Aplicar filtros dinámicamente
+
+    # Aplicar filtros dinámicamente
     filters = []
-    filters.append(TransactionModel.user_id == current_user.id)
-    
+    filters.append(TransactionModel.user_id == current_user.id)  # Filtra por usuario actual
     if category:
         filters.append(Category.name.ilike(f"%{category}%"))  # Filtra por nombre de categoría
     if date:
@@ -43,19 +43,25 @@ def transactions():
 
     # Aplicar todos los filtros
     query = query.filter(*filters)
-   
 
+    # Paginación
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    transactions = [transaction.serialize() for transaction in pagination.items]
     totals = get_totals(query)
-
-    transactions = [transaction.serialize() for transaction in query]
+    # Contexto para la plantilla
     context = {
         'transactions': transactions,
-        "totals": totals,
+        'pagination': pagination,
+        'totals': totals
     }
+
+    # Renderizar la página con HTMX si se usa
+    if request.headers.get('HX-Request'):
+        return render_template('partials/transaction_table.html', **context)
     
-    if htmx:
-        return render_template('partials/transaction_table.html', **context, htmx=htmx), 200    
-    return render_template('transactions.html', **context), 200
+    # Renderizar la página completa
+    return render_template('transactions.html', **context)
+
 
 ## -- Upload transactions
 @main_bp.route('/transactions/upload', methods=['GET', 'POST'])
