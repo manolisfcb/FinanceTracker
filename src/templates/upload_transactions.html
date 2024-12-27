@@ -39,7 +39,7 @@
     <div class="flex text-white">
 
             <!-- 3 de cuatro columnas para la tabla   -->
-                <form method="POST"  hx-swap="outerHTML" enctype="multipart/form-data">
+                <form method="POST"  enctype="multipart/form-data">
                     <div>
                     <label for ="bank" class="text-white">Select Bank</label>
                     <select name="bank" id="bank" class="select select-bordered mt-2 mb-2">
@@ -47,7 +47,7 @@
                         <option value="It">Itau*</option>
                         <option value="Bb">Banco do Brasil*</option>
                         <option value="Br">Bradesco*</option>
-                        <option value="Rc">Rico*</option>
+                        <option value="Rc">Rico</option>
                     </select>
                     </div>
                     <br>
@@ -56,7 +56,7 @@
                         <label for="file" class="text-white">Please import only csv files</label>
                     </div>
                     <div>
-                        <input type="file" class="file-input file-input-bordered" required />
+                        <input type="file"  name="file" id="file" class="file-input file-input-bordered" required />
                     </div>
                     <button type="submit" class="btn btn-neutral mt-4">Import</button>
                 </form>

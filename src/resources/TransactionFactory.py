@@ -1,6 +1,7 @@
 
 from csv import DictReader
 from .NuTransactions import NuTransaction
+from .RicoTransactions import RicoTransaction
 class TransactionFactory():
     def __init__(self, transaction_csv: DictReader, bank_name: str):
         self.transaction_csv = transaction_csv
@@ -14,5 +15,6 @@ class TransactionFactory():
             raise ValueError('Transaction type not allowed yet please add it to the allowed_banks list')
         
 allowed_banks = {
-    'Nu': NuTransaction
+    'Nu': NuTransaction,
+    'Rc': RicoTransaction
 }

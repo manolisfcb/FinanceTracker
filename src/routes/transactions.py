@@ -44,7 +44,7 @@ def transactions():
     # Aplicar todos los filtros
     query = query.filter(*filters)
     all_categories = Category.query.filter().all()
-
+    query = query.order_by(TransactionModel.date.desc())
     # Paginación
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     transactions = [transaction.serialize() for transaction in pagination.items]
@@ -86,8 +86,10 @@ def upload_transactions():
         
         csv_file = TextIOWrapper(request.files['file'].stream, encoding='utf-8')
         
+        delimeter = csv.Sniffer().sniff(csv_file.read(1024)).delimiter
+        csv_file.seek(0)
         
-        csv_reader = csv.DictReader(csv_file)
+        csv_reader = csv.DictReader(csv_file, delimiter=delimeter)
         transactions = TransactionFactory(csv_reader, bank_name)
         try:
             transactions = transactions.create_transaction()
