@@ -44,6 +44,7 @@ from src.routes import main
 from src.routes import auth, dash
 from src.routes import transactions
 from src.routes import transactions_charts
+from src.routes import portfolio
 
 app.register_blueprint(main.main_bp)
 

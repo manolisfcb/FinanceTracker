@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+    PORTFOLIO | Personal Finance Tracker
+{% endblock %}
+
+{% block content %}
+<div class="text-white">
+
+    <!-- Alert Messages -->
+    {% for categ, message in get_flashed_messages(with_categories = true) %}
+    <div class="alert alert-{{categ}}" style="position: relative;">
+        <span>{{ message }}</span>
+        <button type="button" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; right: 0; background: none; border: none;">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    {% endfor %}
+
+    <!-- Main Header -->
+    <h1 class="mt-4 mb-6 text-2xl leading-none tracking-tight text-white md:text-3xl lg:text-4xl flex item-center mb-4">
+        PORTFOLIO OVERVIEW
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Performance Section -->
+        <div class="bg-gray-800 p-6 rounded-lg col-span-1">
+            <h2 class="text-2xl font-bold">Performance</h2>
+            <div class="mt-4 space-y-2">
+                <p class="text-lg">Return: <span class="text-green-400">8.45%</span></p>
+                <p>Patrimony: <span class="font-semibold">48,181.35</span></p>
+                <p>Acquisition Cost: <span class="font-semibold">52,933.97</span></p>
+                <p>Accumulated Earnings: <span class="font-semibold">8,656.30</span></p>
+                <p>Profit: <span class="font-semibold text-green-400">4,471.56</span></p>
+            </div>
+            <button class="btn btn-neutral mt-4">New Asset</button>
+            <button class="btn btn-neutral mt-4">New Order</button>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="bg-gray-800 p-6 rounded-lg col-span-2">
+            <h2 class="text-2xl font-bold">Performance Chart</h2>
+            <canvas id="portfolioPerformanceChart" class="mt-4"></canvas>
+        </div>
+    </div>
+
+    <!-- Contribution History -->
+    <div class="mt-6 bg-gray-800 p-6 rounded-lg">
+        <h2 class="text-2xl font-bold">Contribution History</h2>
+        <canvas id="contributionHistoryChart" class="mt-4"></canvas>
+    </div>
+
+    <!-- Portfolio Table -->
+    <div class="mt-6 bg-gray-800 p-6 rounded-lg">
+        <h2 class="text-2xl font-bold">Portfolio</h2>
+        <table class="table mt-4">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Asset</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Value</th>
+                    <th>Cost</th>
+                    <th>Avg Price</th>
+                    <th>Profit</th>
+                    <th>%R</th>
+                    <th>%R+d</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asset in portfolio %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ asset.name }}</td>
+                    <td>{{ asset.price }}</td>
+                    <td>{{ asset.quantity }}</td>
+                    <td>{{ asset.value }}</td>
+                    <td>{{ asset.cost }}</td>
+                    <td>{{ asset.avg_price }}</td>
+                    <td class="{{ 'text-green-400' if asset.profit > 0 else 'text-red-400' }}">{{ asset.profit }}</td>
+                    <td>{{ asset.percent_return }}</td>
+                    <td>{{ asset.percent_return_dividends }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Chart.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Performance Chart
+    const performanceCtx = document.getElementById('portfolioPerformanceChart').getContext('2d');
+    new Chart(performanceCtx, {
+        type: 'line',
+        data: {
+            labels: {{ performance_dates | safe }},
+            datasets: [{
+                label: 'Performance',
+                data: {{ performance_values | safe }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // Contribution History Chart
+    const contributionCtx = document.getElementById('contributionHistoryChart').getContext('2d');
+    new Chart(contributionCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ contribution_dates | safe }},
+            datasets: [{
+                label: 'Monthly Contributions',
+                data: {{ contribution_values | safe }},
+                backgroundColor: '#4caf50'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
