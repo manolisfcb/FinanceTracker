@@ -8,3 +8,7 @@ def plot_income_expense_bar_char(df: DataFrame):
     fig = px.bar(x=x_vals, y=y_vals, labels={'x': 'Type', 'y': 'Amount'}, title='Income vs Expense') 
    
     return fig
+
+def plot_category_pie_chart(df: DataFrame):
+    fig = px.pie(df, names='category_id', values='amount', title=f'Category Distribution for {df.type.values[0]}')
+    return fig

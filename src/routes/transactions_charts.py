@@ -9,7 +9,7 @@ from sqlalchemy import or_, and_, case, func
 from src.utils.filter import filter, get_totals
 from app import htmx
 from werkzeug.utils import secure_filename
-from src.resources.charting import plot_income_expense_bar_char
+from src.resources.charting import plot_income_expense_bar_char, plot_category_pie_chart
 from io import TextIOWrapper
 import csv
 from datetime import datetime
@@ -43,9 +43,14 @@ def transactions_charts():
     df = pd.DataFrame(transactions)
     
     bar_chart = plot_income_expense_bar_char(df)
+    pie_char = plot_category_pie_chart(df)
+    income_pie_char = plot_category_pie_chart(df[df['type']=='income'])
+    expense_pie_char = plot_category_pie_chart(df[df['type']=='expense'])
     
     context = {
         'bar_chart': bar_chart.to_html(),
+        'income_pie_char':income_pie_char.to_html(),
+        'expense_pie_char':expense_pie_char.to_html(),
         'transactions': df.to_dict(orient='records'),
         'totals': get_totals(query)
     }

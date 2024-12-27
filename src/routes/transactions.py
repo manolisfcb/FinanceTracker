@@ -20,10 +20,9 @@ from src.utils.filter import filter_by_columns_ilike
 
     
 @main_bp.route('/transactions', methods=['GET'])
-@main_bp.route('/transactions', methods=['GET'])
 def transactions():
     # Recuperar filtros enviados por el formulario
-    category = request.args.get('category', '').strip()
+    category = request.args.getlist('categories')
     date = request.args.get('date', '').strip()
     transaction_type = request.args.get('type', '').strip()
     page = request.args.get('page', 1, type=int)  # Página actual, predeterminado: 1
@@ -34,16 +33,17 @@ def transactions():
 
     # Aplicar filtros dinámicamente
     filterss=[
-        {'column': 'user_id', 'value': current_user.id, 'model': TransactionModel},
+        {'column': 'user_id', 'value': [current_user.id], 'model': TransactionModel},
         {'column': 'name', 'value': category, 'model': Category},
-        {'column': 'date', 'value': date, 'model': TransactionModel},
-        {'column': 'type', 'value': transaction_type, 'model': TransactionType}
+        {'column': 'date', 'value': [date], 'model': TransactionModel},
+        {'column': 'type', 'value': [transaction_type], 'model': TransactionModel}
     ]
     
     filters = filter_by_columns_ilike(filterss)
     
     # Aplicar todos los filtros
     query = query.filter(*filters)
+    all_categories = Category.query.filter().all()
 
     # Paginación
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
@@ -53,7 +53,9 @@ def transactions():
     context = {
         'transactions': transactions,
         'pagination': pagination,
-        'totals': totals
+        'totals': totals,
+        'categories': all_categories,
+        'filters': filterss
     }
 
     # Renderizar la página con HTMX si se usa

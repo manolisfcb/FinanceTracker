@@ -1,3 +1,14 @@
+
+<div class="relative overflow-x-auto text-white">
+    <p>Balance</p>
+    {{bar_chart|safe}}
+    <div class="grid grid-cols-2">
+        {{income_pie_char|safe}}
+        {{expense_pie_char|safe}}
+    </div>
+</div>
+<br>
+
 <h1 class="mt-4 mb-6 prose prose-2x1 text-white">
     Totals
 </h1>
@@ -17,13 +28,3 @@
             <td class="px-6 py-4">$ {{ totals.total_amount|currency }}</td>
         </tr>
 </table>
-
-<br>
-
-
-
-<div class="relative overflow-x-auto text-white">
-    <p>Balance</p>
-    {{bar_chart|safe}}
-
-</div>

@@ -36,9 +36,9 @@
 </h1>
 <div class = "relative overflow-x-auto text-white">
 
-    <div class = "flex flex-col-reverse md:grid md:grid-cols-4 md:gap4">
+    <div class = "flex flex-col-reverse md:grid md:grid-cols-6 md:gap6">
          <!-- 3 de cuatro columnas para la tabla   -->
-         <div class = "col-span-3 me-4 ">
+         <div class = "col-span-5 me-4 ">
             <div id = "transaction-container-char">
                 {% include 'partials/transaction_chart.html' %}
             </div>
@@ -57,7 +57,7 @@
             <!-- Date Filter -->
             <div class="mb-2 form-control">
                 <label for="date" class="text-white text-sm">Date</label>
-                <input type="text" name="date" id="date" class="input input-bordered" placeholder="YYYY-MM-DD" />
+                <input type="date" name="date" id="date" class="input input-bordered" placeholder="YYYY-MM-DD" />
             </div>
         
             <!-- Type Filter -->

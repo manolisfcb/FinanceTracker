@@ -1,7 +1,7 @@
 from sqlalchemy import and_, case, func
 from src.models.Transaction import TransactionModel, TransactionType
 
-
+from sqlalchemy import or_
 def filter(qs, filter, relation=None):
     """
     Function to filter a model with a dictionary
@@ -21,11 +21,15 @@ def filter_by_columns_ilike(filters):
         if filter['value']:
             column = getattr(filter['model'], filter['column'])
             if column is not None:
-                output_filter.append(column.ilike(f"%{filter['value']}%"))
-            else:
-                continue
-        else:
-            continue
+                # Accumula filtros para el valor actual
+                like_conditions = []
+                for col_name in filter['value']:
+                    like_conditions.append(column.ilike(f"%{col_name}%"))
+
+                # Usamos un operador OR (|) para combinar las condiciones
+                combined_filter = or_(*like_conditions)
+                output_filter.append(combined_filter)
+
     return output_filter
             
     

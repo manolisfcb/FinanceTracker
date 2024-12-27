@@ -44,29 +44,12 @@
              <!-- 3 de cuatro columnas para la tabla   -->
              <div class = "col-span-3 me-4 " >
                 {% include 'partials/transaction_table.html' %}
-                <div class="pagination mt-4">
-                    {% if pagination.has_prev %}
-                        <a href="?page={{ pagination.prev_num }}" class="btn btn-neutral">Previous</a>
-                    {% endif %}
-                
-                    <span class="mx-2">Page {{ pagination.page }} of {{ pagination.pages }}</span>
-                
-                    {% if pagination.has_next %}
-                        <a href="?page={{ pagination.next_num }}" class="btn btn-neutral">Next</a>
-                    {% endif %}
-                </div>
-                
              </div>
  
             <!-- 1 de cuatro columnas para el formulario de filtros -->
         <div class = "col-span-1">
             <form hx-get="/transactions" hx-target="#transaction-container" hx-swap="outerHTML">
-                <!-- Category Filter -->
-                <div class="mb-2 form-control">
-                    <label for="category" class="text-white text-sm">Category</label>
-                    <input type="text" name="category" id="category" class="input input-bordered" placeholder="Enter category..." />
-                </div>
-            
+
                 <!-- Date Filter -->
                 <div class="mb-2 form-control">
                     <label for="date" class="text-white text-sm">Date</label>
@@ -78,6 +61,16 @@
                     <label for="type" class="text-white text-sm">Type</label>
                     <input type="text" name="type" id="type" class="input input-bordered" placeholder="Enter type (e.g., income or expense)..." />
                 </div>
+                    <!-- Category Filter -->
+                    <div class="form-control">
+                        <label for="categories" class="text-white text-sm">Categories</label>
+                        {% for categ in categories %}
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="category-{{ categ.id }}" name="categories" value="{{ categ.name }}" class="checkbox" />
+                            <label for="category-{{ categ.id }}" class="text-sm">{{ categ.name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
             
                 <button type="submit" class="btn btn-neutral mt-4">Search</button>
             </form>
