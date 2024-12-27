@@ -19,43 +19,58 @@ from src.utils.filter import filter_by_columns_ilike
 # @main_bp.route('/transactions', methods=['GET', 'POST'])
 # @login_required
 # def transactions():
+from flask import Blueprint, render_template, request
+from flask_login import current_user
+from app import db
+from src.models.Transaction import TransactionModel, Category
+from src.utils.filter import filter_by_columns_ilike, get_totals
+import pandas as pd
 
 @main_bp.route('/transactions_charts', methods=['GET'])
 def transactions_charts():
-    
-    category = request.args.get('category', '').strip()
+    # Recuperar filtros
+    category = request.args.getlist('categories')
     date = request.args.get('date', '').strip()
     transaction_type = request.args.get('type', '').strip()
-        # Aplicar filtros dinámicamente
     
-    filterss=[
-        {'column': 'user_id', 'value': current_user.id, 'model': TransactionModel},
-        {'column': 'name', 'value': category, 'model': Category},
-        {'column': 'date', 'value': date, 'model': TransactionModel},
-        {'column': 'type', 'value': transaction_type, 'model': TransactionType}
-    ]
-    
-    filters = filter_by_columns_ilike(filterss)
+    # Construir la consulta
     query = TransactionModel.query.join(Category)
-    query = query.filter(*filters)
-    transactions = query.all()    
-    transactions = [transaction.serialize() for transaction in transactions]
+
+    # Aplicar filtros dinámicamente
+    filters = [
+        {'column': 'user_id', 'value': [current_user.id], 'model': TransactionModel},
+        {'column': 'name', 'value': category, 'model': Category},
+        {'column': 'date', 'value': [date], 'model': TransactionModel},
+        {'column': 'type', 'value': [transaction_type], 'model': TransactionModel},
+    ]
+    query = query.filter(*filter_by_columns_ilike(filters))
+    
+    # Serializar las transacciones y convertir a DataFrame
+    transactions = [transaction.serialize() for transaction in query.all()]
     df = pd.DataFrame(transactions)
-    
-    bar_chart = plot_income_expense_bar_char(df)
-    pie_char = plot_category_pie_chart(df)
-    income_pie_char = plot_category_pie_chart(df[df['type']=='income'])
-    expense_pie_char = plot_category_pie_chart(df[df['type']=='expense'])
-    
+
+    # Preparar datos para el gráfico de ingresos vs gastos
+    income_expense_group = df.groupby('type')['amount'].sum().reset_index()
+    income_expense_labels = income_expense_group['type'].tolist()
+    income_expense_data = income_expense_group['amount'].tolist()
+
+    # Preparar datos para el gráfico de composición por categorías
+    category_group = df.groupby('category_id')['amount'].sum().reset_index()
+    category_labels = category_group['category_id'].tolist()
+    category_data = category_group['amount'].tolist()
+
+    # Preparar contexto
     context = {
-        'bar_chart': bar_chart.to_html(),
-        'income_pie_char':income_pie_char.to_html(),
-        'expense_pie_char':expense_pie_char.to_html(),
-        'transactions': df.to_dict(orient='records'),
-        'totals': get_totals(query)
+        'income_expense_labels': income_expense_labels,
+        'income_data': [amount if type == 'income' else 0 for type, amount in zip(income_expense_labels, income_expense_data)],
+        'expense_data': [abs(amount) if type == 'expense' else 0 for type, amount in zip(income_expense_labels, income_expense_data)],
+        'category_labels': category_labels,
+        'category_data': category_data,
+        'categories': Category.query.all(),
+        'totals': get_totals(query),
     }
-    
-        # Renderizar la página con HTMX si se usa
+
+    # Renderizar con HTMX o completo
     if request.headers.get('HX-Request'):
-        return render_template('partials/transaction_chart.html', **context)
+        return render_template('transaction_chart.html', **context)
     return render_template('transactions_charts.html', **context)
