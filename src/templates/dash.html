@@ -1,14 +1,112 @@
 {% extends "base.html" %}
 
 {% block head_title %}
-    DASHBOARD | Personal Finance Tracker
+    Dashboard | Personal Finance Tracker
 {% endblock %}
 
 {% block content %}
 
-    <h1 class="mt-4 mb-6 text-2xl leading-none tracking-tight text-white md:text-3xl lg:text-4xl">
-        DASHBOARD
-    </h1>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-white">
+    <!-- Performance Panel -->
+    <div class="bg-gray-800 rounded-lg p-6 col-span-1">
+        <h2 class="text-2xl font-bold">Performance</h2>
+        <div class="mt-4">
+            <p class="text-4xl font-bold">{{ totals.performance }}%</p>
+            <p class="text-sm text-gray-400">Performance del portafolio actual</p>
+        </div>
+        <div class="mt-6">
+            <p>Patrimonio: <span class="font-bold">$ {{ totals.patrimonio|currency }}</span></p>
+            <p>Costo de adquisición: <span class="font-bold">$ {{ totals.costo_adquisicion|currency }}</span></p>
+            <p>Proventos acumulados: <span class="font-bold">$ {{ totals.proventos_acumulados|currency }}</span></p>
+            <p>Lucro con operaciones: <span class="font-bold">$ {{ totals.lucro_operaciones|currency }}</span></p>
+        </div>
+        <div class="mt-6">
+            <button class="btn btn-neutral w-full">Nuevo activo</button>
+            <button class="btn btn-primary w-full mt-2">Nueva orden</button>
+        </div>
+    </div>
 
-    
+    <!-- Historical Performance Chart -->
+    <div class="bg-gray-800 rounded-lg p-6 col-span-2">
+        <h2 class="text-2xl font-bold">Rentabilidad histórica</h2>
+        <canvas id="performanceChart" class="mt-4"></canvas>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 text-white">
+    <!-- Contribution History -->
+    <div class="bg-gray-800 rounded-lg p-6 col-span-1">
+        <h2 class="text-2xl font-bold">Histórico de aportes</h2>
+        <canvas id="contributionsChart" class="mt-4"></canvas>
+        <p class="mt-4 text-right font-bold">Total: R$ {{ totals.total_contribuicoes|currency }}</p>
+    </div>
+
+    <!-- Portfolio Composition -->
+    <div class="bg-gray-800 rounded-lg p-6 col-span-2">
+        <h2 class="text-2xl font-bold">Composición del portafolio</h2>
+        <canvas id="portfolioCompositionChart" class="mt-4"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Rentabilidad histórica
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(performanceCtx, {
+        type: 'line',
+        data: {
+            labels: {{ historical_labels|safe }},
+            datasets: [{
+                label: 'Rentabilidad',
+                data: {{ historical_data|safe }},
+                borderColor: '#4caf50',
+                backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Histórico de aportes
+    const contributionsCtx = document.getElementById('contributionsChart').getContext('2d');
+    new Chart(contributionsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ contributions_labels|safe }},
+            datasets: [{
+                label: 'Aportes',
+                data: {{ contributions_data|safe }},
+                backgroundColor: '#3b82f6'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Composición del portafolio
+    const portfolioCtx = document.getElementById('portfolioCompositionChart').getContext('2d');
+    new Chart(portfolioCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ portfolio_labels|safe }},
+            datasets: [{
+                data: {{ portfolio_data|safe }},
+                backgroundColor: ['#4caf50', '#3b82f6', '#f59e0b', '#ef4444', '#6366f1']
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+
 {% endblock %}
