@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
-
+from sqlalchemy.orm import relationship
 from app import db
+from .TicketModel import TicketModel
 
 
 class StockModel(db.Model):
@@ -9,13 +10,14 @@ class StockModel(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    symbol = db.Column(db.String(10), nullable=False)
+    symbol = db.Column(db.String(10), db.ForeignKey('tickets.symbol', name='fk_stocks_tickets'), nullable=False)  # Asignar nombre a la FK
     cvm_code = db.Column(db.String(10), nullable=True)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
     buy_at = db.Column(db.DateTime, server_default=db.func.now())
     sell_at = db.Column(db.DateTime, nullable=True)
     
+    ticket = db.relationship('TicketModel', backref='stocks', lazy=True)  # Cambié `symbol` a `ticket` para mayor claridad
     user = db.relationship('UserModel', backref='stocks', lazy=True)
     
     def __repr__(self):
@@ -25,7 +27,7 @@ class StockModel(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'symbol': self.symbol,
+            'symbol': self.symbol.symbol,
             'quantity': self.quantity,
             'price': self.price,
             'buy_at': self.buy_at,
