@@ -23,10 +23,15 @@ def generate_transactions():
             country = db.Column(db.String(100), nullable=False)
          """
          
+        # Remove all existing tickets
+        db.session.query(TicketModel).delete()
+         
         for index, row in stocks.iterrows():
             # existing_ticket = TicketModel.query.filter_by(symbol=row['symbol']).first()
             # if not existing_ticket:
+            symbol = row['symbol'][0:4]
             ticket = TicketModel(symbol=row['symbol'], 
+                                 base_symbol=symbol,
                                     cvm_code=row['CVM_CODE'],
                                     long_name=row['long_name'], 
                                     short_name=row['short_name'], 
@@ -35,7 +40,9 @@ def generate_transactions():
                                     sectorKey=row['sectorKey'], 
                                     sector=row['sector'], 
                                     industry=row['industry'], 
-                                    country=row['country'])
+                                    country=row['country'],
+                                    
+                                    )
             db.session.add(ticket)
         db.session.commit()
         
@@ -43,3 +50,4 @@ def generate_transactions():
         print("Test data generated successfully!")
 
 generate_transactions()
+

@@ -4,6 +4,10 @@
     PORTFOLIO | Personal Finance Tracker
 {% endblock %}
 
+
+
+
+
 {% block content %}
 <div class="text-white">
 
@@ -44,8 +48,10 @@
                 <p>Accumulated Earnings: <span class="font-semibold">8,656.30</span></p>
                 <p>Profit: <span class="font-semibold text-green-400">4,471.56</span></p>
             </div>
-            <button class="btn btn-neutral mt-4">New Asset</button>
-            <button class="btn btn-neutral mt-4">New Order</button>
+            <a href="#IMPORT_PORTFOLIO" class="btn">Import Portfolio</a>
+            <button class="btn btn-neutral mt-4">Explore Stocks</button>
+            <!-- The button to open modal -->
+            <a href="#NEW_OPERATION" class="btn">New Operation</a>
         </div>
 
         <!-- Chart Section -->
@@ -99,6 +105,72 @@
     </div>
 </div>
 
+<!-- Modal -->
+<!-- NEW_OPERATION MODAL -->
+<div class="modal" role="dialog" id="NEW_OPERATION">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">Hello!</h3>
+      <p class="py-4">This modal works with anchor links</p>
+  
+      <form id="operationForm" method="POST" action="/api/stock" class="form-control">
+        {{ form.hidden_tag() }}
+    
+        <div class="form-group">
+            {{ form.ticket.label(class="form-label") }}
+            {{ form.ticket(class="form-control") }}
+    
+            {{ form.quantity.label(class="form-label") }}
+            {{ form.quantity(class="form-control") }}
+    
+            {{ form.price.label(class="form-label") }}
+            {{ form.price(class="form-control") }}
+    
+            {{ form.date.label(class="form-label") }}
+            {{ form.date(class="form-control") }}
+        </div>
+    
+        <!-- Botones: BUY y SELL -->
+        <div class="flex space-x-4 mt-4">
+            <button type="submit" name="action" value="BUY" class="btn btn-success">BUY</button>
+            <button type="submit" name="action" value="SELL" class="btn btn-danger">SELL</button>
+        </div>
+    
+        <!-- Botón de Cancel -->
+        <div class="modal-action">
+            <a href="#" class="btn">Cancel</a>
+        </div>
+    </form>
+    
+  
+      <!-- Botón de Cancel -->
+      <div class="modal-action">
+        <a href="#" class="btn">Cancel!</a>
+      </div>
+    </div>
+  </div>
+  
+
+<!-- UPLOAD_PORTFOLIO MODAL -->
+<div class="modal" role="dialog" id="IMPORT_PORTFOLIO">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold">Upload Portfolio</h3>
+        <form method="POST" action="/api/upload-portfolio" enctype="multipart/form-data" class="form-control">
+            <div class="form-group">
+                <label for="file">File</label>
+                <input type="file" id="file" name="file" class="form-control" required>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-success">Upload</button>
+            </div>
+        </form>
+        <div class="modal-action">
+            <a href="#" class="btn">Cancel!</a>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- Chart.js Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -142,5 +214,7 @@
             }
         }
     });
+
+
 </script>
 {% endblock %}

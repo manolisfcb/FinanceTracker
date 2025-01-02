@@ -61,17 +61,18 @@
                     <label for="type" class="text-white text-sm">Type</label>
                     <input type="text" name="type" id="type" class="input input-bordered" placeholder="Enter type (e.g., income or expense)..." />
                 </div>
-                    <!-- Category Filter -->
-                    <div class="form-control">
-                        <label for="categories" class="text-white text-sm">Categories</label>
-                        {% for categ in categories %}
-                        <div class="flex items-center space-x-2">
-                            <input type="checkbox" id="category-{{ categ.id }}" name="categories" value="{{ categ.name }}" class="checkbox" />
-                            <label for="category-{{ categ.id }}" class="text-sm">{{ categ.name }}</label>
-                        </div>
-                        {% endfor %}
+                
+                <!-- Category Filter -->
+                <div class="form-control">
+                    <label for="categories" class="text-white text-sm">Categories</label>
+                    {% for categ in categories %}
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="category-{{ categ.id }}" name="categories" value="{{ categ.name }}" class="checkbox" />
+                        <label for="category-{{ categ.id }}" class="text-sm">{{ categ.name }}</label>
                     </div>
-            
+                    {% endfor %}
+                </div>
+        
                 <button type="submit" class="btn btn-neutral mt-4">Search</button>
             </form>
             

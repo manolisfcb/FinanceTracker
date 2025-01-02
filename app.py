@@ -8,6 +8,7 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_login import LoginManager
 from flask_htmx import HTMX
+from flask_restful import Api
 
 app = flask.Flask(__name__)
 db = SQLAlchemy()
@@ -45,6 +46,8 @@ from src.routes import auth, dash
 from src.routes import transactions
 from src.routes import transactions_charts
 from src.routes import portfolio
+from src.routes import stockViews
+
 
 app.register_blueprint(main.main_bp)
 
@@ -54,6 +57,14 @@ db.init_app(app)
 migration.init_app(app, db)
 login_manager.init_app(app)
 login_manager.login_view = 'main.login'
+
+api = Api(app)
+
+from src.routes import stockResources
+api.add_resource(stockResources.StockResources, '/api/stock')
+api.add_resource(stockResources.UploadPortfolio, '/api/upload-portfolio')
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return UserModel.query.get(user_id)
