@@ -32,6 +32,7 @@ class OrderModel(db.Model):
               "type": self.type,
               "quantity": self.quantity,
               "price": self.price,
-              "date": self.date
+              "date": self.date, 
+              "stock": self.stock
          }
        
