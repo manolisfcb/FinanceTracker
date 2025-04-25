@@ -15,7 +15,7 @@ class Config(object):
     STATICS_PATH = os.path.join(BASE_PATH, 'src/static')
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'xxx')  # Replace with a secure key for production
     SECRET_KEY = os.environ.get('SECRET_KEY', 'xxx')  # Replace with a secure key for production
-
+    SCHEDULER_API_ENABLED = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):

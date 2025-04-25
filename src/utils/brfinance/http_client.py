@@ -3,9 +3,9 @@ import logging
 from bs4 import BeautifulSoup
 from datetime import date
 
-from brfinance.connector import CVMHttpClientConnector
-from brfinance.constants import BOOL_STRING_MAPPER, ENET_URL
-from brfinance.utils import extract_substring
+from .connector import CVMHttpClientConnector
+from .constants import BOOL_STRING_MAPPER, ENET_URL
+from .utils import extract_substring
 
 logger = logging.getLogger(__name__)
 

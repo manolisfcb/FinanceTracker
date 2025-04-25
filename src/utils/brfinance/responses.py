@@ -6,8 +6,8 @@ import json
 import io
 import zipfile
 
-from brfinance.utils import extract_substring
-from brfinance.constants import ENET_URL
+from .utils import extract_substring
+from .constants import ENET_URL
 
 
 class GetSearchResponse():

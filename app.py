@@ -9,6 +9,8 @@ from flask_jwt_extended import JWTManager
 from flask_login import LoginManager
 from flask_htmx import HTMX
 from flask_restful import Api
+from flask_apscheduler import APScheduler
+
 
 app = flask.Flask(__name__)
 db = SQLAlchemy()
@@ -39,7 +41,7 @@ app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-
 
 
 jwt = JWTManager(app)
-
+scheduler = APScheduler()
 
 from src.routes import main
 from src.routes import auth, dash
@@ -48,7 +50,6 @@ from src.routes import transactions_charts
 from src.routes import portfolio
 from src.routes import stockViews
 
-
 app.register_blueprint(main.main_bp)
 
 
@@ -56,6 +57,11 @@ app.register_blueprint(main.main_bp)
 db.init_app(app)
 migration.init_app(app, db)
 login_manager.init_app(app)
+
+
+from src.resources.jobs.update_stocks_info import update_stocks_info
+scheduler.init_app(app)
+
 login_manager.login_view = 'main.login'
 
 api = Api(app)
@@ -64,8 +70,14 @@ from src.routes import stockResources
 api.add_resource(stockResources.StockResources, '/api/stock')
 api.add_resource(stockResources.UploadPortfolio, '/api/upload-portfolio')
 
+scheduler.start()
+
 
 @login_manager.user_loader
+
+
+
+
 def load_user(user_id):
     return UserModel.query.get(user_id)
 
@@ -80,7 +92,7 @@ def create_app():
     app = flask.Flask(__name__)
     app.config.from_object(env[ENVIROMENT])
     app.template_folder = app.config['TEMPLATES_PATH']
-    app.config["DEBUG"] = True
+    app.config["DEBUG"] = False
     return app
 
 

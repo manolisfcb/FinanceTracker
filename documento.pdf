@@ -1,0 +1,600 @@
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head><script type="text/javascript" src="/ENET/ruxitagentjs_ICANQVfgqrux_10309250310100759.js" data-dtconfig="rid=RID_2147261657|rpid=-1630969385|domain=cvm.gov.br|reportUrl=/ENET/rb_3e3688fc-2b0e-4bc4-bbfb-2999b956e3bd|app=ca883f3beebf9526|featureHash=ICANQVfgqrux|msl=153600|srsr=20000|rdnt=1|uxrgce=1|cuc=wj11fgxl|srms=2,2,1,|mel=100000|expw=1|dpvc=1|lastModification=1744893386699|tp=500,50,0|agentUri=/ENET/ruxitagentjs_ICANQVfgqrux_10309250310100759.js"></script><link href="App_Themes/CVM/Calendar/Skins/CVM/Calendar.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Calendar/Skins/CVM/RadTimePicker.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Calendario.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/ComboBox/CVM/Styles.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/ComboBox/Skins/CVM/Styles.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/EditarConteudo.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Entrada.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Erro.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Estrutura.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Ferramentas.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Formulario.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/FormularioReferencia.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Grid.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Input/Skins/CVM/styles.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Login.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Logout.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Menu.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Pesquisa.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/PopUp.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/TabStrip.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Tabstrip/Scripts/3_6_2/tabstrip.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Tabstrip/Scripts/3_6_2/vtabstrip.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Tabstrip/Skins/CBLC/styles.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Tabstrip/Skins/CVM/styles.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Topo.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/TrocaSenha.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Upload/Skins/CVM/RadUpload.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Upload/Skins/CVM/RadUploadProgressArea.css" type="text/css" rel="stylesheet" /><link href="App_Themes/CVM/Window/Skins/CVM/Window.css" type="text/css" rel="stylesheet" />
+    <!--Jquery-->
+    <script src="jquery/jquery-1.12.4.js" type="text/javascript"></script>
+    <script src="jquery/ui/jquery-ui.js" type="text/javascript"></script>
+
+    <link rel="Stylesheet" href="jquery/ui/jquery-ui.css" /><link rel="Stylesheet" href="css/slidemenu.css" />
+
+    <!--Foundation-->
+    <link rel="Stylesheet" href="css/foundation.css" /><link rel="Stylesheet" href="css/foundation-icons/foundation-icons.css" />
+
+    <script src="jquery/jquery.slidemenu.js" type="text/javascript"></script>
+    <script src="js/mensagemModal.js" type="text/javascript"></script>    
+
+
+    <script type="text/javascript" async src="https://www.googletagmanager.com/gtag/js?id=UA-99990786-2"></script>
+        <script type="text/javascript">
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', 'UA-99990786-2');
+		</script> 
+
+    <script type="text/javascript">
+        window.onload = CarregarDadosArquivoIPE;
+
+        $(document).ready(function () {
+
+            if (document.getElementById('hdnHabilitaCaptcha').value == 'S') {
+
+                var htmlCaptchaV2 = '<div class="g-recaptcha" id="ConsExternaV2" data-sitekey="' + document.getElementById('hdnChaveSiteV2').value + '"></div>';
+                $('#divCaptchaV2').html(htmlCaptchaV2);
+            }
+
+            if (document.getElementById('hdnTipoPlugin').value == 'M') {
+
+                document.getElementById('pdfViewer').src = "./pdfjs/web/viewer.html";
+
+            }
+
+
+
+        });
+
+       
+        function CarregarDadosArquivoIPE() {
+
+            //Verifica se foi chamada da tela do NBC
+            var id = getParameterByName("ID");
+            if (document.getElementById('hdnExisteProtocolo').value == "0" && (id == null || id.length == 0)) {
+                MensagemModal("Exibir Documento", 'O protocolo informado é inválido', "A");
+                $("#divSplash").hide();
+                return;
+            }
+
+            if (document.getElementById('hdnCarimboProtocolo').value == "") {                
+                $("#divDadosProtocolo").show();
+                MontarDadosCabecalhoTela();
+                ExibirPDF();
+            }
+            else {
+                ExibirCarimgoProtocolo();
+            }
+        }
+
+        function MostraAjax() {
+            $("#divSplash").show();
+            $("#divSplash").css({
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                left: 0,
+                top: 0,
+                zIndex: 1000000, 
+                background: "#666666 url(jquery/ui/images/ui-bg_diagonals-thick_20_666666_40x40.png) repeat ",
+                opacity: .5
+            }).appendTo($(".container").css("position", "relative"));
+        }
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+        function ExibirCarimgoProtocolo() {
+            var pdfjsframe = document.getElementById('pdfViewer');            
+            var pdfData = base64ToUint8Array(document.getElementById('hdnCarimboProtocolo').value);
+            pdfjsframe.contentWindow.PDFViewerApplication.open(pdfData);
+            $("#divSplash").hide();
+            $("#divDadosProtocolo").hide();
+            $("#pdfViewer").css("height", "100%");
+        }
+
+        function base64ToUint8Array(base64) {
+            var raw = atob(base64);
+            var uint8Array = new Uint8Array(raw.length);
+            for (var i = 0; i < raw.length; i++) {
+                uint8Array[i] = raw.charCodeAt(i);
+            }
+            return uint8Array;
+        }
+
+        function ExibirPDF() {
+            MostraAjax();
+
+            //Verifica se foi chamada da tela do NBC
+            var id = getParameterByName("ID");
+
+            if (id != null && id.length > 0) {
+                var numeroProtocolo = id;
+                var codInstituicao = 2;
+            }
+            else 
+            {
+                var numeroProtocolo = getParameterByName("NumeroProtocoloEntrega");
+                var codInstituicao = 1;
+            }
+            
+            var dataValue = ''; 
+
+            if (document.getElementById('hdnHabilitaCaptcha').value == 'S') {
+
+                try {
+
+                    if (document.getElementById('hdnTokenB3').value != '') {
+                        dataValue = "{ codigoInstituicao: '" + codInstituicao + "', numeroProtocolo: '" + numeroProtocolo + "'";
+                        buscarPDF(dataValue, document.getElementById('hdnTokenB3').value, '');
+                        return;
+                    }
+
+                    grecaptcha.ready(function () {
+
+                        try {
+
+                            grecaptcha.execute(document.getElementById('hdnChaveSiteV3').value, { action: 'submit' }).then(function (token) {
+
+                                dataValue = "{ codigoInstituicao: '" + codInstituicao + "', numeroProtocolo: '" + numeroProtocolo + "'";
+                                buscarPDF(dataValue, token, 'V3');
+                            });
+                        }
+                        catch (ex) {
+                            MensagemModal("Exibir Documento", ex.message, "E");
+                        }
+                    });
+
+                }
+                catch (ex2) {
+                    MensagemModal("Exibir Documento", ex2.message, "E");
+                }
+
+            }
+            else {
+                dataValue = "{ codigoInstituicao: '" + codInstituicao + "', numeroProtocolo: '" + numeroProtocolo + "'";
+                buscarPDF(dataValue,'','');
+            }
+
+        }
+
+
+        function buscarPDF(dataValue, token, versaoCaptcha) {
+
+            var dataValuePesquisa = '';
+
+            dataValuePesquisa = dataValue + ", token: '" + token + "', versaoCaptcha: '" + versaoCaptcha + "'}";   
+
+            $.ajax({
+                type: "POST",
+                url: "frmExibirArquivoIPEExterno.aspx/ExibirPDF",
+                data: dataValuePesquisa,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: "true",
+                cache: "false",
+                success: function (response) {
+
+                    if (response.d == "V2") {                        
+
+                        var validaCaptchaV2 = function (response) {
+                            MostraAjax();
+                            $('#divCaptchaV2').css('display', 'none');
+                            try {
+                                grecaptcha.reset();
+                            }
+                            catch (ex1) {}
+                            buscarPDF(dataValue, response,'V2');
+                        };
+                        
+                        $('#divCaptchaV2').css('display', 'block');
+
+                        try {
+
+                            grecaptcha.render('ConsExternaV2', {
+                                'sitekey': document.getElementById('hdnChaveSiteV2').value,
+                                'callback': validaCaptchaV2,
+                                'theme': 'dark'
+                            });
+                        }
+                        catch (xs) { }
+
+                        return;
+                    }
+
+                    if (response.d.indexOf(':ERRO:') == 0) {
+                        MensagemModal("Exibir Documento", response.d.replace(":ERRO:", ""), "A");
+                        $("#divSplash").hide();
+                        return;
+                    }
+
+                    var tamanhoCabecalho = 0;
+
+                    if (document.getElementById('divBarraFerramentas') != null) {
+                        tamanhoCabecalho = document.getElementById('divBarraFerramentas').style.height;
+                        tamanhoCabecalho = tamanhoCabecalho.replace('px', '');
+                    }
+
+                    var tamanhoHeight = (screen.availHeight - tamanhoCabecalho);
+
+                    tamanhoHeight = tamanhoHeight - 250;
+
+                    //       document.getElementById('pdfViewer').style.height = tamanhoHeight + 'px';
+
+                    var pdfjsframe = document.getElementById('pdfViewer');
+
+                    if (document.getElementById('hdnTipoPlugin').value == 'M') {
+
+                        var pdfjsframe = document.getElementById('pdfViewer');
+
+                        var pdfData = base64ToUint8Array(response.d);
+
+                        if (pdfjsframe.contentWindow.PDFViewerApplication == null) {
+                            pdfjsframe.onload = function () {
+                                pdfjsframe.contentWindow.PDFViewerApplication.open(pdfData);
+                            };
+                        }
+                        else {
+                            pdfjsframe.contentWindow.PDFViewerApplication.open(pdfData);
+                        }
+
+                    }
+                    else {
+                        var file = new Blob([base64ToUint8Array(response.d)], { type: 'application/pdf' });
+
+                        var fileURL = URL.createObjectURL(file);
+
+                        document.getElementById('pdfViewer').src = fileURL;
+                    }
+
+                    
+                                        
+                    function base64ToUint8Array(base64) {
+                        var raw = atob(base64);
+                        var uint8Array = new Uint8Array(raw.length);
+                        for (var i = 0; i < raw.length; i++) {
+                            uint8Array[i] = raw.charCodeAt(i);
+                        }
+                        return uint8Array;
+                    }
+
+                    
+
+                }
+            });
+        }
+
+        function veriricaSePDFCarregadoSucesso(dataValue) {
+            var pdfjsframe = document.getElementById('pdfViewer');
+            if (pdfjsframe.contentWindow.PDFViewerApplication.pdfLoadingTask != null) {
+
+                if (pdfjsframe.contentWindow.PDFViewerApplication.appConfig.errorWrapper.errorMessage.innerText == '') { 
+
+                    // Sucesso
+                    $("#divSplash").hide();
+                    return; 
+                }
+                else {
+                    if (pdfjsframe.contentWindow.PDFViewerApplication.appConfig.errorWrapper.errorMessage.innerText.includes('Invalid or corrupted PDF file') || pdfjsframe.contentWindow.PDFViewerApplication.appConfig.errorWrapper.errorMessage.innerText.includes('Arquivo PDF corrompido')) {
+
+                        pdfjsframe.contentWindow.PDFViewerApplication.appConfig.errorWrapper.errorMessage.innerText = '';
+
+                        $.ajax({
+                            type: "POST",
+                            url: "frmExibirArquivoIPEExterno.aspx/CorrigirExibicaoPDF",
+                            data: dataValue,
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            async: "true",
+                            cache: "false",
+                            success: function (response) {
+
+                                var pdfjsframe = document.getElementById('pdfViewer');
+
+                                var pdfData = base64ToUint8Array(response.d);
+
+                                pdfjsframe.contentWindow.PDFViewerApplication.open(pdfData);
+
+                                function base64ToUint8Array(base64) {
+                                    var raw = atob(base64);
+                                    var uint8Array = new Uint8Array(raw.length);
+                                    for (var i = 0; i < raw.length; i++) {
+                                        uint8Array[i] = raw.charCodeAt(i);
+                                    }
+                                    return uint8Array;
+                                }
+
+                                $("#divSplash").hide();
+                            }
+                        });
+                                               
+                    }
+                }
+
+            }
+            else {
+                setTimeout(function () {
+                    veriricaSePDFCarregadoSucesso(dataValue);
+                }, 500);
+            }
+        }
+
+        function MontarDadosCabecalhoTela() {
+            MostraAjax();
+
+            //Verifica se foi chamada da tela do NBC
+            var id = getParameterByName("ID");
+
+            if (id != null && id.length > 0) {
+                var numeroProtocolo = id;
+                var codInstituicao = 2;
+            }
+            else {
+                var numeroProtocolo = getParameterByName("NumeroProtocoloEntrega");
+                var codInstituicao = 1;
+            }
+            
+            var dataValue = "{ codigoInstituicao: '" + codInstituicao + "', numeroProtocolo: '" + numeroProtocolo + "'}";
+            $.ajax({
+                type: "POST",
+                url: "frmExibirArquivoIPEExterno.aspx/MontarDadosCabecalhoTela",
+                data: dataValue,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: "true",
+                cache: "false",
+                success: function (response) {
+                    if (response.d.indexOf(':ERRO:') == 0) {
+                        MensagemModal("Exibir Documento", response.d.replace(":ERRO:", ""), "A");
+                        $("#divSplash").hide();
+                        return;
+                    }
+
+                    var retorno = response.d.split(';');
+
+                    document.getElementById("nomeCompanhia").innerText = retorno[0];
+                    document.getElementById("nomeDRI").innerText = retorno[1];
+                    document.getElementById("descricaoCategoria").innerText = retorno[2];
+                    document.getElementById("dataDocumento").innerText = retorno[3];
+                    document.getElementById("dataEnvio").innerText = retorno[4];
+                    document.getElementById("protocolo").innerText = retorno[5];
+
+                    if (retorno[1] == "DRI_IPE") {
+
+                        document.getElementById("nomeDRI").style.display = "none";
+                        document.getElementById("iconeDri").style.display = "none";
+                        document.getElementById("campoDRI").style.display = "none";
+                    }
+
+                    if (retorno[6] == "" && retorno[7] == "") 
+                    {
+                        document.getElementById("motivoCancelamento").innerText = "";
+                        document.getElementById("divMotivoCancelamento").style.display = "none";
+                    }
+                    else 
+                    {
+                        if (retorno[7] != "") 
+                        {
+                            document.getElementById("lblMotivo").innerText = "Motivo de Reapresentação: ";
+                            document.getElementById("motivoCancelamento").innerText = retorno[7];
+                            document.getElementById("divMotivoCancelamento").style.display = "block";
+                        }
+                        else if (retorno[6] != "") 
+                        {
+                            document.getElementById("lblMotivo").innerText = "Motivo de Cancelamento: ";                        
+                            document.getElementById("motivoCancelamento").innerText = retorno[6];
+                            document.getElementById("divMotivoCancelamento").style.display = "block";
+                        }
+                    }
+
+                    $("#divSplash").hide();
+                }
+            });
+        }         
+    </script>    
+    <style>
+        .conteudo {
+            width: 90%;
+            margin: 0 auto;
+
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-direction: row;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            -webkit-flex-wrap: wrap;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            -webkit-justify-content: space-between;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            -webkit-align-content: center;
+            -ms-flex-line-pack: center;
+            align-content: center;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            align-items: center;
+        }
+            .conteudo .box-empresa {
+                padding: 5px;
+                line-height: 25px;
+                width: 50%;
+
+                
+            }
+           
+            .conteudo .box-empresa *{
+                color: #FFF;
+            }
+
+            .conteudo .box-empresa .nome-empresa{
+                font-size: 14px;
+                color: #00b0eb;
+                display: block;
+            }
+
+        .conteudo .box-protocolo{
+            background-color: #FFF; 
+            border-radius: 5px; 
+            min-width: 30%; 
+            padding: 15px 25px;
+        }
+            .conteudo .box-protocolo .box-protocolo-linha {
+                width:100%;
+
+                display: -ms-flexbox;
+                display: -webkit-flex;
+                display: flex;
+                -webkit-flex-direction: row;
+                -ms-flex-direction: row;
+                flex-direction: row;
+                -webkit-flex-wrap: nowrap;
+                -ms-flex-wrap: nowrap;
+                flex-wrap: nowrap;
+                -webkit-justify-content: flex-start;
+                -ms-flex-pack: start;
+                justify-content: flex-start;
+                -webkit-align-content: stretch;
+                -ms-flex-line-pack: stretch;
+                align-content: stretch;
+                -webkit-align-items: center;
+                -ms-flex-align: center;
+                align-items: center;
+            }
+            .conteudo .box-protocolo .box-protocolo-linha .box-protocolo-coluna{
+               min-width: 50%;
+               line-height: 22px;
+            }
+
+            .conteudo .box-protocolo .span-label:not(.protocolo) {
+                display:block;
+            }
+
+            .conteudo .box-protocolo .span-label {
+                color: #747474;
+            }
+
+            .conteudo .box-protocolo .span-info {
+                color:#004685; font-size: 13px; font-weight: bold;
+            }
+
+        #iconeTipo, #iconeDri {
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        #campoDRI, #nomeDRI, #descricaoCategoria {
+            padding-left: 2px;
+        }
+
+        #descricaoCategoria {
+            text-align: left;
+        }
+
+        /** Responsivo **/
+
+         @media screen and (max-width: 700px) {
+                .conteudo .box-empresa {
+                    width: 100%;
+                }
+                
+
+            }
+
+        @media screen and (max-width: 450px) {
+        .conteudo .box-protocolo .span-label {
+                    display: block;
+                    text-align: left;
+                }
+
+            .conteudo .box-protocolo .box-protocolo-linha {
+            -webkit-flex-wrap: wrap;
+                -ms-flex-wrap: wrap;
+                flex-wrap: wrap;
+                    -webkit-flex-direction: column;
+                -ms-flex-direction: column;
+                flex-direction: column;
+            }
+        }
+
+    </style>
+<title>
+	ENET IPE - Assembleia\AGO\Mapa Sintético Consolidado
+</title></head>
+
+<body>
+    <form method="post" action="./frmExibirArquivoIPEExterno.aspx?NumeroProtocoloEntrega=1363054" id="frmCarimbo">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKLTM1NTI5OTgxNWRkT/9O0IvzbY6rwAYGrAJg4jv7aQ473nGD6R5EjR6MePo=" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="885407F1" />
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdAAiN9+mI2JL/hqFLFIcnzHFLTYUUSolUKfy3afzXUESFU6wW1D2kYGD+Rl3JVbP8wepmgj+tGHf50/gMmkavd6ua9G7B9LsoPSDxRrYIEGazvO2gXdkG9byUyjApvwD1oknam6B3wf5cF85Giu0zQdfNIITTHF9Rwt/13K99t3+6IyYESHrhLy7RxRqslgrcPKN4yztze97IwmVbNMiDyN7K" />
+        <input type="hidden" name="hdnCarimboProtocolo" id="hdnCarimboProtocolo" />    
+        <input type="hidden" name="hdnExisteProtocolo" id="hdnExisteProtocolo" value="1" />
+        <input name="hdnChaveSiteV3" type="hidden" id="hdnChaveSiteV3" value="6LdVyiwaAAAAABobBnLknCD5VGGkmH9snlJBxCyr" />    
+        <input name="hdnTokenB3" type="hidden" id="hdnTokenB3" />    
+        <input name="hdnChaveSiteV2" type="hidden" id="hdnChaveSiteV2" value="6LeSyywaAAAAAGzZjvIaDntL8_Ht6aO7Gqt317x8" />    
+        <input name="hdnTipoPlugin" type="hidden" id="hdnTipoPlugin" value="N" />    
+        <input name="hdnHabilitaCaptcha" type="hidden" id="hdnHabilitaCaptcha" value="N" />            
+        <input type="hidden" id="hdnDataValue" value=""/>    
+    </form>
+    <div class="large-12 columns" style="background-color: #004685; display: none; height: auto; padding: 1rem 0;" id="divDadosProtocolo">
+        <div class="conteudo">            
+            <div class="box-empresa">
+                <span class="nome-empresa" id="nomeCompanhia"></span>
+
+                <i class='fi-play' id='iconeTipo'></i>
+                <span id="descricaoCategoria" ></span>   <br />
+                <i class='fi-play' id='iconeDri'></i>  
+            
+                <span id="campoDRI">DRI:</span> <span id="nomeDRI"></span>
+                        
+            </div>
+            <div id="divCaptchaV2" style="padding-right: 10px;"></div>
+            <div class="box-protocolo">            
+                
+                <div class="box-protocolo-linha">
+                    <div class="box-protocolo-coluna">
+                        <span class="span-label protocolo">Protocolo nº: </span><span id="protocolo" class="span-info"></span>
+                     </div>
+                </div>
+                <div class="box-protocolo-linha">
+                    <div class="box-protocolo-coluna">
+                        <span class="span-label">Data do Documento</span>
+                        <span id="dataDocumento" class="span-info"></span>               
+                    </div>
+                    <div class="box-protocolo-coluna">
+                        <span class="span-label">Data do Envio</span>
+                        <span id="dataEnvio" class="span-info"></span>                
+                    </div>
+                </div>
+                
+            </div>        
+        </div>                
+    </div>
+    <div class="large-12 columns" style="background-color: #0F2D5C; height: auto; padding: 5px 0;">
+        <div class="conteudo">
+            <div style="display: none; padding-top: 2px;" id="divMotivoCancelamento">
+                <i class='fi-alert' id='iconeMotivo' style='font-size: 20px;cursor:pointer;color:#FFF; display:inline-block; vertical-align: middle; margin-right: 5px;'></i>
+                <span style="color:#FFF; display:inline-block; vertical-align: middle;" id="lblMotivo"></span>&nbsp;<span id="motivoCancelamento" style="color:#FFF;display:inline-block; vertical-align: middle;"></span>
+            </div>
+        </div>
+    </div>
+    <br />
+    <iframe id="pdfViewer" style="width: 100%; height: 81%;">
+        
+    </iframe>    
+    <div id="divSplash" style="display: none;">
+        <div id="divLoading" style="height: 60px; width: 60px; left: 50%; position: absolute;
+            transform: translateX(-50%); top: 400px; background: #FFFFFF url(img/loading.gif) no-repeat;
+            -webkit-border-radius: 7px; -moz-border-radius: 7px; -ms-border-radius: 7px;
+            border-radius: 7px;">
+        </div>
+    </div>    
+</body>          
+</html>

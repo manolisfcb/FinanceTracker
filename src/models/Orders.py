@@ -10,7 +10,7 @@ class OrderModel(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    stock_id = db.Column(db.Integer, db.ForeignKey('stocks.symbol', name='fk_orders_stocks'), nullable=False)
+    stock_id = db.Column(db.Integer, db.ForeignKey('stocks.id'), nullable=False)
     type = db.Column(db.Enum(OrderType), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)

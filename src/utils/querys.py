@@ -1,22 +1,22 @@
 
+from sqlalchemy import text
 # This query will group by user_id and symbol, and will return the average price of the stock
-PORTFOLIO = f"""
-SELECT
-    user_id,
-    symbol AS name,
-    -- Volume-weighted average (instead of raw AVG)
-    SUM(price * quantity) * 1.0 / SUM(quantity) AS avg_price,
+def get_portfolio(user_id: int):
 
-    SUM(quantity) AS quantity,
-    SUM(price * quantity) AS cost,
-    
-    -- Example "profit" and "percent_return" placeholders
-    -- (It depends on what you'd like them to represent!)
-    0 AS profit,
-    0 AS percent_return,
-
-    0 AS dividend_amount
-FROM stocks
-GROUP BY user_id, symbol;
-
-"""
+    PORTFOLIO = text(f"""
+    SELECT
+    st.root_symbol,
+    st.symbol,
+    pt.actual_price,
+    pt.quantity,
+    pt.adquisition_cost,
+    pt.avg_price,
+    pt.profit,
+    pt.percent_return,
+    0 as percent_return_dividends
+    FROM portfolios pt 
+    JOIN stocks st ON pt.stock_id = st.id
+    WHERE
+    pt.user_id = {user_id}
+    """)
+    return PORTFOLIO

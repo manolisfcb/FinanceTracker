@@ -4,6 +4,8 @@ from flask_login import current_user
 import pandas as pd
 from app import db
 from src.models import StockModel, OrderModel
+from src.resources.OrdersFactory import Orders, OrdersFromB3
+from src.resources.PortfolioFactory import Portfolio, PortfolioByTransaction, PortfolioByPosition
 class StockResources(Resource):
     def get(self):
         reqst = request.args
@@ -30,7 +32,7 @@ class UploadPortfolio(Resource):
         if 'file' not in request.files:
             return {"error": "No file part"}, 400
         file = request.files['file']
-        
+        file_type = request.form['file_type']
         # Verifica si se seleccionó un archivo
         if file.filename == '':
             return {"error": "No selected file"}, 400
@@ -39,18 +41,33 @@ class UploadPortfolio(Resource):
         try:
             user_id = current_user.id
             new_df = pd.read_excel(file)  # Leer el archivo con pandas
-            new_df['Data do Negócio'] = new_df.apply(get_date, axis=1)
-            new_df['Tipo de Movimentação'] = new_df.apply(get_type_of_negotiation, axis=1)
-            new_df['Código de Negociação'] = new_df.apply(get_symbol, axis=1)
-            new_df['user_id'] = user_id
-            new_df.rename(columns={'Preço': 'price', 'Quantidade': 'quantity', 'Data do Negócio': 'negociation_date', 'Tipo de Movimentação': 'type_of_negotiation', 'Código de Negociação': 'symbol'}, inplace=True)
-            new_df.drop(columns=['Prazo/Vencimento', 'Valor', 'Instituição',  'Mercado'], inplace=True)    
-            new_df.to_sql('stocks', con=db.engine, if_exists='append', index=False)
-        
             
-            return {"message": "File uploaded successfully", "columns": new_df.columns.tolist()}, 200
+            orderstrategy = OrdersFromB3()
+            orders = Orders(orderstrategy, new_df)
+            orders_to_db = orders.create_orders()
+            orders_to_db["user_id"] = user_id
+            orders_to_db.to_sql('orders', con=db.engine, if_exists='append', index=False)
+            if request.form['file_type'] == 'mov':
+                portfoliostrategy = PortfolioByTransaction()
+            else:
+                portfoliostrategy = PortfolioByPosition()
+            
+            portfolio = Portfolio(portfoliostrategy, orders_to_db, user_id)
+            portfolio.portfolio_df.to_sql('portfolios', con=db.engine, if_exists='append', index=False)
+            return portfolio.portfolio_df.to_dict(orient='records'), 200
         except Exception as e:
             return {"error": f"Failed to process file: {str(e)}"}, 500
+        #     new_df['Data do Negócio'] = new_df.apply(get_date, axis=1)
+        #     new_df['Tipo de Movimentação'] = new_df.apply(get_type_of_negotiation, axis=1)
+        #     new_df['Código de Negociação'] = new_df.apply(get_symbol, axis=1)
+        #     new_df['user_id'] = user_id
+        #     new_df.rename(columns={'Preço': 'price', 'Quantidade': 'quantity', 'Data do Negócio': 'negociation_date', 'Tipo de Movimentação': 'type_of_negotiation', 'Código de Negociação': 'symbol'}, inplace=True)
+        #     new_df.to_sql('stocks', con=db.engine, if_exists='append', index=False)
+        
+            
+        #     return {"message": "File uploaded successfully", "columns": new_df.columns.tolist()}, 200
+        # except Exception as e:
+        #     return {"error": f"Failed to process file: {str(e)}"}, 500
 
 
 

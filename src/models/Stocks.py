@@ -20,6 +20,13 @@ class StockModel(db.Model):
     industry = db.Column(db.String(100), nullable=True)
     country = db.Column(db.String(100), nullable=True)
     
+    previous_close = db.Column(db.Float, nullable=True)
+    dividend_yield = db.Column(db.Float, nullable=True)
+    ex_dividend_date = db.Column(db.String(100), nullable=True)
+    current_price = db.Column(db.Float, nullable=True)
+    fiftyTwoWeekHigh = db.Column(db.Float, nullable=True)
+    
+    
         
     def __repr__(self):
         return f"<StockModel(symbol={self.symbol}, quantity={self.quantity}, price={self.price})>"
@@ -35,7 +42,18 @@ class StockModel(db.Model):
             "country": self.country,
             "long_name": self.long_name,
             "short_name": self.short_name,
-            "website": self.website
+            "website": self.website,
+            "floatShares": self.floatShares,
+            "previous_close": self.previous_close,
+            "dividend_yield": self.dividend_yield,
+            "ex_dividend_date": self.ex_dividend_date,
+            "current_price": self.current_price,
+            "fiftyTwoWeekHigh": self.fiftyTwoWeekHigh,
+            
             
             
         }
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()

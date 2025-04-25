@@ -4,193 +4,358 @@
     PORTFOLIO | Personal Finance Tracker
 {% endblock %}
 
-
-
-
-
 {% block content %}
 <div class="text-white">
-
     <!-- Alert Messages -->
-    {% for categ, message in get_flashed_messages(with_categories = true) %}
-    <div class="alert alert-{{categ}}" style="position: relative;">
+    {% for categ, message in get_flashed_messages(with_categories=true) %}
+    <div class="alert alert-{{categ}} flex justify-between items-center" role="alert">
         <span>{{ message }}</span>
-        <button type="button" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; right: 0; background: none; border: none;">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12" />
+        <button type="button" data-bs-dismiss="alert" aria-label="Close" class="bg-transparent border-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
     </div>
     {% endfor %}
 
-    <!-- Main Header -->
-    <h1 class="mt-4 mb-6 text-2xl leading-none tracking-tight text-white md:text-3xl lg:text-4xl flex item-center mb-4">
-        PORTFOLIO OVERVIEW
-    </h1>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Performance Section -->
-        <div class="bg-gray-800 p-6 rounded-lg col-span-1">
-            <h2 class="text-2xl font-bold">Performance</h2>
-            <div class="mt-4 space-y-2">
-                <p class="text-lg">Return: <span class="text-green-400">8.45%</span></p>
-                <p>Patrimony: <span class="font-semibold">48,181.35</span></p>
-                <p>Acquisition Cost: <span class="font-semibold">52,933.97</span></p>
-                <p>Accumulated Earnings: <span class="font-semibold">8,656.30</span></p>
-                <p>Profit: <span class="font-semibold text-green-400">4,471.56</span></p>
-            </div>
-            <a href="#IMPORT_PORTFOLIO" class="btn">Import Portfolio</a>
-            <button class="btn btn-neutral mt-4">Explore Stocks</button>
-            <!-- The button to open modal -->
-            <a href="#NEW_OPERATION" class="btn">New Operation</a>
-        </div>
-
-        <!-- Chart Section -->
-        <div class="bg-gray-800 p-6 rounded-lg col-span-2">
-            <h2 class="text-2xl font-bold">Performance Chart</h2>
-            <canvas id="portfolioPerformanceChart" class="mt-4"></canvas>
+    <!-- Dashboard Header -->
+    <div class="flex justify-between items-center my-6">
+        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight">
+            PORTFOLIO OVERVIEW
+        </h1>
+        <div class="space-x-2">
+            <a href="#IMPORT_PORTFOLIO" class="btn btn-outline btn-sm">Import Portfolio</a>
+            <a href="#NEW_OPERATION" class="btn btn-primary btn-sm">New Operation</a>
+            <button class="btn btn-neutral btn-sm">Explore Stocks</button>
         </div>
     </div>
 
-    <!-- Contribution History -->
-    <div class="mt-6 bg-gray-800 p-6 rounded-lg">
-        <h2 class="text-2xl font-bold">Contribution History</h2>
-        <canvas id="contributionHistoryChart" class="mt-4"></canvas>
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-gray-400 text-sm font-medium">Return</h3>
+            <p class="text-xl font-bold text-green-400">8.45%</p>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-gray-400 text-sm font-medium">Patrimony</h3>
+            <p class="text-xl font-bold">{{patrimony}}</p>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-gray-400 text-sm font-medium">Cost</h3>
+            <p class="text-xl font-bold">{{total_invested}}</p>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-gray-400 text-sm font-medium">Profit</h3>
+            <p class="text-xl font-bold {% if patrimony < total_invested %}text-red-400{% else %}text-green-400{% endif %}">
+                {{ patrimony - total_invested |default('0.0') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Performance Chart -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-md lg:col-span-2">
+            <h2 class="text-xl font-bold mb-4">Performance History</h2>
+            <div class="h-64">
+                <canvas id="portfolioPerformanceChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Contribution Chart -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold mb-4">Monthly Contributions</h2>
+            <div class="h-64">
+                <canvas id="contributionHistoryChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <!-- Portfolio Table -->
-    <div class="mt-6 bg-gray-800 p-6 rounded-lg">
-        <h2 class="text-2xl font-bold">Portfolio</h2>
-        <table class="table mt-4">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Asset</th>
-                    <th>Price</th>
-                    <th>Qty</th>
-                    <th>Value</th>
-                    <th>Cost</th>
-                    <th>Avg Price</th>
-                    <th>Profit</th>
-                    <th>%R</th>
-                    <th>%R+d</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for asset in portfolio %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ asset.name }}</td>
-                    <td>{{ asset.price }}</td>
-                    <td>{{ asset.quantity }}</td>
-                    <td>{{ asset.value }}</td>
-                    <td>{{ asset.cost }}</td>
-                    <td>{{ asset.avg_price }}</td>
-                    <td class="{{ 'text-green-400' if asset.profit > 0 else 'text-red-400' }}">{{ asset.profit }}</td>
-                    <td>{{ asset.percent_return }}</td>
-                    <td>{{ asset.percent_return_dividends }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Assets</h2>
+            <div class="flex gap-2">
+                <button class="btn btn-xs">Export</button>
+                <div class="dropdown dropdown-end">
+                    <label tabindex="0" class="btn btn-xs">Filter</label>
+                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-gray-700 rounded-box w-52">
+                        <li><a>All Assets</a></li>
+                        <li><a>Stocks</a></li>
+                        <li><a>ETFs</a></li>
+                        <li><a>Crypto</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            {% if portfolio and portfolio|length > 0 %}
+                <table class="table w-full">
+                    <thead>
+                        <tr>
+                            <th class="bg-gray-700">#</th>
+                            <th class="bg-gray-700">Asset</th>
+                            <th class="bg-gray-700">Price</th>
+                            <th class="bg-gray-700">Qty</th>
+                            <th class="bg-gray-700">Cost</th>
+                            <th class="bg-gray-700">Avg Price</th>
+                            <th class="bg-gray-700">Profit</th>
+                            <th class="bg-gray-700">%R</th>
+                            <th class="bg-gray-700">%R+d</th>
+                            <th class="bg-gray-700"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in portfolio %}
+                        <tr class="hover:bg-gray-700">
+                            <td>{{ loop.index }}</td>
+                            <td>{{ asset.symbol }}</td>
+                            <td>{{ asset.actual_price }}</td>
+                            <td>{{ asset.quantity }}</td>
+                            <td>{{ asset.adquisition_cost }}</td>
+                            <td>{{ asset.avg_price }}</td>
+                            <td class="{{ 'text-green-400' if asset.profit|default(0) > 0 else 'text-red-400' }}">
+                                {{ asset.profit|default(0) }}
+                            </td>
+                            <td>{{ asset.percent_return|default('0%') }}</td>
+                            <td>{{ asset.percent_return_dividends|default('0%') }}</td>
+                            <td>
+                                <div class="dropdown dropdown-end">
+                                    <label tabindex="0" class="btn btn-ghost btn-xs">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                        </svg>
+                                    </label>
+                                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-gray-700 rounded-box w-52">
+                                        <li><a href="#NEW_OPERATION" onclick="prefillAsset('{{ asset.name }}', '{{ asset.price|default(0) }}', 'BUY')">Buy More</a></li>
+                                        <li><a href="#NEW_OPERATION" onclick="prefillAsset('{{ asset.name }}', '{{ asset.price|default(0) }}', 'SELL')">Sell</a></li>
+                                        <li><a>View Details</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="text-center py-8">
+                    <p class="text-xl text-gray-400">No assets in your portfolio yet.</p>
+                    <p class="text-gray-500 mt-2">Start by adding your first asset or importing your portfolio.</p>
+                    <div class="mt-6">
+                        <a href="#NEW_OPERATION" class="btn btn-primary">Add First Asset</a>
+                        <a href="#IMPORT_PORTFOLIO" class="btn btn-outline ml-2">Import Portfolio</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
     </div>
-</div>
 
-<!-- Modal -->
-<!-- NEW_OPERATION MODAL -->
-<div class="modal" role="dialog" id="NEW_OPERATION">
-    <div class="modal-box">
-      <h3 class="text-lg font-bold">Hello!</h3>
-      <p class="py-4">This modal works with anchor links</p>
-  
-      <form id="operationForm" method="POST" action="/api/stock" class="form-control">
-        {{ form.hidden_tag() }}
-    
-        <div class="form-group">
-            {{ form.ticket.label(class="form-label") }}
-            {{ form.ticket(class="form-control") }}
-    
-            {{ form.quantity.label(class="form-label") }}
-            {{ form.quantity(class="form-control") }}
-    
-            {{ form.price.label(class="form-label") }}
-            {{ form.price(class="form-control") }}
-    
-            {{ form.date.label(class="form-label") }}
-            {{ form.date(class="form-control") }}
-        </div>
-    
-        <!-- Botones: BUY y SELL -->
-        <div class="flex space-x-4 mt-4">
-            <button type="submit" name="action" value="BUY" class="btn btn-success">BUY</button>
-            <button type="submit" name="action" value="SELL" class="btn btn-danger">SELL</button>
-        </div>
-    
-        <!-- Botón de Cancel -->
-        <div class="modal-action">
-            <a href="#" class="btn">Cancel</a>
-        </div>
-    </form>
-    
-  
-      <!-- Botón de Cancel -->
-      <div class="modal-action">
-        <a href="#" class="btn">Cancel!</a>
-      </div>
-    </div>
-  </div>
-  
-
-<!-- UPLOAD_PORTFOLIO MODAL -->
-<div class="modal" role="dialog" id="IMPORT_PORTFOLIO">
-    <div class="modal-box">
-        <h3 class="text-lg font-bold">Upload Portfolio</h3>
-        <form method="POST" action="/api/upload-portfolio" enctype="multipart/form-data" class="form-control">
-            <div class="form-group">
-                <label for="file">File</label>
-                <input type="file" id="file" name="file" class="form-control" required>
+    <!-- Additional Financial Information -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-4">Financial Summary</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="text-lg font-medium mb-2">Performance Details</h3>
+                <ul class="space-y-2">
+                    <li class="flex justify-between">
+                        <span class="text-gray-400">Patrimony:</span>
+                        <span class="font-semibold">{{patrimony}}</span>
+                    </li>
+                    <li class="flex justify-between">
+                        <span class="text-gray-400">Acquisition Cost:</span>
+                        <span class="font-semibold">{{total_invested}}</span>
+                    </li>
+                    <!-- <li class="flex justify-between">
+                        <span class="text-gray-400">Accumulated Earnings:</span>
+                        <span class="font-semibold">8,656.30</span>
+                    </li> -->
+                    <li class="flex justify-between">
+                        <span class="text-gray-400">Profit:</span>
+                        <span class="font-semibold {% if patrimony < total_invested %}text-red-400{% else %}text-green-400{% endif %}">
+                            {{ patrimony - total_invested |default('0.0') }}
+                        </span>
+                    </li>
+                </ul>
             </div>
             <div>
-                <button type="submit" class="btn btn-success">Upload</button>
+                <h3 class="text-lg font-medium mb-2">Asset Allocation</h3>
+                <div class="h-48">
+                    <canvas id="assetAllocationChart"></canvas>
+                </div>
             </div>
-        </form>
-        <div class="modal-action">
-            <a href="#" class="btn">Cancel!</a>
         </div>
     </div>
 </div>
 
+<!-- NEW_OPERATION MODAL -->
+<div class="modal" id="NEW_OPERATION">
+    <div class="modal-box max-w-md">
+        <h3 class="text-lg font-bold mb-4">New Operation</h3>
+        
+        <form id="operationForm" method="POST" action="/api/stock" class="form-control">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-control mb-3">
+                <label class="label">
+                    <span class="label-text">{{ form.ticket.label.text }}</span>
+                </label>
+                {{ form.ticket(class="input input-bordered w-full", id="ticket") }}
+            </div>
+            
+            <div class="form-control mb-3">
+                <label class="label">
+                    <span class="label-text">{{ form.quantity.label.text }}</span>
+                </label>
+                {{ form.quantity(class="input input-bordered w-full", type="number", step="0.01", id="quantity") }}
+            </div>
+            
+            <div class="form-control mb-3">
+                <label class="label">
+                    <span class="label-text">{{ form.price.label.text }}</span>
+                </label>
+                {{ form.price(class="input input-bordered w-full", type="number", step="0.01", id="price") }}
+            </div>
+            
+            <div class="form-control mb-3">
+                <label class="label">
+                    <span class="label-text">{{ form.date.label.text }}</span>
+                </label>
+                {{ form.date(class="input input-bordered w-full", type="date", id="date") }}
+            </div>
+            
+            <div class="flex justify-between mt-6">
+                <button type="submit" name="action" value="BUY" class="btn btn-success">BUY</button>
+                <button type="submit" name="action" value="SELL" class="btn btn-error">SELL</button>
+                <a href="#" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
 
+<!-- IMPORT_PORTFOLIO MODAL -->
+<div class="modal" id="IMPORT_PORTFOLIO">
+    <div class="modal-box max-w-md">
+        <h3 class="text-lg font-bold mb-4">Import Portfolio</h3>
+        
+        <form method="POST" action="/api/upload-portfolio" enctype="multipart/form-data" class="form-control">
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text font-medium">Select import type:</span>
+                </label>
+                <div class="flex flex-col gap-2">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="file_type" id="mov" value="mov" class="radio radio-primary" checked />
+                        <span>Upload all transactions</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="file_type" id="position" value="pos" class="radio radio-primary" />
+                        <span>Upload positions only</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-control mb-6">
+                <label class="label">
+                    <span class="label-text">File to upload</span>
+                </label>
+                <input type="file" id="file" name="file" class="file-input file-input-bordered w-full" required />
+                <label class="label">
+                    <span class="label-text-alt">Supported formats: CSV, XLS, XLSX</span>
+                </label>
+            </div>
+            
+            <div class="flex justify-between">
+                <button type="submit" class="btn btn-primary">Upload</button>
+                <a href="#" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 <!-- Chart.js Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Pre-fill asset functionality
+    function prefillAsset(assetName, assetPrice, actionType) {
+        setTimeout(function() {
+            // Establecer el valor del campo de ticket con el nombre del activo
+            document.getElementById('ticket').value = assetName;
+            
+            // Establecer el precio actual
+            document.getElementById('price').value = assetPrice;
+            
+            // Opcionalmente, resaltar el botón correspondiente (BUY o SELL)
+            if (actionType === 'BUY') {
+                document.querySelector('button[value="BUY"]').classList.add('btn-focus');
+            } else if (actionType === 'SELL') {
+                document.querySelector('button[value="SELL"]').classList.add('btn-focus');
+            }
+            
+            // Enfocar el siguiente campo que el usuario necesitará completar
+            document.getElementById('quantity').focus();
+        }, 100);
+    }
+
+    // Chart color scheme
+    const chartColors = {
+        primary: 'rgba(75, 192, 192, 1)',
+        primaryLight: 'rgba(75, 192, 192, 0.2)',
+        secondary: '#4caf50',
+        secondaryLight: 'rgba(76, 175, 80, 0.2)',
+        text: '#e2e8f0'
+    };
+    
+    // Common chart options
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: chartColors.text
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                },
+                ticks: {
+                    color: chartColors.text
+                }
+            },
+            y: {
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                },
+                ticks: {
+                    color: chartColors.text
+                }
+            }
+        }
+    };
+
     // Performance Chart
     const performanceCtx = document.getElementById('portfolioPerformanceChart').getContext('2d');
     new Chart(performanceCtx, {
         type: 'line',
         data: {
-            labels: {{ performance_dates | safe }},
+            labels: {{ performance_dates|default('[]')|safe }},
             datasets: [{
-                label: 'Performance',
-                data: {{ performance_values | safe }},
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 2
+                label: 'Portfolio Value',
+                data: {{ performance_values|default('[]')|safe }},
+                backgroundColor: chartColors.primaryLight,
+                borderColor: chartColors.primary,
+                tension: 0.2,
+                fill: true,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: chartColors.primary
             }]
         },
-        options: {
-            responsive: true
-        }
+        options: commonOptions
     });
 
     // Contribution History Chart
@@ -198,23 +363,58 @@
     new Chart(contributionCtx, {
         type: 'bar',
         data: {
-            labels: {{ contribution_dates | safe }},
+            labels: {{ contribution_dates|default('[]')|safe }},
             datasets: [{
                 label: 'Monthly Contributions',
-                data: {{ contribution_values | safe }},
-                backgroundColor: '#4caf50'
+                data: {{ contribution_values|default('[]')|safe }},
+                backgroundColor: chartColors.secondary
             }]
         },
         options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '$' + context.raw.toLocaleString();
+                        }
+                    }
                 }
             }
         }
     });
-
-
+    
+    // Asset Allocation Chart
+    const assetAllocationCtx = document.getElementById('assetAllocationChart').getContext('2d');
+    new Chart(assetAllocationCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ asset_types|default('["Stocks", "ETFs", "Bonds", "Crypto", "Cash"]')|safe }},
+            datasets: [{
+                data: {{ asset_allocation|default('[45, 25, 15, 10, 5]')|safe }},
+                backgroundColor: [
+                    '#4caf50', // Green
+                    '#2196f3', // Blue
+                    '#ff9800', // Orange
+                    '#9c27b0', // Purple
+                    '#607d8b'  // Gray
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: chartColors.text
+                    }
+                }
+            }
+        }
+    });
 </script>
 {% endblock %}

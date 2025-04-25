@@ -1,8 +1,8 @@
 from datetime import date
 
-from brfinance.connector import CVMHttpClientConnector
-from brfinance.http_client import CVMHttpClient
-from brfinance.responses import (
+from .connector import CVMHttpClientConnector
+from .http_client import CVMHttpClient
+from .responses import (
     GetCVMCodesResponse,
     GetCategoriesResponse,
     GetSearchResponse,

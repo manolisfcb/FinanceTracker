@@ -5,6 +5,7 @@ from flask_login import login_user, logout_user, login_required, current_user, U
 from flask import  render_template, request
 from app import db
 from src.models.Transaction import TransactionModel, Category, TransactionType
+from src.models.Portfolio import PortfolioModel
 from src.utils.filter import  get_totals
 from app import htmx
 from werkzeug.utils import secure_filename
@@ -23,74 +24,18 @@ import yfinance as yf
 def portfolio():
   # Datos mockeados para el portafolio
     form = Stock()
-    from src.utils.querys import PORTFOLIO
-    portfolio_df = pd.read_sql(PORTFOLIO, db.engine)
-    portfolio_df['profit'] = portfolio_df['avg_price'] - portfolio_df['cost']
-    portfolio_df['percent_return'] = ((portfolio_df['avg_price'] - portfolio_df['cost']) / portfolio_df['cost']) * 100
-    portfolio = []
-    for index, row in portfolio_df.iterrows():
-        symbol_yf = row['name']
-        if symbol_yf.endswith('F'):
-            symbol_yf = symbol_yf[:-1] + '.SA'
-        else:
-            symbol_yf += '.SA'
-        stock = yf.Ticker(symbol_yf)
-        try:
-            price = int(stock.get_info()['currentPrice'])
-        except:
-            price = 0
-        row['cost'] = price
-        row["profit"] = row['quantity'] * (price - row['avg_price'])
-        portfolio.append(row.to_dict())
+    from src.utils.querys import get_portfolio
+    # portfolio = PortfolioModel.query.all()
+    # portfolio = [portfolio.serialize() for portfolio in portfolio]
     
-    # portfolio = [
-    #     {
-    #         'name': 'BBSE3',
-    #         'price': 36.01,
-    #         'quantity': 12,
-    #         'value': 432.12,
-    #         'cost': 371.718,
-    #         'avg_price': 30.98,
-    #         'profit': 108.25,
-    #         'percent_return': '16.25%',
-    #         'percent_return_dividends': '29.12%'
-    #     },
-    #     {
-    #         'name': 'AGRO3',
-    #         'price': 22.56,
-    #         'quantity': 25,
-    #         'value': 564.00,
-    #         'cost': 628.499,
-    #         'avg_price': 25.14,
-    #         'profit': 100.10,
-    #         'percent_return': '-10.26%',
-    #         'percent_return_dividends': '15.93%'
-    #     },
-    #     {
-    #         'name': 'EGE3',
-    #         'price': 35.58,
-    #         'quantity': 20,
-    #         'value': 711.60,
-    #         'cost': 800.724,
-    #         'avg_price': 40.04,
-    #         'profit': -56.00,
-    #         'percent_return': '-11.13%',
-    #         'percent_return_dividends': '-6.99%'
-    #     },
-    #     {
-    #         'name': 'ABCB4',
-    #         'price': 20.67,
-    #         'quantity': 45,
-    #         'value': 930.15,
-    #         'cost': 822.761,
-    #         'avg_price': 18.28,
-    #         'profit': 165.76,
-    #         'percent_return': '13.05%',
-    #         'percent_return_dividends': '20.15%'
-    #     },
-    # ]
-    # tickets = StockModel.query.all()
-    # tickets = [ticket.serialize() for ticket in tickets]
+    result = db.session.execute(get_portfolio(current_user.id)).fetchall()
+
+    # Opcional: convertir a lista de dicts
+    portfolio = [
+        dict(row._mapping)  # _mapping es la forma correcta de transformar Row en dict
+        for row in result
+    ]
+
     # Datos mockeados para el rendimiento histórico
     performance_dates = ['2022-01', '2022-02', '2022-03', '2022-04', '2022-05']
     performance_values = [1000, 1500, 2000, 1800, 2200]
@@ -106,6 +51,8 @@ def portfolio():
         'performance_values': performance_values,
         'contribution_dates': contribution_dates,
         'contribution_values': contribution_values,
+        'patrimony': 10000,
+        'total_invested': 100000,
         # 'tickets': tickets
     }
 
