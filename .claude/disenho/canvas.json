@@ -1,0 +1,17 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 1180, "title": "Dashboard" },
+    { "file": "Portafolio.dc.html", "x": 1560, "y": 0, "w": 1440, "h": 1150, "title": "Portafolio (Carteira)" },
+    { "file": "Screener.dc.html", "x": 3120, "y": 0, "w": 1440, "h": 1060, "title": "Acciones (Screener)" },
+    { "file": "Empresa.dc.html", "x": 0, "y": 1320, "w": 1440, "h": 1560, "title": "Empresa — RY" },
+    { "file": "Dividendos.dc.html", "x": 1560, "y": 1320, "w": 1440, "h": 1230, "title": "Dividendos (Proventos)" },
+    { "file": "Inbox.dc.html", "x": 3120, "y": 1320, "w": 1440, "h": 1160, "title": "Inbox — Hechos relevantes" },
+    { "file": "Comunidad.dc.html", "x": 4680, "y": 0, "w": 1440, "h": 1290, "title": "Comunidad" },
+    { "file": "ScreenerCards.dc.html", "x": 4680, "y": 1320, "w": 1440, "h": 1140, "title": "Acciones (vista Cards)" }
+  ],
+  "annotations": [
+    { "id": "brief", "x": 0, "y": -200, "w": 460, "text": "TrueNorth Analytics — plataforma de portafolio e inversiones para el mercado canadiense (TSX/TSXV + US).\nSistema: fondo claro cálido, IBM Plex Sans + Plex Mono (números tabulares), Instrument Serif para marca y títulos, acento rojo maple #b3372b, verde/rojo para P&L.\nFila superior: Dashboard · Portafolio · Screener · Comunidad. Fila inferior: Empresa · Dividendos · Inbox." },
+    { "id": "nota-comunidad", "x": 4680, "y": -110, "w": 340, "text": "Comunidad (Fase 6 del plan): feed con votos, categorías y menciones $TICKER que enlazan a la página de la empresa. Incluye la barra superior de mercado (market strip) que luego iría en toda la app." }
+  ],
+  "launch": { "view": "canvas" }
+}

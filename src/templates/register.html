@@ -1,58 +1,50 @@
 {% extends "base.html" %}
 
 {% block head_title %}
-    Register | Personal Finance Tracker
+    Registro | TrueNorth Analytics
 {% endblock %}
 
 {% block content %}
-    {% for categ, message in get_flashed_messages(with_categories = true) %}
-        <div class="alert alert-{{ categ }} fade show" role="alert" style="position: relative;">
-            <span>{{ message }}</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; right: 0; background: none; border: none;">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    {% endfor %}
+<div class="max-w-md mx-auto card p-8 mt-8">
+    {% include 'partials/flash_messages.html' %}
 
-    <h1 class="mt-4 mb-6 text-2xl leading-none tracking-tight text-white md:text-3xl lg:text-4xl">
-        Register
-    </h1>
+    <h1 class="font-serif-display text-3xl text-ink mb-6">Crear cuenta</h1>
 
     {% if name %}
-        <p> You are now registered as <strong>{{ name }}</strong>!</p>
+        <p class="text-[13.5px] text-muted2">Ya estás registrado como <strong class="text-ink">{{ name }}</strong>.</p>
+        <a href="{{ url_for('main.login') }}" class="btn btn-primary mt-5">Iniciar sesión</a>
     {% else %}
-        <p> Please register</p>
-
-        <br>
-        <form method="POST" class="form-control">
+        <form method="POST" class="space-y-4">
             {{ form.hidden_tag() }}
-            
-            <div class="space-y-4">
-                <div class="space-y-2">
-                    {{ form.name.label(class="form-label text-gray-300") }} 
-                    {{ form.name(class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500") }}
-                </div>
 
-                <div class="space-y-2">
-                    {{ form.email.label(class="form-label text-gray-300") }} 
-                    {{ form.email(class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500") }}
-                </div>
-
-                <div class="space-y-2">
-                    {{ form.password.label(class="form-label text-gray-300") }} 
-                    {{ form.password(class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500") }}
-                </div>
-
-                <div class="space-y-2">
-                    {{ form.confirm_password.label(class="form-label text-gray-300") }} 
-                    {{ form.confirm_password(class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500") }}
-                </div>
+            <div class="space-y-1.5">
+                {{ form.name.label(class="lbl") }}
+                {{ form.name(class="tn-input") }}
             </div>
 
-            <br>
-            {{ form.submit(class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500") }}
+            <div class="space-y-1.5">
+                {{ form.email.label(class="lbl") }}
+                {{ form.email(class="tn-input") }}
+            </div>
+
+            <div class="space-y-1.5">
+                {{ form.password.label(class="lbl") }}
+                {{ form.password(class="tn-input") }}
+            </div>
+
+            <div class="space-y-1.5">
+                {{ form.confirm_password.label(class="lbl") }}
+                {{ form.confirm_password(class="tn-input") }}
+            </div>
+
+            <div class="pt-2">
+                {{ form.submit(class="btn btn-primary w-full justify-center") }}
+            </div>
         </form>
+
+        <div class="mt-5 text-center text-[13px] text-muted2">
+            <p>¿Ya tienes cuenta? <a href="{{ url_for('main.login') }}" class="font-semibold">Inicia sesión</a></p>
+        </div>
     {% endif %}
-
-
+</div>
 {% endblock %}

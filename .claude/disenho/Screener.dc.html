@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif&display=swap">
+  <style>
+    body { margin:0; background:#f7f6f3; color:#1c1b18; font-family:'IBM Plex Sans',system-ui,sans-serif; }
+    a { color:#b3372b; text-decoration:none; } a:hover { color:#8f2b22; }
+    .num { font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+    .pos { color:#1a7f4e; } .neg { color:#c23934; }
+    .card { background:#ffffff; border:1px solid #e7e4dc; border-radius:10px; }
+    .navlink { padding:20px 2px; border-bottom:2px solid transparent; }
+    .navlink-active { color:#1c1b18; border-bottom:2px solid #b3372b; }
+    .btn { display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; border-radius:8px; padding:8px 14px; border:1px solid #d9d5cb; background:#ffffff; color:#1c1b18; }
+    .chip { display:inline-flex; align-items:center; font-size:12px; font-weight:600; border-radius:999px; padding:5px 13px; border:1px solid #d9d5cb; color:#6f6b60; background:#ffffff; }
+    .chip-on { background:#1c1b18; color:#ffffff; border-color:#1c1b18; }
+    .sel { display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:500; border:1px solid #d9d5cb; border-radius:8px; padding:7px 12px; background:#ffffff; color:#1c1b18; }
+    table { border-collapse:collapse; width:100%; font-size:13px; }
+    th { text-align:right; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:#8a857a; font-weight:600; padding:10px 12px; border-bottom:1px solid #e7e4dc; white-space:nowrap; }
+    td { text-align:right; padding:11px 12px; border-bottom:1px solid #f0eee8; white-space:nowrap; }
+    th.l, td.l { text-align:left; }
+    tr:hover td { background:#fbfaf7; }
+  </style>
+</helmet>
+<div style="width:1440px; background:#f7f6f3">
+
+  <!-- Top navigation -->
+  <div style="display:flex; align-items:center; justify-content:space-between; height:60px; padding:0 36px; background:#ffffff; border-bottom:1px solid #e7e4dc; box-sizing:border-box">
+    <div style="display:flex; align-items:center; gap:44px">
+      <div style="display:flex; align-items:center; gap:9px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#b3372b"><path d="M12 2l1.8 3.4 2.6-1.2-.6 3 3.2-.4-1.4 2.6 3.4 1.6-3 1.8 1.6 2.8-3.4-.6.4 3.4-3-1.8L12 22l-1.6-4.4-3 1.8.4-3.4-3.4.6 1.6-2.8-3-1.8 3.4-1.6L5 7.8l3.2.4-.6-3 2.6 1.2L12 2z"></path></svg>
+        <span style="font-family:'Instrument Serif',Georgia,serif; font-size:21px">TrueNorth</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:28px; font-size:13.5px; font-weight:500; color:#6f6b60; height:60px">
+        <span class="navlink">Dashboard</span>
+        <span class="navlink">Portafolio</span>
+        <span class="navlink navlink-active">Acciones</span>
+        <span class="navlink">Dividendos</span>
+        <span class="navlink">Inbox</span>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px">
+      <div style="display:flex; align-items:center; gap:8px; border:1px solid #e7e4dc; border-radius:8px; padding:7px 12px; width:220px; color:#8a857a; font-size:13px; background:#fbfaf8">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+        <span>Buscar ticker o empresa…</span>
+      </div>
+      <span class="num" style="font-size:12px; font-weight:600; border:1px solid #e7e4dc; border-radius:6px; padding:5px 9px; background:#fbfaf8">CAD</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6f6b60" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+      <div style="width:30px; height:30px; border-radius:50%; background:#1c1b18; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600">M</div>
+    </div>
+  </div>
+
+  <div style="padding:28px 36px 40px; box-sizing:border-box">
+
+    <!-- Header -->
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:20px">
+      <div>
+        <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:30px; font-weight:400; margin:0 0 4px">Acciones</h1>
+        <div style="font-size:13px; color:#8a857a">Indicadores fundamentales del universo canadiense y americano · actualizado hoy 18:05 ET</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px">
+        <div style="display:flex; border:1px solid #d9d5cb; border-radius:8px; overflow:hidden; background:#ffffff">
+          <span style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; padding:8px 14px; background:#1c1b18; color:#ffffff">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"></path><path d="M3 6h.01M3 12h.01M3 18h.01"></path></svg>
+            Lista
+          </span>
+          <span style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; padding:8px 14px; color:#6f6b60; border-left:1px solid #d9d5cb">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+            Cards
+          </span>
+        </div>
+        <span class="btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 21h16"></path></svg>
+          Exportar CSV
+        </span>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card" style="padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+      <div style="display:flex; gap:8px">
+        <span class="chip chip-on">TSX</span>
+        <span class="chip">TSXV</span>
+        <span class="chip chip-on">NYSE</span>
+        <span class="chip chip-on">NASDAQ</span>
+      </div>
+      <div style="width:1px; height:24px; background:#e7e4dc"></div>
+      <span class="sel">Sector: Todos <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg></span>
+      <span class="sel">P/E: &lt; 20 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg></span>
+      <span class="sel">Div. yield: &gt; 3% <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg></span>
+      <span class="sel">ROE: cualquiera <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg></span>
+      <span style="font-size:12px; font-weight:600; color:#b3372b; margin-left:4px">+ Agregar filtro</span>
+      <div style="margin-left:auto; font-size:12px; color:#8a857a">1.247 empresas · <span style="font-weight:600; color:#1c1b18">38 coinciden</span></div>
+    </div>
+
+    <!-- Table -->
+    <div class="card" style="overflow:hidden">
+      <table>
+        <thead>
+          <tr>
+            <th class="l" style="padding-left:20px">Activo</th>
+            <th class="l">Sector</th>
+            <th>Precio</th>
+            <th style="color:#1c1b18">P/E ↓</th>
+            <th>P/B</th>
+            <th>ROE</th>
+            <th>D/E</th>
+            <th>Margen neto</th>
+            <th>Div. yield</th>
+            <th>Payout</th>
+            <th style="padding-right:20px">Mkt cap</th>
+          </tr>
+        </thead>
+        <tbody class="num">
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">SU</span> <span style="color:#a8a396; font-size:11px">TSX</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Suncor Energy</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Energía</td>
+            <td>C$54,20</td><td style="font-weight:600">9,8</td><td>1,6</td><td class="pos">16,9%</td><td>0,4</td><td>11,2%</td><td>4,2%</td><td>40%</td><td style="padding-right:20px">C$68B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">TD</span> <span style="color:#a8a396; font-size:11px">TSX</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Toronto-Dominion Bank</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Financiero</td>
+            <td>C$88,15</td><td style="font-weight:600">11,8</td><td>1,4</td><td class="pos">12,1%</td><td>0,9</td><td>28,4%</td><td>4,6%</td><td>52%</td><td style="padding-right:20px">C$154B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">RY</span> <span style="color:#a8a396; font-size:11px">TSX</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Royal Bank of Canada</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Financiero</td>
+            <td>C$178,42</td><td style="font-weight:600">13,2</td><td>1,9</td><td class="pos">14,8%</td><td>1,1</td><td>30,1%</td><td>3,4%</td><td>45%</td><td style="padding-right:20px">C$252B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">JNJ</span> <span style="color:#a8a396; font-size:11px">NYSE</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Johnson &amp; Johnson</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Salud</td>
+            <td>US$162,35</td><td style="font-weight:600">15,1</td><td>5,4</td><td class="pos">34,9%</td><td>0,5</td><td>24,7%</td><td>3,1%</td><td>46%</td><td style="padding-right:20px">US$390B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">BCE</span> <span style="color:#a8a396; font-size:11px">TSX</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">BCE Inc.</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Telecom</td>
+            <td>C$47,10</td><td style="font-weight:600">17,2</td><td>2,9</td><td class="pos">13,4%</td><td>1,8</td><td>9,1%</td><td>8,5%</td><td class="neg">112%</td><td style="padding-right:20px">C$43B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">ATD</span> <span style="color:#a8a396; font-size:11px">TSX</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Alimentation Couche-Tard</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Consumo</td>
+            <td>C$78,60</td><td style="font-weight:600">18,4</td><td>3,6</td><td class="pos">21,2%</td><td>0,7</td><td>4,8%</td><td>0,9%</td><td>17%</td><td style="padding-right:20px">C$74B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">FTS</span> <span style="color:#a8a396; font-size:11px">TSX</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Fortis Inc.</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Utilities</td>
+            <td>C$62,45</td><td style="font-weight:600">18,9</td><td>1,5</td><td>7,8%</td><td>1,4</td><td>13,6%</td><td>3,9%</td><td>74%</td><td style="padding-right:20px">C$31B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">CNR</span> <span style="color:#a8a396; font-size:11px">TSX</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Canadian National Railway</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Industrial</td>
+            <td>C$156,30</td><td style="font-weight:600">19,1</td><td>4,8</td><td class="pos">26,5%</td><td>0,8</td><td>32,9%</td><td>2,2%</td><td>41%</td><td style="padding-right:20px">C$98B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">ENB</span> <span style="color:#a8a396; font-size:11px">TSX</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Enbridge Inc.</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Energía</td>
+            <td>C$58,90</td><td style="font-weight:600">19,5</td><td>1,8</td><td>9,2%</td><td>1,3</td><td>12,4%</td><td>6,2%</td><td>78%</td><td style="padding-right:20px">C$125B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">CP</span> <span style="color:#a8a396; font-size:11px">TSX</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Canadian Pacific Kansas City</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Industrial</td>
+            <td>C$112,80</td><td style="font-weight:600">26,3</td><td>2,4</td><td>9,6%</td><td>0,9</td><td>25,3%</td><td>0,7%</td><td>19%</td><td style="padding-right:20px">C$105B</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">AAPL</span> <span style="color:#a8a396; font-size:11px">NASDAQ</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Apple Inc.</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Tecnología</td>
+            <td>US$232,10</td><td style="font-weight:600">31,2</td><td>46,8</td><td class="pos">147,3%</td><td>1,9</td><td>26,3%</td><td>0,4%</td><td>15%</td><td style="padding-right:20px">US$3,5T</td>
+          </tr>
+          <tr>
+            <td class="l" style="padding-left:20px"><span style="font-family:'IBM Plex Sans',sans-serif; font-weight:600">MSFT</span> <span style="color:#a8a396; font-size:11px">NASDAQ</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; color:#8a857a">Microsoft Corp.</div></td>
+            <td class="l" style="font-family:'IBM Plex Sans',sans-serif; color:#6f6b60">Tecnología</td>
+            <td>US$425,60</td><td style="font-weight:600">34,8</td><td>11,2</td><td class="pos">35,1%</td><td>0,3</td><td>36,4%</td><td>0,7%</td><td>25%</td><td style="padding-right:20px">US$3,2T</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 20px; font-size:12.5px; color:#8a857a">
+        <span>Mostrando 1–12 de 38</span>
+        <div style="display:flex; gap:6px; align-items:center" class="num">
+          <span style="padding:5px 10px; border:1px solid #e7e4dc; border-radius:6px; background:#fbfaf8">←</span>
+          <span style="padding:5px 11px; border-radius:6px; background:#1c1b18; color:#ffffff; font-weight:600">1</span>
+          <span style="padding:5px 11px; border-radius:6px">2</span>
+          <span style="padding:5px 11px; border-radius:6px">3</span>
+          <span style="padding:5px 10px; border:1px solid #e7e4dc; border-radius:6px; background:#ffffff">→</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

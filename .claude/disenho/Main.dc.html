@@ -1,0 +1,248 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif&display=swap">
+  <style>
+    body { margin:0; background:#f7f6f3; color:#1c1b18; font-family:'IBM Plex Sans',system-ui,sans-serif; }
+    a { color:#b3372b; text-decoration:none; } a:hover { color:#8f2b22; }
+    .num { font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+    .pos { color:#1a7f4e; } .neg { color:#c23934; }
+    .card { background:#ffffff; border:1px solid #e7e4dc; border-radius:10px; }
+    .lbl { font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:#8a857a; font-weight:600; }
+    .navlink { padding:20px 2px; border-bottom:2px solid transparent; }
+    .navlink-active { color:#1c1b18; border-bottom:2px solid #b3372b; }
+    .btn { display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; border-radius:8px; padding:8px 14px; border:1px solid #d9d5cb; background:#ffffff; color:#1c1b18; }
+    .btn-primary { background:#b3372b; border-color:#b3372b; color:#ffffff; }
+    table { border-collapse:collapse; width:100%; font-size:13px; }
+    th { text-align:left; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#8a857a; font-weight:600; padding:9px 12px; border-bottom:1px solid #e7e4dc; }
+    td { padding:10px 12px; border-bottom:1px solid #f0eee8; }
+  </style>
+</helmet>
+<div style="width:1440px; background:#f7f6f3">
+
+  <!-- Top navigation -->
+  <div style="display:flex; align-items:center; justify-content:space-between; height:60px; padding:0 36px; background:#ffffff; border-bottom:1px solid #e7e4dc; box-sizing:border-box">
+    <div style="display:flex; align-items:center; gap:44px">
+      <div style="display:flex; align-items:center; gap:9px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#b3372b"><path d="M12 2l1.8 3.4 2.6-1.2-.6 3 3.2-.4-1.4 2.6 3.4 1.6-3 1.8 1.6 2.8-3.4-.6.4 3.4-3-1.8L12 22l-1.6-4.4-3 1.8.4-3.4-3.4.6 1.6-2.8-3-1.8 3.4-1.6L5 7.8l3.2.4-.6-3 2.6 1.2L12 2z"></path></svg>
+        <span style="font-family:'Instrument Serif',Georgia,serif; font-size:21px">TrueNorth</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:28px; font-size:13.5px; font-weight:500; color:#6f6b60; height:60px">
+        <span class="navlink navlink-active">Dashboard</span>
+        <span class="navlink">Portafolio</span>
+        <span class="navlink">Acciones</span>
+        <span class="navlink">Dividendos</span>
+        <span class="navlink">Inbox</span>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px">
+      <div style="display:flex; align-items:center; gap:8px; border:1px solid #e7e4dc; border-radius:8px; padding:7px 12px; width:220px; color:#8a857a; font-size:13px; background:#fbfaf8">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+        <span>Buscar ticker o empresa…</span>
+      </div>
+      <span class="num" style="font-size:12px; font-weight:600; border:1px solid #e7e4dc; border-radius:6px; padding:5px 9px; background:#fbfaf8">CAD</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6f6b60" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+      <div style="width:30px; height:30px; border-radius:50%; background:#1c1b18; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600">M</div>
+    </div>
+  </div>
+
+  <!-- Page body -->
+  <div style="padding:28px 36px 40px; box-sizing:border-box">
+
+    <!-- Header -->
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px">
+      <div>
+        <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:30px; font-weight:400; margin:0 0 4px">Dashboard</h1>
+        <div style="font-size:13px; color:#8a857a">Miércoles, 19 de agosto 2026 · Mercados abiertos · USD/CAD <span class="num">1.3642</span></div>
+      </div>
+      <div style="display:flex; gap:10px">
+        <span class="btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4"></path><path d="M21 3v6h-6"></path></svg>
+          Recalcular
+        </span>
+        <span class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+          Nueva orden
+        </span>
+      </div>
+    </div>
+
+    <!-- KPI band -->
+    <div style="display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:14px; margin-bottom:18px">
+      <div class="card" style="padding:16px 18px">
+        <div class="lbl" style="margin-bottom:8px">Patrimonio</div>
+        <div class="num" style="font-size:23px; font-weight:600">C$148.230</div>
+        <div class="num pos" style="font-size:12px; margin-top:5px">▲ 1,24% hoy</div>
+      </div>
+      <div class="card" style="padding:16px 18px">
+        <div class="lbl" style="margin-bottom:8px">Invertido</div>
+        <div class="num" style="font-size:23px; font-weight:600">C$132.410</div>
+        <div style="font-size:12px; color:#8a857a; margin-top:5px">costo promedio</div>
+      </div>
+      <div class="card" style="padding:16px 18px">
+        <div class="lbl" style="margin-bottom:8px">Ganancia total</div>
+        <div class="num pos" style="font-size:23px; font-weight:600">+C$15.820</div>
+        <div class="num pos" style="font-size:12px; margin-top:5px">+11,9%</div>
+      </div>
+      <div class="card" style="padding:16px 18px">
+        <div class="lbl" style="margin-bottom:8px">Dividendos 12m</div>
+        <div class="num" style="font-size:23px; font-weight:600">C$4.386</div>
+        <div style="font-size:12px; color:#8a857a; margin-top:5px">C$366/mes prom.</div>
+      </div>
+      <div class="card" style="padding:16px 18px">
+        <div class="lbl" style="margin-bottom:8px">Yield on cost</div>
+        <div class="num" style="font-size:23px; font-weight:600">3,9%</div>
+        <div style="font-size:12px; color:#8a857a; margin-top:5px">vs 3,3% del TSX</div>
+      </div>
+    </div>
+
+    <!-- Row: evolution + allocation -->
+    <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; margin-bottom:18px">
+      <div class="card" style="padding:20px 22px; grid-column:span 2">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px">
+          <div style="font-size:14px; font-weight:600">Evolución del patrimonio</div>
+          <div style="display:flex; gap:6px; font-size:11px; font-weight:600; color:#8a857a">
+            <span style="padding:3px 9px; border-radius:6px">1M</span>
+            <span style="padding:3px 9px; border-radius:6px">6M</span>
+            <span style="padding:3px 9px; border-radius:6px; background:#1c1b18; color:#ffffff">1A</span>
+            <span style="padding:3px 9px; border-radius:6px">Todo</span>
+          </div>
+        </div>
+        <svg width="100%" height="220" viewBox="0 0 800 220" preserveAspectRatio="none">
+          <line x1="0" y1="55" x2="800" y2="55" stroke="#efede7" stroke-width="1"></line>
+          <line x1="0" y1="110" x2="800" y2="110" stroke="#efede7" stroke-width="1"></line>
+          <line x1="0" y1="165" x2="800" y2="165" stroke="#efede7" stroke-width="1"></line>
+          <path d="M0,178 L67,170 L133,174 L200,158 L267,150 L333,157 L400,136 L467,128 L533,135 L600,112 L667,98 L733,104 L800,82 L800,220 L0,220 Z" fill="#1a7f4e" opacity="0.09"></path>
+          <path d="M0,178 L67,170 L133,174 L200,158 L267,150 L333,157 L400,136 L467,128 L533,135 L600,112 L667,98 L733,104 L800,82" fill="none" stroke="#1a7f4e" stroke-width="2.5"></path>
+          <path d="M0,182 L67,176 L133,172 L200,166 L267,160 L333,156 L400,150 L467,146 L533,140 L600,136 L667,130 L733,126 L800,122" fill="none" stroke="#b3a992" stroke-width="1.5" stroke-dasharray="5 4"></path>
+        </svg>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:#a8a396; margin-top:6px" class="num">
+          <span>sep 25</span><span>nov 25</span><span>ene 26</span><span>mar 26</span><span>may 26</span><span>jul 26</span><span>ago 26</span>
+        </div>
+        <div style="display:flex; gap:20px; margin-top:12px; font-size:12px; color:#6f6b60">
+          <span style="display:flex; align-items:center; gap:6px"><span style="width:14px; height:3px; background:#1a7f4e; border-radius:2px"></span>Patrimonio</span>
+          <span style="display:flex; align-items:center; gap:6px"><span style="width:14px; height:0; border-top:2px dashed #b3a992"></span>Aportado</span>
+        </div>
+      </div>
+      <div class="card" style="padding:20px 22px">
+        <div style="font-size:14px; font-weight:600; margin-bottom:14px">Alocación por sector</div>
+        <div style="display:flex; align-items:center; gap:20px">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <g transform="rotate(-90 70 70)">
+              <circle cx="70" cy="70" r="56" fill="none" stroke="#b3372b" stroke-width="20" stroke-dasharray="112.6 239.2" stroke-dashoffset="0"></circle>
+              <circle cx="70" cy="70" r="56" fill="none" stroke="#b98a2e" stroke-width="20" stroke-dasharray="63.3 288.5" stroke-dashoffset="-112.6"></circle>
+              <circle cx="70" cy="70" r="56" fill="none" stroke="#1a7f4e" stroke-width="20" stroke-dasharray="49.2 302.6" stroke-dashoffset="-175.9"></circle>
+              <circle cx="70" cy="70" r="56" fill="none" stroke="#4a6b8a" stroke-width="20" stroke-dasharray="42.2 309.6" stroke-dashoffset="-225.1"></circle>
+              <circle cx="70" cy="70" r="56" fill="none" stroke="#7d5ba6" stroke-width="20" stroke-dasharray="35.2 316.6" stroke-dashoffset="-267.3"></circle>
+              <circle cx="70" cy="70" r="56" fill="none" stroke="#d9d5cb" stroke-width="20" stroke-dasharray="49.3 302.5" stroke-dashoffset="-302.5"></circle>
+            </g>
+            <text x="70" y="66" text-anchor="middle" font-size="11" fill="#8a857a" font-family="IBM Plex Sans, sans-serif">Total</text>
+            <text x="70" y="84" text-anchor="middle" font-size="14" font-weight="600" fill="#1c1b18" font-family="IBM Plex Mono, monospace">C$148k</text>
+          </svg>
+          <div style="display:flex; flex-direction:column; gap:8px; font-size:12px; flex:1">
+            <div style="display:flex; justify-content:space-between"><span style="display:flex; align-items:center; gap:7px"><span style="width:9px; height:9px; border-radius:2px; background:#b3372b"></span>Financiero</span><span class="num">32%</span></div>
+            <div style="display:flex; justify-content:space-between"><span style="display:flex; align-items:center; gap:7px"><span style="width:9px; height:9px; border-radius:2px; background:#b98a2e"></span>Energía</span><span class="num">18%</span></div>
+            <div style="display:flex; justify-content:space-between"><span style="display:flex; align-items:center; gap:7px"><span style="width:9px; height:9px; border-radius:2px; background:#1a7f4e"></span>Industrial</span><span class="num">14%</span></div>
+            <div style="display:flex; justify-content:space-between"><span style="display:flex; align-items:center; gap:7px"><span style="width:9px; height:9px; border-radius:2px; background:#4a6b8a"></span>Utilities</span><span class="num">12%</span></div>
+            <div style="display:flex; justify-content:space-between"><span style="display:flex; align-items:center; gap:7px"><span style="width:9px; height:9px; border-radius:2px; background:#7d5ba6"></span>Tecnología</span><span class="num">10%</span></div>
+            <div style="display:flex; justify-content:space-between"><span style="display:flex; align-items:center; gap:7px"><span style="width:9px; height:9px; border-radius:2px; background:#d9d5cb"></span>Otros</span><span class="num">14%</span></div>
+          </div>
+        </div>
+        <div style="border-top:1px solid #efede7; margin-top:16px; padding-top:14px">
+          <div class="lbl" style="margin-bottom:10px">Por moneda</div>
+          <div style="display:flex; flex-direction:column; gap:8px; font-size:12px">
+            <div style="display:flex; align-items:center; gap:10px"><span style="width:30px" class="num">CAD</span><div style="flex:1; height:8px; background:#f0eee8; border-radius:4px"><div style="width:68%; height:8px; background:#b3372b; border-radius:4px"></div></div><span class="num" style="width:32px; text-align:right">68%</span></div>
+            <div style="display:flex; align-items:center; gap:10px"><span style="width:30px" class="num">USD</span><div style="flex:1; height:8px; background:#f0eee8; border-radius:4px"><div style="width:32%; height:8px; background:#4a6b8a; border-radius:4px"></div></div><span class="num" style="width:32px; text-align:right">32%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row: contributions + top positions + events -->
+    <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px">
+      <div class="card" style="padding:20px 22px">
+        <div style="font-size:14px; font-weight:600; margin-bottom:14px">Aportes mensuales</div>
+        <svg width="100%" height="170" viewBox="0 0 340 170">
+          <rect x="8" y="90" width="16" height="70" rx="3" fill="#d9d5cb"></rect>
+          <rect x="36" y="70" width="16" height="90" rx="3" fill="#d9d5cb"></rect>
+          <rect x="64" y="100" width="16" height="60" rx="3" fill="#d9d5cb"></rect>
+          <rect x="92" y="55" width="16" height="105" rx="3" fill="#d9d5cb"></rect>
+          <rect x="120" y="80" width="16" height="80" rx="3" fill="#d9d5cb"></rect>
+          <rect x="148" y="65" width="16" height="95" rx="3" fill="#d9d5cb"></rect>
+          <rect x="176" y="95" width="16" height="65" rx="3" fill="#d9d5cb"></rect>
+          <rect x="204" y="45" width="16" height="115" rx="3" fill="#d9d5cb"></rect>
+          <rect x="232" y="75" width="16" height="85" rx="3" fill="#d9d5cb"></rect>
+          <rect x="260" y="60" width="16" height="100" rx="3" fill="#d9d5cb"></rect>
+          <rect x="288" y="85" width="16" height="75" rx="3" fill="#d9d5cb"></rect>
+          <rect x="316" y="30" width="16" height="130" rx="3" fill="#b3372b"></rect>
+        </svg>
+        <div style="display:flex; justify-content:space-between; font-size:10.5px; color:#a8a396; margin-top:6px; padding:0 6px" class="num">
+          <span>S</span><span>O</span><span>N</span><span>D</span><span>E</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span><span>J</span><span>A</span>
+        </div>
+        <div style="font-size:12px; color:#6f6b60; margin-top:12px">Agosto: <span class="num" style="font-weight:600; color:#1c1b18">C$2.600</span> aportados</div>
+      </div>
+      <div class="card" style="padding:20px 22px">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+          <div style="font-size:14px; font-weight:600">Top posiciones</div>
+          <a href="#" style="font-size:12px; font-weight:600">Ver portafolio →</a>
+        </div>
+        <table>
+          <tbody>
+            <tr><td style="font-weight:600">RY <span style="color:#a8a396; font-weight:400">TSX</span></td><td class="num" style="text-align:right">C$27.9k</td><td class="num pos" style="text-align:right; width:70px">+20,4%</td></tr>
+            <tr><td style="font-weight:600">ENB <span style="color:#a8a396; font-weight:400">TSX</span></td><td class="num" style="text-align:right">C$21.2k</td><td class="num pos" style="text-align:right">+18,4%</td></tr>
+            <tr><td style="font-weight:600">CNR <span style="color:#a8a396; font-weight:400">TSX</span></td><td class="num" style="text-align:right">C$16.9k</td><td class="num pos" style="text-align:right">+9,7%</td></tr>
+            <tr><td style="font-weight:600">MSFT <span style="color:#a8a396; font-weight:400">NASDAQ</span></td><td class="num" style="text-align:right">C$14.6k</td><td class="num pos" style="text-align:right">+31,2%</td></tr>
+            <tr><td style="font-weight:600">BCE <span style="color:#a8a396; font-weight:400">TSX</span></td><td class="num" style="text-align:right">C$9.8k</td><td class="num neg" style="text-align:right">−12,6%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="padding:20px 22px">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+          <div style="font-size:14px; font-weight:600">Próximos eventos</div>
+          <a href="#" style="font-size:12px; font-weight:600">Inbox →</a>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:12px">
+          <div style="display:flex; gap:12px; align-items:flex-start">
+            <div style="width:32px; height:32px; border-radius:8px; background:#f3ece3; display:flex; align-items:center; justify-content:center; flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b98a2e" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+            </div>
+            <div style="font-size:12.5px; line-height:1.45"><span style="font-weight:600">ENB</span> · Ex-dividend date <span class="num">28 ago</span> — C$0,9425/acción<div style="color:#8a857a; font-size:11.5px; margin-top:2px">Recibirás ≈ C$113,10</div></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start">
+            <div style="width:32px; height:32px; border-radius:8px; background:#e9efe9; display:flex; align-items:center; justify-content:center; flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>
+            </div>
+            <div style="font-size:12.5px; line-height:1.45"><span style="font-weight:600">RY</span> · Resultados Q3 2026 — <span class="num">27 ago</span>, antes de apertura</div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start">
+            <div style="width:32px; height:32px; border-radius:8px; background:#eceef2; display:flex; align-items:center; justify-content:center; flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4a6b8a" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path></svg>
+            </div>
+            <div style="font-size:12.5px; line-height:1.45"><span style="font-weight:600">AAPL</span> · Filing 8-K publicado en EDGAR — <span class="num">18 ago</span></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start">
+            <div style="width:32px; height:32px; border-radius:8px; background:#f3ece3; display:flex; align-items:center; justify-content:center; flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b98a2e" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+            </div>
+            <div style="font-size:12.5px; line-height:1.45"><span style="font-weight:600">FTS</span> · Pago de dividendo <span class="num">1 sep</span> — C$0,615/acción</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

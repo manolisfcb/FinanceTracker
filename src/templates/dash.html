@@ -1,55 +1,76 @@
 {% extends "base.html" %}
 
 {% block head_title %}
-    Dashboard | Personal Finance Tracker
+    Dashboard | TrueNorth Analytics
 {% endblock %}
 
 {% block content %}
+{% include 'partials/flash_messages.html' %}
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-white">
-    <!-- Performance Panel -->
-    <div class="bg-gray-800 rounded-lg p-6 col-span-1">
-        <h2 class="text-2xl font-bold">Performance</h2>
-        <div class="mt-4">
-            <p class="text-4xl font-bold">{{ totals.performance }}%</p>
-            <p class="text-sm text-gray-400">Performance del portafolio actual</p>
-        </div>
-        <div class="mt-6">
-            <p>Patrimonio: <span class="font-bold">$ {{ totals.patrimonio|currency }}</span></p>
-            <p>Costo de adquisición: <span class="font-bold">$ {{ totals.costo_adquisicion|currency }}</span></p>
-            <p>Proventos acumulados: <span class="font-bold">$ {{ totals.proventos_acumulados|currency }}</span></p>
-            <p>Lucro con operaciones: <span class="font-bold">$ {{ totals.lucro_operaciones|currency }}</span></p>
-        </div>
-        <div class="mt-6">
-            <button class="btn btn-neutral w-full">Nuevo activo</button>
-            <button class="btn btn-primary w-full mt-2">Nueva orden</button>
-        </div>
+<div class="flex items-end justify-between mb-6">
+    <div>
+        <h1 class="font-serif-display text-3xl text-ink mb-1">Dashboard</h1>
+        <div class="text-[13px] text-muted">Resumen de tu portafolio</div>
     </div>
-
-    <!-- Historical Performance Chart -->
-    <div class="bg-gray-800 rounded-lg p-6 col-span-2">
-        <h2 class="text-2xl font-bold">Rentabilidad histórica</h2>
-        <canvas id="performanceChart" class="mt-4"></canvas>
+    <div class="flex gap-2.5">
+        <a href="{{ url_for('main.portfolio') }}" class="btn">Ver portafolio</a>
+        <a href="{{ url_for('main.transactions') }}" class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+            Nueva transacción
+        </a>
     </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 text-white">
-    <!-- Contribution History -->
-    <div class="bg-gray-800 rounded-lg p-6 col-span-1">
-        <h2 class="text-2xl font-bold">Histórico de aportes</h2>
-        <canvas id="contributionsChart" class="mt-4"></canvas>
-        <p class="mt-4 text-right font-bold">Total: R$ {{ totals.total_contribuicoes|currency }}</p>
+<!-- KPI band -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-5">
+    <div class="card p-4">
+        <div class="lbl mb-2">Patrimonio</div>
+        <div class="num text-xl font-semibold">$ {{ totals.patrimonio|currency }}</div>
+    </div>
+    <div class="card p-4">
+        <div class="lbl mb-2">Costo de adquisición</div>
+        <div class="num text-xl font-semibold">$ {{ totals.costo_adquisicion|currency }}</div>
+    </div>
+    <div class="card p-4">
+        <div class="lbl mb-2">Proventos acumulados</div>
+        <div class="num text-xl font-semibold">$ {{ totals.proventos_acumulados|currency }}</div>
+    </div>
+    <div class="card p-4">
+        <div class="lbl mb-2">Lucro con operaciones</div>
+        <div class="num text-xl font-semibold {{ 'pos' if totals.lucro_operaciones >= 0 else 'neg' }}">$ {{ totals.lucro_operaciones|currency }}</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-5">
+    <div class="card p-5 md:col-span-2">
+        <div class="flex items-center justify-between mb-3">
+            <div class="text-sm font-semibold">Rentabilidad histórica</div>
+            <div class="num text-xl font-semibold {{ 'pos' if totals.performance >= 0 else 'neg' }}">{{ totals.performance }}%</div>
+        </div>
+        <canvas id="performanceChart" height="90"></canvas>
     </div>
 
-    <!-- Portfolio Composition -->
-    <div class="bg-gray-800 rounded-lg p-6 col-span-2">
-        <h2 class="text-2xl font-bold">Composición del portafolio</h2>
-        <canvas id="portfolioCompositionChart" class="mt-4"></canvas>
+    <div class="card p-5">
+        <div class="text-sm font-semibold mb-3">Composición del portafolio</div>
+        <canvas id="portfolioCompositionChart" height="140"></canvas>
     </div>
+</div>
+
+<div class="card p-5">
+    <div class="flex items-center justify-between mb-3">
+        <div class="text-sm font-semibold">Histórico de aportes</div>
+        <div class="text-[12px] text-muted2">Total: <span class="num font-semibold text-ink">$ {{ totals.total_contribuicoes|currency }}</span></div>
+    </div>
+    <canvas id="contributionsChart" height="70"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    const tnGridColor = '#efede7';
+    const tnTextColor = '#6f6b60';
+    Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+    Chart.defaults.color = tnTextColor;
+
     // Rentabilidad histórica
     const performanceCtx = document.getElementById('performanceChart').getContext('2d');
     new Chart(performanceCtx, {
@@ -59,15 +80,20 @@
             datasets: [{
                 label: 'Rentabilidad',
                 data: {{ historical_data|safe }},
-                borderColor: '#4caf50',
-                backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                tension: 0.4,
+                borderColor: '#1a7f4e',
+                backgroundColor: 'rgba(26, 127, 78, 0.09)',
+                tension: 0.35,
+                fill: true,
+                pointRadius: 0,
+                borderWidth: 2.5,
             }]
         },
         options: {
             responsive: true,
+            plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true }
+                x: { grid: { color: tnGridColor } },
+                y: { beginAtZero: true, grid: { color: tnGridColor } }
             }
         }
     });
@@ -81,13 +107,16 @@
             datasets: [{
                 label: 'Aportes',
                 data: {{ contributions_data|safe }},
-                backgroundColor: '#3b82f6'
+                backgroundColor: '#d9d5cb',
+                borderRadius: 3,
             }]
         },
         options: {
             responsive: true,
+            plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true }
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, grid: { color: tnGridColor } }
             }
         }
     });
@@ -100,13 +129,14 @@
             labels: {{ portfolio_labels|safe }},
             datasets: [{
                 data: {{ portfolio_data|safe }},
-                backgroundColor: ['#4caf50', '#3b82f6', '#f59e0b', '#ef4444', '#6366f1']
+                backgroundColor: ['#b3372b', '#b98a2e', '#1a7f4e', '#4a6b8a', '#7d5ba6', '#d9d5cb'],
+                borderWidth: 0,
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, padding: 12, font: { size: 11.5 } } } }
         }
     });
 </script>
-
 {% endblock %}

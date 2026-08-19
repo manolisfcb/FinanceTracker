@@ -1,54 +1,26 @@
 {% extends "base.html" %}
 
 {% block head_title %}
-    BUY STOCK | Personal Finance Tracker
+    Acciones | TrueNorth Analytics
 {% endblock %}
 {% block content %}
-{% for categ, message in get_flashed_messages(with_categories = true) %}
-<div class="alert alert-{{categ}}" style="position: relative;">
-    <span>{{ message }}</span>
-    <button type="button" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; right: 0; background: none; border: none;">
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    </button>
-</div>
-{% endfor %}
+{% include 'partials/flash_messages.html' %}
 
-
-<h1 class="mt-4 mb-6 text-2xl leading-none tracking-tight text-white md:text-3xl lg:text-4xl">
-    Stocks
-</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-6">Acciones</h1>
 
 {% if name %}
-    <p> You are now registered as {{ name }}!!</p>
+    <p class="text-[13.5px] text-muted2">Ya estás registrado como <strong class="text-ink">{{ name }}</strong>.</p>
 {% else %}
-    <p> Please register</p>
+    <div class="card p-6 max-w-lg">
+        <form method="POST" class="space-y-4">
+            {{ form.hidden_tag() }}
+            <div class="space-y-1.5">
+                {{ form.stock.label(class="text-[13px] text-muted2") }}
+                {{ form.stock(class="tn-input") }}
+            </div>
 
-    <br>
-    <form method="POST" class="form-control">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.stock.label(class="form-label") }}
-            {{ form.stock(class="form-control") }}
-        </div>
-    
-        <br>
-
-        {{ form.submit(class="btn btn-dark mb-3") }}
-    </form>
-
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+    </div>
 {% endif %}
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
 {% endblock %}
