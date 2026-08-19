@@ -1,13 +1,11 @@
-from flask import  render_template, flash, redirect, url_for, make_response
-from .main import main_bp
+from flask import Blueprint, render_template, flash, redirect, url_for, make_response
 from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
 
-from flask import  render_template, request
-from app import db
+from flask import render_template, request
+from src.extensions import db
 from src.models.Transaction import TransactionModel, Category, TransactionType
 from src.models.Portfolio import PortfolioModel
-from src.utils.filter import  get_totals
-from app import htmx
+from src.utils.filter import get_totals
 from werkzeug.utils import secure_filename
 from io import TextIOWrapper
 import csv
@@ -19,8 +17,11 @@ from src.models.Stocks import StockModel
 from src.forms.StockForm import Stock
 import yfinance as yf
 
-@main_bp.route('/portfolio', methods=['GET'])
-#@login_required
+portfolio_bp = Blueprint('portfolio', __name__)
+
+
+@portfolio_bp.route('/portfolio', methods=['GET'])
+@login_required
 def portfolio():
   # Datos mockeados para el portafolio
     form = Stock()

@@ -20,14 +20,14 @@
 
     {% if current_user.is_authenticated %}
     <div class="flex flex-wrap items-center justify-center gap-3 mt-8">
-        <a href="{{ url_for('main.dash_page') }}" class="btn btn-primary">Ir al dashboard</a>
-        <a href="{{ url_for('main.portfolio') }}" class="btn">Ver portafolio</a>
-        <a href="{{ url_for('main.transactions') }}" class="btn">Ver transacciones</a>
+        <a href="{{ url_for('portfolio.dash_page') }}" class="btn btn-primary">Ir al dashboard</a>
+        <a href="{{ url_for('portfolio.portfolio') }}" class="btn">Ver portafolio</a>
+        <a href="{{ url_for('personal_finance.transactions') }}" class="btn">Ver transacciones</a>
     </div>
     {% else %}
     <div class="flex flex-wrap items-center justify-center gap-3 mt-8">
-        <a href="{{ url_for('main.login') }}" class="btn btn-primary">Iniciar sesión</a>
-        <a href="{{ url_for('main.register') }}" class="btn">Registrarse</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Iniciar sesión</a>
+        <a href="{{ url_for('auth.register') }}" class="btn">Registrarse</a>
     </div>
     {% endif %}
 </div>

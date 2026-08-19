@@ -2,7 +2,7 @@ from flask_restful import Resource
 from flask import request
 from flask_login import current_user
 import pandas as pd
-from app import db
+from src.extensions import db
 from src.models import StockModel, OrderModel
 from src.resources.OrdersFactory import Orders, OrdersFromB3
 from src.resources.PortfolioFactory import Portfolio, PortfolioByTransaction, PortfolioByPosition
@@ -84,10 +84,3 @@ def get_type_of_negotiation(row):
     
 def get_symbol(row):
     return row['Código de Negociação']
-
-def get_cvm_code(symbol, cvm_codes):
-    try:
-        symbol = symbol[0:4]
-        return cvm_codes[cvm_codes['base_symbol'] == symbol]['cvm_code'].values[0]
-    except:
-        return None

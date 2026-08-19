@@ -1,0 +1,853 @@
+symbol,cvm_code,long_name,short_name,floatShares,website,sectorKey,sector,industry,country,fax,cep,CVM_CODE
+AALR3.SA,"73    24058
+Name: CD_CVM, dtype: int64",Alliança Saúde e Participações S.A.,ALLIAR      ON      NM,81795776.0,https://www.allianca.com,Healthcare,Healthcare,Diagnostics & Research,Brazil,,1830,24058.0
+ABCB4.SA,"214    20958
+Name: CD_CVM, dtype: int64",Banco ABC Brasil S.A.,ABC BRASIL  PN      N2,89992431.0,https://www.abcbrasil.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,55 11 3170 2001,01453-000,20958.0
+ABEV3.SA,"106    23264
+107    23264
+Name: CD_CVM, dtype: int64",Ambev S.A.,AMBEV S/A   ON  EDJ,4386116383.0,https://www.ambev.com.br,Consumer Defensive,Consumer Defensive,Beverages - Brewers,Brazil,,04530-001,23264.0
+AERI3.SA,,Aeris Indústria e Comércio de Equipamentos para Geração de Energia S.A.,AERIS       ON      NM,15044206.0,https://www.aerisenergy.com.br,Industrials,Industrials,Specialty Industrial Machinery,Brazil,,61680-000,25283.0
+AESB3.SA,,AES Brasil Energia S.A.,AES BRASIL  ON      NM,218721567.0,https://ri.aesbrasil.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,,04578-000,25640.0
+AFLT3.SA,,Afluente Transmissão de Energia Elétrica S.A.,AFLUENTE T  ON  EJ,835872.0,https://www.afluentet.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,22179.0
+AGRO3.SA,,BrasilAgro - Companhia Brasileira de Propriedades Agrícolas,BRASILAGRO  ON      NM,45919621.0,https://ri.brasil-agro.com,Consumer Defensive,Consumer Defensive,Farm Products,Brazil,,01452-002,20036.0
+AGXY3.SA,"49    25658
+Name: CD_CVM, dtype: int64",AgroGalaxy Participações S.A.,AGROGALAXY  ON      NM,250555188.0,https://www.agrogalaxy.com.br,Basic Materials,Basic Materials,Agricultural Inputs,Brazil,,,25658.0
+AHEB3.SA,"2192    9415
+Name: CD_CVM, dtype: int64",São Paulo Turismo S.A.,SPTURIS     ON,277726.0,https://spturis.com,Consumer Cyclical,Consumer Cyclical,Travel Services,Brazil,,01014-908,9415.0
+AHEB5.SA,"2192    9415
+Name: CD_CVM, dtype: int64",São Paulo Turismo S.A.,SPTURIS     PNA,277726.0,https://spturis.com,Consumer Cyclical,Consumer Cyclical,Travel Services,Brazil,,01014-908,9415.0
+AHEB6.SA,"2192    9415
+Name: CD_CVM, dtype: int64",São Paulo Turismo S.A.,SPTURIS     PNB,277726.0,https://spturis.com,Consumer Cyclical,Consumer Cyclical,Travel Services,Brazil,,01014-908,9415.0
+ALLD3.SA,"74    25330
+75    25330
+Name: CD_CVM, dtype: int64",Allied Tecnologia S.A.,ALLIED      ON      NM,18384833.0,https://alliedbrasil.com.br,Technology,Technology,Software - Application,Brazil,55 11 5503 9998,04578-911,25330.0
+ALOS3.SA,"77    22357
+78    22357
+Name: CD_CVM, dtype: int64",Allos S.A.,ALLOS       ON  EJ  NM,384340091.0,https://allos.co,Real Estate,Real Estate,Real Estate Services,Brazil,,,22357.0
+ALPA3.SA,"83    10456
+84    10456
+Name: CD_CVM, dtype: int64",Alpargatas S.A.,ALPARGATAS  ON      N1,186168909.0,https://www.alpargatas.com.br,Consumer Cyclical,Consumer Cyclical,Footwear & Accessories,Brazil,,04794-000,10456.0
+ALPA4.SA,"83    10456
+84    10456
+Name: CD_CVM, dtype: int64",Alpargatas S.A.,ALPARGATAS  PN      N1,186168909.0,https://www.alpargatas.com.br,Consumer Cyclical,Consumer Cyclical,Footwear & Accessories,Brazil,,04794-000,10456.0
+ALPK3.SA,"79    24953
+80    24953
+Name: CD_CVM, dtype: int64","Allpark Empreendimentos, Participações e Serviços S.A.",ESTAPAR     ON      NM,215773180.0,https://www.ri.estapar.com.br,Industrials,Industrials,Infrastructure Operations,Brazil,,,24953.0
+ALUP11.SA,"96    21490
+Name: CD_CVM, dtype: int64",Alupar Investimento S.A.,ALUPAR      UNT     N2,430334214.0,https://www.alupar.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,55 11 4571 2472,04547-006,21490.0
+ALUP3.SA,"96    21490
+Name: CD_CVM, dtype: int64",Alupar Investimento S.A.,ALUPAR      ON      N2,430334214.0,https://www.alupar.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,55 11 4571 2472,04547-006,21490.0
+ALUP4.SA,"96    21490
+Name: CD_CVM, dtype: int64",Alupar Investimento S.A.,ALUPAR      PN      N2,430334214.0,https://www.alupar.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,55 11 4571 2472,04547-006,21490.0
+AMAR3.SA,"1664    22055
+Name: CD_CVM, dtype: int64",Marisa Lojas S.A.,LOJAS MARISAON      NM,40273660.0,https://www.marisa.com.br,Consumer Cyclical,Consumer Cyclical,Apparel Retail,Brazil,55 11 3392 4276,01138-909,22055.0
+AMBP3.SA,"108    24961
+109    24961
+Name: CD_CVM, dtype: int64",Ambipar Participações e Empreendimentos S.A.,AMBIPAR     ON  ATZ NM,34648315.0,https://ambipar.com,Industrials,Industrials,Waste Management,Brazil,,01228-200,24961.0
+AMER3.SA,"112    20990
+Name: CD_CVM, dtype: int64",Americanas S.A.,AMERICANAS  ON      NM,191521295.0,https://ri.americanas.io,Consumer Cyclical,Consumer Cyclical,Internet Retail,Brazil,,20081-902,20990.0
+ANIM3.SA,,Ânima Holding S.A.,ANIMA       ON      NM,237096962.0,https://animaeducacao.com.br,Consumer Defensive,Consumer Defensive,Education & Training Services,Brazil,,05443-001,23248.0
+ARML3.SA,"153    26069
+Name: CD_CVM, dtype: int64","Armac Locação, Logística e Serviços S.A.",ARMAC       ON      NM,172203479.0,https://armac.com.br,Industrials,Industrials,Rental & Leasing Services,Brazil,,06460-040,26069.0
+ASAI3.SA,"2223    25372
+Name: CD_CVM, dtype: int64",Sendas Distribuidora S.A.,ASSAI       ON      NM,1212594874.0,https://www.assai.com.br,Consumer Defensive,Consumer Defensive,Grocery Stores,Brazil,,22775-005,25372.0
+ATMP3.SA,,ATMA Participações S.A.,ATMASA      ON,8619678.0,https://atmasa.com.br,Industrials,Industrials,Specialty Business Services,Brazil,,03040-010,19100.0
+ATOM3.SA,"174    15423
+Name: CD_CVM, dtype: int64",Atom Empreendimentos e Participações S.A.,ATOMPAR     ON  EC,6903140.0,https://www.atompar.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,18046-640,15423.0
+AURA33.SA,,Aura Minerals Inc.,AURA 360    DR3,30218166.0,https://www.auraminerals.com,Basic Materials,Basic Materials,Gold,United States,,33134,26590.0
+AURE3.SA,"177    26620
+Name: CD_CVM, dtype: int64",Auren Energia S.A.,AUREN       ON      NM,612450000.0,https://www.aurenenergia.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,,05425-070,26620.0
+AVLL3.SA,"87    25275
+Name: CD_CVM, dtype: int64",Alphaville S.A.,ALPHAVILLE  ON      NM,121282205.0,https://www.alphaville.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,,25275.0
+AZEV3.SA,"197    27626
+198    11975
+Name: CD_CVM, dtype: int64",Azevedo & Travassos S.A.,AZEVEDO     ON,145314589.0,https://www.azevedotravassos.com.br,Industrials,Industrials,Engineering & Construction,Brazil,,,27626.0
+AZEV4.SA,"197    27626
+198    11975
+Name: CD_CVM, dtype: int64",Azevedo & Travassos S.A.,AZEVEDO     PN,145314589.0,https://www.azevedotravassos.com.br,Industrials,Industrials,Engineering & Construction,Brazil,,,27626.0
+AZUL4.SA,"199    24112
+Name: CD_CVM, dtype: int64",Azul S.A.,AZUL        PN      N2,288715006.0,https://www.voeazul.com.br/ir,Industrials,Industrials,Airlines,Brazil,,,24112.0
+AZZA3.SA,"200    22349
+Name: CD_CVM, dtype: int64",Azzas 2154 S.A.,AZZAS 2154  ON      NM,87193357.0,https://ri.arezzoco.com.br,Consumer Cyclical,Consumer Cyclical,Footwear & Accessories,Brazil,,30112-000,22349.0
+B3SA3.SA,,"B3 S.A. - Brasil, Bolsa, Balcão",B3          ON      NM,5576347222.0,https://www.b3.com.br,Financial Services,Financial Services,Financial Data & Stock Exchanges,Brazil,,18970-020,21610.0
+BAHI3.SA,,Bahema Educação S.A.,BAHEMA      ON      MA,23804305.0,https://www.bahema.com.br,Consumer Defensive,Consumer Defensive,Education & Training Services,Brazil,,01451-918,701.0
+BALM3.SA,"311    1562
+Name: CD_CVM, dtype: int64",Baumer S.A.,BAUMER      ON  EJ,3485145.0,https://www.baumer.com.br,Healthcare,Healthcare,Medical Instruments & Supplies,Brazil,,01236-030,1562.0
+BALM4.SA,"311    1562
+Name: CD_CVM, dtype: int64",Baumer S.A.,BAUMER      PN  EJ,3485145.0,https://www.baumer.com.br,Healthcare,Healthcare,Medical Instruments & Supplies,Brazil,,01236-030,1562.0
+BAUH4.SA,"1165    1570
+Name: CD_CVM, dtype: int64",Excelsior Alimentos S.A.,EXCELSIOR   PN,1380912.0,https://www.excelsior.com.br,Consumer Defensive,Consumer Defensive,Packaged Foods,Brazil,,96830-504,1570.0
+BAZA3.SA,"242    922
+Name: CD_CVM, dtype: int64",Banco da Amazônia S.A.,AMAZONIA    ON,12105793.0,https://www.bancoamazonia.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,66010-000,922.0
+BBAS3.SA,"246    1023
+Name: CD_CVM, dtype: int64",Banco do Brasil S.A.,BRASIL      ON      NM,2584151280.0,https://www.bb.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,,1023.0
+BBDC3.SA,"235    906
+Name: CD_CVM, dtype: int64",Banco Bradesco S.A.,BRADESCO    ON      N1,7589878113.0,https://banco.bradesco,Financial Services,Financial Services,Banks - Regional,Brazil,,06029-900,906.0
+BBDC4.SA,"235    906
+Name: CD_CVM, dtype: int64",Banco Bradesco S.A.,BRADESCO    PN      N1,7589878113.0,https://banco.bradesco,Financial Services,Financial Services,Banks - Regional,Brazil,,06029-900,906.0
+BBSE3.SA,"312    23159
+Name: CD_CVM, dtype: int64",BB Seguridade Participações S.A.,BBSEGURIDADEON      NM,616190678.0,https://www.bbseguridaderi.com.br,Financial Services,Financial Services,Insurance - Diversified,Brazil,,,23159.0
+BDLL3.SA,,Bardella S.A. Indústrias Mecânicas,BARDELLA    ON,763824.0,https://www.bardella.com.br,Industrials,Industrials,Specialty Industrial Machinery,Brazil,,1192-1324,1520.0
+BDLL4.SA,,Bardella S.A. Indústrias Mecânicas,BARDELLA    PN,763824.0,https://www.bardella.com.br,Industrials,Industrials,Specialty Industrial Machinery,Brazil,,1192-1324,1520.0
+BEEF3.SA,"1751    20931
+Name: CD_CVM, dtype: int64",Minerva S.A.,MINERVA     ON      NM,266988202.0,https://ri.minervafoods.com,Consumer Defensive,Consumer Defensive,Farm Products,Brazil,55 17 3323 3041,14781-545,20931.0
+BEES3.SA,,Banestes S.A - Banco do Estado do Espírito Santo,BANESTES    ON,23605009.0,https://www.ri.banestes.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,55 27 3383 1531,29010-930,1155.0
+BEES4.SA,,Banestes S.A - Banco do Estado do Espírito Santo,BANESTES    PN,23605009.0,https://www.ri.banestes.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,55 27 3383 1531,29010-930,1155.0
+BGIP3.SA,"250    1120
+Name: CD_CVM, dtype: int64",Banco do Estado de Sergipe S.A.,BANESE      ON,2508535.0,https://www.banese.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,49040-840,1120.0
+BGIP4.SA,"250    1120
+Name: CD_CVM, dtype: int64",Banco do Estado de Sergipe S.A.,BANESE      PN,2508535.0,https://www.banese.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,49040-840,1120.0
+BHIA3.SA,"1307    6505
+1308    6505
+Name: CD_CVM, dtype: int64",Grupo Casas Bahia S.A.,CASAS BAHIA ON      NM,90142617.0,https://www.grupocasasbahia.com.br,Consumer Cyclical,Consumer Cyclical,Specialty Retail,Brazil,,05425-070,6505.0
+BIOM3.SA,"351    19305
+Name: CD_CVM, dtype: int64",Biomm S.A.,BIOMM       ON      MA,53036228.0,https://www.biomm.com,Healthcare,Healthcare,Biotechnology,Brazil,,34018-000,19305.0
+BLAU3.SA,"355    24627
+Name: CD_CVM, dtype: int64",Blau Farmacêutica S.A.,BLAU        ON      NM,30218060.0,https://www.blau.com,Healthcare,Healthcare,Drug Manufacturers - Specialty & Generic,Brazil,55 11 4615 9401,06705-030,24627.0
+BMEB3.SA,,Banco Mercantil do Brasil S.A.,MERCANTIL   ON  EJ  N1,36855362.0,https://www.bancomercantil.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,30160-041,1325.0
+BMEB4.SA,,Banco Mercantil do Brasil S.A.,MERCANTIL   PN  EJ  N1,36855362.0,https://www.bancomercantil.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,30160-041,1325.0
+BMGB4.SA,"229    24600
+Name: CD_CVM, dtype: int64",Banco BMG S.A.,BANCO BMG   PN      N1,116454137.0,https://www.bancobmg.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,04543-900,24600.0
+BMIN3.SA,"266    1309
+Name: CD_CVM, dtype: int64",Banco Mercantil de Investimentos S.A.,MERC INVEST ON,360298.0,https://www.bancobmi.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,,1309.0
+BMIN4.SA,"266    1309
+Name: CD_CVM, dtype: int64",Banco Mercantil de Investimentos S.A.,MERC INVEST PN,360298.0,https://www.bancobmi.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,,1309.0
+BMKS3.SA,"349    1694
+Name: CD_CVM, dtype: int64",Bicicletas Monark S.A.,BIC MONARK  ON,114375.0,https://www.monark.com.br,Consumer Cyclical,Consumer Cyclical,Leisure,Brazil,,13347-370,1694.0
+BMOB3.SA,"335    25500
+Name: CD_CVM, dtype: int64",Bemobi Mobile Tech S.A.,BEMOBI TECH ON  EDJ NM,51835994.0,https://www.bemobi.com.br,Communication Services,Communication Services,Entertainment,Brazil,,,25500.0
+BNBR3.SA,"254    1228
+Name: CD_CVM, dtype: int64",Banco do Nordeste do Brasil S.A.,NORD BRASIL ON,38475032.0,https://www.bnb.gov.br,Financial Services,Financial Services,Banks - Regional,Brazil,,60743-902,1228.0
+BOBR4.SA,"373    12190
+Name: CD_CVM, dtype: int64",Bombril S.A.,BOMBRIL     PN,71001940.0,https://www.bombril.com.br,Consumer Defensive,Consumer Defensive,Household & Personal Products,Brazil,55 11 4366 1001,09696-000,12190.0
+BPAC11.SA,"236    22616
+Name: CD_CVM, dtype: int64",Banco BTG Pactual S.A.,BTGP BANCO  UNT EX  N2,3364839159.0,https://www.btgpactual.com.br,Financial Services,Financial Services,Capital Markets,Brazil,,,22616.0
+BPAC3.SA,"236    22616
+Name: CD_CVM, dtype: int64",Banco BTG Pactual S.A.,BTGP BANCO  ON  EJ  N2,3364839159.0,https://www.btgpactual.com.br,Financial Services,Financial Services,Capital Markets,Brazil,,,22616.0
+BPAC5.SA,"236    22616
+Name: CD_CVM, dtype: int64",Banco BTG Pactual S.A.,BTGP BANCO  PNA EJ  N2,3364839159.0,https://www.btgpactual.com.br,Financial Services,Financial Services,Capital Markets,Brazil,,,22616.0
+BPAN4.SA,"271    21199
+Name: CD_CVM, dtype: int64",Banco Pan S.A.,BANCO PAN   PN  EJ  N1,304538828.0,https://www.bancopan.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,,21199.0
+BRAP3.SA,"403    18724
+Name: CD_CVM, dtype: int64",Bradespar S.A.,BRADESPAR   ON  EJ  N1,303321206.0,https://www.bradespar.com.br,Financial Services,Financial Services,Asset Management,Brazil,,04543-011,18724.0
+BRAP4.SA,"403    18724
+Name: CD_CVM, dtype: int64",Bradespar S.A.,BRADESPAR   PN  EJ  N1,303321206.0,https://www.bradespar.com.br,Financial Services,Financial Services,Asset Management,Brazil,,04543-011,18724.0
+BRAV3.SA,"433    25291
+Name: CD_CVM, dtype: int64",Brava Energia S.A.,BRAVA       ON      NM,234204335.0,https://bravaenergia.com,Energy,Energy,Oil & Gas E&P,Brazil,,,25291.0
+BRFS3.SA,"442    16292
+Name: CD_CVM, dtype: int64",BRF S.A.,BRF SA      ON  EJ  NM,608504446.0,https://www.brf-global.com,Consumer Defensive,Consumer Defensive,Packaged Foods,Brazil,,04730-090,16292.0
+BRIT3.SA,,Brisanet Participações S.A.,BRISANET    ON      NM,92104272.0,https://www.brisanet.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,63460-000,27693.0
+BRKM3.SA,"429    4820
+Name: CD_CVM, dtype: int64",Braskem S.A.,BRASKEM     ON      N1,202817638.0,https://www.braskem.com.br,Basic Materials,Basic Materials,Chemicals,Brazil,55 11 3576 9532,05501-050,4820.0
+BRKM5.SA,"429    4820
+Name: CD_CVM, dtype: int64",Braskem S.A.,BRASKEM     PNA     N1,202817638.0,https://www.braskem.com.br,Basic Materials,Basic Materials,Chemicals,Brazil,55 11 3576 9532,05501-050,4820.0
+BRKM6.SA,"429    4820
+Name: CD_CVM, dtype: int64",Braskem S.A.,BRASKEM     PNB     N1,202817638.0,https://www.braskem.com.br,Basic Materials,Basic Materials,Chemicals,Brazil,55 11 3576 9532,05501-050,4820.0
+BRSR3.SA,"253    1210
+Name: CD_CVM, dtype: int64",Banco do Estado do Rio Grande do Sul S.A.,BANRISUL    ON  EJ  N1,206986073.0,https://www.banrisul.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,,1210.0
+BRSR5.SA,"253    1210
+Name: CD_CVM, dtype: int64",Banco do Estado do Rio Grande do Sul S.A.,BANRISUL    PNA EJ  N1,206986073.0,https://www.banrisul.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,,1210.0
+BRSR6.SA,"253    1210
+Name: CD_CVM, dtype: int64",Banco do Estado do Rio Grande do Sul S.A.,BANRISUL    PNB EJ  N1,206986073.0,https://www.banrisul.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,,1210.0
+BSLI3.SA,,BRB - Banco de Brasília S.A.,BRB BANCO   ON  ED,93266646.0,https://novo.brb.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,70040-250,14206.0
+BSLI4.SA,,BRB - Banco de Brasília S.A.,BRB BANCO   PN  ED,93266646.0,https://novo.brb.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,70040-250,14206.0
+CALI3.SA,"902    4723
+Name: CD_CVM, dtype: int64",Construtora Adolpho Lindenberg S.A.,CONST A LINDON,3494438.0,https://www.lindenberg.com.br,Industrials,Industrials,Engineering & Construction,Brazil,,04534-002,4723.0
+CAMB3.SA,"503    2100
+Name: CD_CVM, dtype: int64",Cambuci S.A.,CAMBUCI     ON,15726913.0,https://www.cambuci.com.br,Consumer Cyclical,Consumer Cyclical,Leisure,Brazil,55 11 4713 9568,18130-430,2100.0
+CAML3.SA,"504    24228
+Name: CD_CVM, dtype: int64",Camil Alimentos S.A.,CAMIL       ON      NM,144337935.0,https://www.camil.com.br,Consumer Defensive,Consumer Defensive,Packaged Foods,Brazil,,05425-070,24228.0
+CASH3.SA,,Méliuz S.A.,MELIUZ      ON      NM,67600637.0,https://www.meliuz.com.br,Communication Services,Communication Services,Internet Content & Information,Brazil,,,25232.0
+CBAV3.SA,,Companhia Brasileira de Alumínio,CBA         ON      NM,204462870.0,https://www.cba.com.br,Basic Materials,Basic Materials,Aluminum,Brazil,,,25984.0
+CBEE3.SA,"117    3050
+Name: CD_CVM, dtype: int64",Ampla Energia e Serviços S.A.,AMPLA ENERG ON,40817640.0,,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,20220-297,3050.0
+CCRO3.SA,"538    18821
+Name: CD_CVM, dtype: int64",CCR S.A.,CCR SA      ON      NM,1205161648.0,https://www.ccr.com.br,Industrials,Industrials,Infrastructure Operations,Brazil,,04551-06,18821.0
+CEAB3.SA,"483    24848
+Name: CD_CVM, dtype: int64",C&A Modas S.A.,CEA MODAS   ON      NM,101340475.0,https://www.cea.com.br,Consumer Cyclical,Consumer Cyclical,Specialty Retail,Brazil,,06455-000,24848.0
+CEBR3.SA,"814    14451
+Name: CD_CVM, dtype: int64",Companhia Energética de Brasília - CEB,CEB         ON,18721836.0,https://www.ceb.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,70830-010,14451.0
+CEBR5.SA,"814    14451
+Name: CD_CVM, dtype: int64",Companhia Energética de Brasília - CEB,CEB         PNA,18721836.0,https://www.ceb.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,70830-010,14451.0
+CEBR6.SA,"814    14451
+Name: CD_CVM, dtype: int64",Companhia Energética de Brasília - CEB,CEB         PNB,18721836.0,https://www.ceb.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,70830-010,14451.0
+CEDO3.SA,,Companhia de Fiação e Tecidos Cedro e Cachoeira S.A.,CEDRO       ON      N1,3597000.0,https://www.cedro.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,30130-140,3077.0
+CEDO4.SA,,Companhia de Fiação e Tecidos Cedro e Cachoeira S.A.,CEDRO       PN      N1,3597000.0,https://www.cedro.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,30130-140,3077.0
+CEEB3.SA,,Companhia de Eletricidade do Estado da Bahia - COELBA,COELBA      ON  EJ,2670759.0,https://www.coelba.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,41181-900,14524.0
+CEEB5.SA,,Companhia de Eletricidade do Estado da Bahia - COELBA,COELBA      PNA EJ,2670759.0,https://www.coelba.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,41181-900,14524.0
+CEED3.SA,,Companhia Estadual de Distribuição de Energia Elétrica,"CEEE,D      ON",178828.0,https://www.ceee.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,20648.0
+CEED4.SA,,Companhia Estadual de Distribuição de Energia Elétrica,"CEEE,D      PN",178828.0,https://www.ceee.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,20648.0
+CEGR3.SA,,Companhia Distribuidora de Gás do Rio de Janeiro - CEG,CEG         ON  EJ,11825971.0,https://www.naturgy.com.br,Utilities,Utilities,Utilities - Regulated Gas,Brazil,,22640-907,16616.0
+CGAS3.SA,"805    15636
+806    15636
+Name: CD_CVM, dtype: int64",Companhia de Gás de São Paulo - COMGÁS,COMGAS      ON,24499157.0,https://www.comgas.com.br,Utilities,Utilities,Utilities - Regulated Gas,Brazil,,04538-132,15636.0
+CGAS5.SA,"805    15636
+806    15636
+Name: CD_CVM, dtype: int64",Companhia de Gás de São Paulo - COMGÁS,COMGAS      PNA,24499157.0,https://www.comgas.com.br,Utilities,Utilities,Utilities - Regulated Gas,Brazil,,04538-132,15636.0
+CGRA3.SA,"1304    4537
+Name: CD_CVM, dtype: int64",Grazziotin S.A.,GRAZZIOTIN  ON  EJ,11032987.0,https://www.grazziotin.com.br,Consumer Cyclical,Consumer Cyclical,Department Stores,Brazil,,99060-030,4537.0
+CGRA4.SA,"1304    4537
+Name: CD_CVM, dtype: int64",Grazziotin S.A.,GRAZZIOTIN  PN  EJ,11032987.0,https://www.grazziotin.com.br,Consumer Cyclical,Consumer Cyclical,Department Stores,Brazil,,99060-030,4537.0
+CLSA3.SA,,ClearSale S.A.,CLEARSALE   ON      NM,56736447.0,https://br.clear.sale,Technology,Technology,Software - Infrastructure,Brazil,,06460-040,26093.0
+CLSC3.SA,,Centrais Elétricas de Santa Catarina S.A.,CELESC      ON  EJ  N2,15101935.0,https://www.celesc.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,2461.0
+CLSC4.SA,,Centrais Elétricas de Santa Catarina S.A.,CELESC      PN  EJ  N2,15101935.0,https://www.celesc.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,2461.0
+CMIG3.SA,,Companhia Energética de Minas Gerais - CEMIG,CEMIG       ON  EJ  N1,2326746841.0,https://www.cemig.com.br,Utilities,Utilities,Utilities - Diversified,Brazil,,30190-131,2453.0
+CMIG4.SA,,Companhia Energética de Minas Gerais - CEMIG,CEMIG       PN  EJ  N1,2326746841.0,https://www.cemig.com.br,Utilities,Utilities,Utilities - Diversified,Brazil,,30190-131,2453.0
+CMIN3.SA,"953    25585
+Name: CD_CVM, dtype: int64",CSN Mineração S.A.,CSNMINERACAOON      N2,478266693.0,https://ri.csnmineracao.com.br,Basic Materials,Basic Materials,Steel,Brazil,,04538-132,25585.0
+COCE3.SA,,Companhia Energética do Ceará - COELCE,COELCE      ON,11408916.0,https://www.enel.com.br/pt/investidores.html,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,14869.0
+COCE5.SA,,Companhia Energética do Ceará - COELCE,COELCE      PNA,11408916.0,https://www.enel.com.br/pt/investidores.html,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,14869.0
+COGN3.SA,"770    17973
+Name: CD_CVM, dtype: int64",Cogna Educação S.A.,COGNA ON    ON      NM,1871956123.0,https://www.cogna.com.br,Consumer Defensive,Consumer Defensive,Education & Training Services,Brazil,,,17973.0
+CPFE3.SA,"933    18660
+934    18660
+935    20540
+936    20540
+Name: CD_CVM, dtype: int64",CPFL Energia S.A.,CPFL ENERGIAON      NM,187713771.0,https://www.cpfl.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,13087-397,18660.0
+CPLE3.SA,,Companhia Paranaense de Energia - COPEL,COPEL       ON      N2,1682335001.0,https://www.copel.com,Utilities,Utilities,Utilities - Diversified,Brazil,55 41 3331 4145,81200-240,14311.0
+CPLE5.SA,,Companhia Paranaense de Energia - COPEL,COPEL       PNA     N2,1682335001.0,https://www.copel.com,Utilities,Utilities,Utilities - Diversified,Brazil,55 41 3331 4145,81200-240,14311.0
+CPLE6.SA,,Companhia Paranaense de Energia - COPEL,COPEL       PNB     N2,1682335001.0,https://www.copel.com,Utilities,Utilities,Utilities - Diversified,Brazil,55 41 3331 4145,81200-240,14311.0
+CRFB3.SA,"163    24171
+164    24171
+Name: CD_CVM, dtype: int64",Atacadão S.A.,CARREFOUR BRON  EJ  NM,505182354.0,https://www.grupocarrefourbrasil.com.br,Consumer Cyclical,Consumer Cyclical,Department Stores,Brazil,,02170-901,24171.0
+CRPG3.SA,"2474    11398
+Name: CD_CVM, dtype: int64",Tronox Pigmentos do Brasil S.A.,CRISTAL     ON,7878300.0,https://www.tronox-al.com.br,Basic Materials,Basic Materials,Chemicals,Brazil,,42829-710,11398.0
+CRPG5.SA,"2474    11398
+Name: CD_CVM, dtype: int64",Tronox Pigmentos do Brasil S.A.,CRISTAL     PNA,7878300.0,https://www.tronox-al.com.br,Basic Materials,Basic Materials,Chemicals,Brazil,,42829-710,11398.0
+CRPG6.SA,"2474    11398
+Name: CD_CVM, dtype: int64",Tronox Pigmentos do Brasil S.A.,CRISTAL     PNB,7878300.0,https://www.tronox-al.com.br,Basic Materials,Basic Materials,Chemicals,Brazil,,42829-710,11398.0
+CSAN3.SA,"928    19836
+Name: CD_CVM, dtype: int64",Cosan S.A.,COSAN       ON      NM,510482336.0,https://www.cosan.com.br,Energy,Energy,Oil & Gas Refining & Marketing,Brazil,,04538-132,19836.0
+CSED3.SA,"948    25526
+Name: CD_CVM, dtype: int64",Cruzeiro do Sul Educacional S.A.,CRUZEIRO EDUON      NM,45174113.0,https://www.cruzeirodosuleducacional.com.br,Consumer Defensive,Consumer Defensive,Education & Training Services,Brazil,,03071-000,25526.0
+CSMG3.SA,"810    19445
+811    19445
+Name: CD_CVM, dtype: int64",Companhia de Saneamento de Minas Gerais,COPASA      ON  EJ  NM,188930939.0,https://www.copasa.com.br,Utilities,Utilities,Utilities - Regulated Water,Brazil,,30330-270,19445.0
+CSNA3.SA,,Companhia Siderúrgica Nacional,SID NACIONALON,604909885.0,https://www.csn.com.br,Basic Materials,Basic Materials,Steel,Brazil,,04538-132,4030.0
+CTKA3.SA,"1534    4146
+Name: CD_CVM, dtype: int64",Karsten S.A.,KARSTEN     ON,841325.0,https://www.karsten.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,89074-700,4146.0
+CTKA4.SA,"1534    4146
+Name: CD_CVM, dtype: int64",Karsten S.A.,KARSTEN     PN,841325.0,https://www.karsten.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,89074-700,4146.0
+CTNM3.SA,,Companhia de Tecidos Norte de Minas,COTEMINAS   ON,12735882.0,https://www.coteminas.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,55 38 4009 5050,39404-005,3158.0
+CTNM4.SA,,Companhia de Tecidos Norte de Minas,COTEMINAS   PN,12735882.0,https://www.coteminas.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,55 38 4009 5050,39404-005,3158.0
+CTPC3.SA,,Companhia de Tecidos Norte de Minas,COTEMINAS   PN,12735882.0,https://www.coteminas.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,55 38 4009 5050,39404-005,3158.0
+CTSA3.SA,,Companhia Tecidos Santanense Ltda.,SANTANENSE  ON,12088198.0,https://www.santanense.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,39404-006,4081.0
+CTSA4.SA,,Companhia Tecidos Santanense Ltda.,SANTANENSE  PN,12088198.0,https://www.santanense.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,39404-006,4081.0
+CURY3.SA,"962    25100
+Name: CD_CVM, dtype: int64",Cury Construtora e Incorporadora S.A.,CURY S/A    ON      NM,132117663.0,https://cury.net,Real Estate,Real Estate,Real Estate - Development,Brazil,,,25100.0
+CVCB3.SA,"963    23310
+964    23310
+Name: CD_CVM, dtype: int64",CVC Brasil Operadora e Agência de Viagens S.A.,CVC BRASIL  ON      NM,497690093.0,https://www.cvc.com.br,Consumer Cyclical,Consumer Cyclical,Travel Services,Brazil,,09080-370,23310.0
+CXSE3.SA,"496    23795
+Name: CD_CVM, dtype: int64",Caixa Seguridade Participações S.A.,CAIXA SEGURION      NM,517500000.0,https://www.caixaseguridade.com.br,Financial Services,Financial Services,Insurance - Diversified,Brazil,,,23795.0
+CYRE3.SA,,Cyrela Brazil Realty S.A. Empreendimentos e Participações,CYRELA REALTON      NM,265784965.0,https://www.cyrela.com.br,Consumer Cyclical,Consumer Cyclical,Residential Construction,Brazil,,04552-000,14460.0
+DASA3.SA,,Diagnósticos da América S.A.,DASA        ON      NM,672948558.0,https://www.dasa3.com.br,Healthcare,Healthcare,Diagnostics & Research,Brazil,,06455-010,19623.0
+DESK3.SA,"986    26026
+Name: CD_CVM, dtype: int64",Desktop S.A.,DESKTOP     ON      NM,49638432.0,https://desktop.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,13171-105,26026.0
+DEXP3.SA,"990    16632
+Name: CD_CVM, dtype: int64",Dexxos Participações S.A.,DEXXOS PAR  ON  ED  N1,53857990.0,https://www.dexxos.com.br,Basic Materials,Basic Materials,Chemicals,Brazil,,20021-290,16632.0
+DEXP4.SA,"990    16632
+Name: CD_CVM, dtype: int64",Dexxos Participações S.A.,DEXXOS PAR  PN  ED  N1,53857990.0,https://www.dexxos.com.br,Basic Materials,Basic Materials,Chemicals,Brazil,,20021-290,16632.0
+DIRR3.SA,"1003    21350
+Name: CD_CVM, dtype: int64",Direcional Engenharia S.A.,DIRECIONAL  ON      NM,123836798.0,https://direcional.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,30150-270,21350.0
+DMFN3.SA,,"DM Financeira S.A. - Crédito, Financiamento e Investimento",DMFINANCEIRAON,60927927.0,https://www.finansinos.com.br,Financial Services,Financial Services,Credit Services,Brazil,,93510-365,6076.0
+DMVF3.SA,"969    25046
+Name: CD_CVM, dtype: int64",d1000 Varejo Farma Participações S.A.,D1000VFARMA ON      NM,14891404.0,https://www.d1000varejofarma.com.br/ri,Healthcare,Healthcare,Pharmaceutical Retailers,Brazil,,,25046.0
+DOHL3.SA,,Döhler S.A.,DOHLER      ON,19225293.0,https://www.dohler.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,89219-902,5207.0
+DOHL4.SA,,Döhler S.A.,DOHLER      PN,19225293.0,https://www.dohler.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,89219-902,5207.0
+DOTZ3.SA,"1018    25836
+Name: CD_CVM, dtype: int64",Dotz S.A.,DOTZ SA     ON      NM,3623309.0,https://dotz.com.br,Communication Services,Communication Services,Advertising Agencies,Brazil,,534-011,25836.0
+DTCY3.SA,"1025    18597
+1026    18597
+Name: CD_CVM, dtype: int64",DTCOM - Direct to Company S.A.,"DTCOM,DIRECTON",1758830.0,https://dtcom.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,83420-000,18597.0
+DXCO3.SA,"988    21091
+989    21091
+Name: CD_CVM, dtype: int64",Dexco S.A.,DEXCO       ON  EJ  NM,306091941.0,https://ri.dex.co,Basic Materials,Basic Materials,Lumber & Wood Production,Brazil,,01310-942,21091.0
+EALT3.SA,"1064    5380
+Name: CD_CVM, dtype: int64",Electro Aço Altona S.A.,ACO ALTONA  ON,10003950.0,https://www.altona.com.br,Industrials,Industrials,Metal Fabrication,Brazil,,89030-900,5380.0
+EALT4.SA,"1064    5380
+Name: CD_CVM, dtype: int64",Electro Aço Altona S.A.,ACO ALTONA  PN,10003950.0,https://www.altona.com.br,Industrials,Industrials,Metal Fabrication,Brazil,,89030-900,5380.0
+ECOR3.SA,"1043    19453
+Name: CD_CVM, dtype: int64",EcoRodovias Infraestrutura e Logística S.A.,ECORODOVIAS ON      NM,334405992.0,https://www.ecorodovias.com.br,Industrials,Industrials,Infrastructure Operations,Brazil,55 11 3787 2668,04547-005,19453.0
+EGIE3.SA,"1127    17329
+1128    17329
+1129    17329
+Name: CD_CVM, dtype: int64",Engie Brasil Energia S.A.,ENGIE BRASILON  EJ  NM,255238516.0,https://www.engie.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,,88025-255,17329.0
+EKTR3.SA,"1069    17485
+Name: CD_CVM, dtype: int64",Elektro Redes S.A.,ELEKTRO     ON,623905.0,https://www.elektro.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,17485.0
+EKTR4.SA,"1069    17485
+Name: CD_CVM, dtype: int64",Elektro Redes S.A.,ELEKTRO     PN  EJ,623905.0,https://www.elektro.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,17485.0
+ELET3.SA,,Centrais Elétricas Brasileiras S.A. - Eletrobrás,ELETROBRAS  ON      N1,1193525939.0,https://www.eletrobras.com,Utilities,Utilities,Utilities - Renewable,Brazil,,20091-005,2437.0
+ELET5.SA,,Centrais Elétricas Brasileiras S.A. - Eletrobrás,ELETROBRAS  PNA     N1,1193525939.0,https://www.eletrobras.com,Utilities,Utilities,Utilities - Renewable,Brazil,,20091-005,2437.0
+ELET6.SA,,Centrais Elétricas Brasileiras S.A. - Eletrobrás,ELETROBRAS  PNB     N1,1193525939.0,https://www.eletrobras.com,Utilities,Utilities,Utilities - Renewable,Brazil,,20091-005,2437.0
+ELMD3.SA,"1073    25569
+Name: CD_CVM, dtype: int64",Eletromidia S.A.,ELETROMIDIA ON      NM,35501076.0,https://www.eletromidia.com.br,Communication Services,Communication Services,Advertising Agencies,Brazil,,04542-200,25569.0
+EMAE4.SA,,Empresa Metropolitana de Águas e Energia S.A.,EMAE        PN,7775514.0,https://emae.com.br,Utilities,Utilities,Utilities - Diversified,Brazil,,04576-010,16993.0
+EMBR3.SA,"1095    20087
+Name: CD_CVM, dtype: int64",Embraer S.A.,EMBRAER     ON      NM,694867317.0,https://embraer.com,Industrials,Industrials,Aerospace & Defense,Brazil,,05425-070,20087.0
+ENEV3.SA,"1123    21237
+Name: CD_CVM, dtype: int64",Eneva S.A.,ENEVA       ON      NM,2918068681.0,https://www.eneva.com.br,Utilities,Utilities,Utilities - Diversified,Brazil,,22250-040,21237.0
+ENGI11.SA,"1113     5576
+1114    14605
+1115     3271
+1116    21938
+1117    15253
+1118    18996
+1119    24864
+1120    24864
+1121    24589
+Name: CD_CVM, dtype: int64",Energisa S.A.,ENERGISA    UNT     N2,1379208304.0,https://www.energisa.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,55 32 3429 6317,36770-901,5576.0
+ENGI3.SA,"1113     5576
+1114    14605
+1115     3271
+1116    21938
+1117    15253
+1118    18996
+1119    24864
+1120    24864
+1121    24589
+Name: CD_CVM, dtype: int64",Energisa S.A.,ENERGISA    ON      N2,1379208304.0,https://www.energisa.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,55 32 3429 6317,36770-901,5576.0
+ENGI4.SA,"1113     5576
+1114    14605
+1115     3271
+1116    21938
+1117    15253
+1118    18996
+1119    24864
+1120    24864
+1121    24589
+Name: CD_CVM, dtype: int64",Energisa S.A.,ENERGISA    PN      N2,1379208304.0,https://www.energisa.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,55 32 3429 6317,36770-901,5576.0
+ENJU3.SA,"1131    25259
+Name: CD_CVM, dtype: int64",Enjoei S.A.,ENJOEI      ON      NM,128832528.0,https://www.enjoei.com.br,Consumer Cyclical,Consumer Cyclical,Internet Retail,Brazil,,04543-900,25259.0
+ENMT3.SA,,Energisa Mato Grosso - Distribuidora de Energia S/A,ENERGISA MT ON,218941939.0,https://www.energisa.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,78.0109-00,14605.0
+ENMT4.SA,,Energisa Mato Grosso - Distribuidora de Energia S/A,ENERGISA MT PN,218941939.0,https://www.energisa.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,78.0109-00,14605.0
+EPAR3.SA,,Embpar Participacoes S.A.,EMBPAR S/A  ON  ED,4533662.0,https://www.battistella.com.br,Basic Materials,Basic Materials,Lumber & Wood Production,Brazil,,83015-140,15458.0
+EQMA3B.SA,"1143    16608
+Name: CD_CVM, dtype: int64",Equatorial Maranhão Distribuidora de Energia S.A.,EQUATORIAL MARANHA,2439773.0,https://www.ri.equatorialenergia.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,16608.0
+EQPA3.SA,"1144    18309
+Name: CD_CVM, dtype: int64",Equatorial Pará Distribuidora de Energia S.A.,EQTL PARA   ON,55293122.0,https://pa.equatorialenergia.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,66823-010,18309.0
+EQPA5.SA,"1144    18309
+Name: CD_CVM, dtype: int64",Equatorial Pará Distribuidora de Energia S.A.,EQTL PARA   PNA,55293122.0,https://pa.equatorialenergia.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,66823-010,18309.0
+EQPA6.SA,"1144    18309
+Name: CD_CVM, dtype: int64",Equatorial Pará Distribuidora de Energia S.A.,EQTL PARA   PNB,55293122.0,https://pa.equatorialenergia.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,66823-010,18309.0
+EQPA7.SA,"1144    18309
+Name: CD_CVM, dtype: int64",Equatorial Pará Distribuidora de Energia S.A.,EQTL PARA   PNC,55293122.0,https://pa.equatorialenergia.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,66823-010,18309.0
+EQTL3.SA,"1142    25577
+1143    16608
+1144    18309
+1145    20010
+1146    24457
+1147    24481
+Name: CD_CVM, dtype: int64",Equatorial S.A.,EQUATORIAL  ON      NM,1150181000.0,https://www.equatorialenergia.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,70308-200,25577.0
+ESPA3.SA,"1782    25445
+Name: CD_CVM, dtype: int64",MPM Corpóreos S.A.,ESPACOLASER ON      NM,135287882.0,https://ri.espacolaser.com.br,Consumer Cyclical,Consumer Cyclical,Personal Services,Brazil,,,25445.0
+ESTR4.SA,,Manufatura de Brinquedos Estrela S.A.,ESTRELA     PN,5531054.0,https://www.estrela.com.br,Consumer Cyclical,Consumer Cyclical,Leisure,Brazil,,5423180,8427.0
+ETER3.SA,"1157    5762
+Name: CD_CVM, dtype: int64",Eternit S.A.,ETERNIT     ON      NM,58170685.0,https://www.eternit.com.br,Industrials,Industrials,Building Products & Equipment,Brazil,,05423-040,5762.0
+EUCA3.SA,,Eucatex S.A. Indústria e Comércio,EUCATEX     ON      N1,8240351.0,https://www.eucatex.com.br,Industrials,Industrials,Building Products & Equipment,Brazil,,04543-900,5770.0
+EUCA4.SA,,Eucatex S.A. Indústria e Comércio,EUCATEX     PN      N1,8240351.0,https://www.eucatex.com.br,Industrials,Industrials,Building Products & Equipment,Brazil,,04543-900,5770.0
+EVEN3.SA,"1163    20524
+Name: CD_CVM, dtype: int64",Even Construtora e Incorporadora S.A.,EVEN        ON      NM,198847036.0,https://www.even.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,01455-000,20524.0
+EZTC3.SA,,EZTEC Empreendimentos e Participações S.A.,EZTEC       ON      NM,17301731.0,https://www.eztec.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,04501-002,20770.0
+FESA3.SA,,Cia de Ferro Ligas da Bahia S.A. - FERBASA,FERBASA     ON  EJ  N1,162837641.0,https://www.ferbasa.com.br,Basic Materials,Basic Materials,Steel,Brazil,,41820-022,3069.0
+FESA4.SA,,Cia de Ferro Ligas da Bahia S.A. - FERBASA,FERBASA     PN  EJ  N1,162837641.0,https://www.ferbasa.com.br,Basic Materials,Basic Materials,Steel,Brazil,,41820-022,3069.0
+FHER3.SA,"1189    20621
+Name: CD_CVM, dtype: int64",Fertilizantes Heringer S.A.,FER HERINGERON      NM,15627230.0,https://www.heringer.com.br,Basic Materials,Basic Materials,Agricultural Inputs,Brazil,,13148-906,20621.0
+FIEI3.SA,"1203    20630
+Name: CD_CVM, dtype: int64",Fica Empreendimentos Imobiliarios S.A,FICA        ON,624261.0,https://www.cr2.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,,20630.0
+FIQE3.SA,"2507    26050
+Name: CD_CVM, dtype: int64",Unifique Telecomunicações S.A.,UNIFIQUE    ON      NM,90355976.0,https://unifique.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,89120-000,26050.0
+FLRY3.SA,"1221    21881
+Name: CD_CVM, dtype: int64",Fleury S.A.,FLEURY      ON  EJ  NM,360869421.0,https://ri.fleury.com.br,Healthcare,Healthcare,Diagnostics & Research,Brazil,,04703-003,21881.0
+FRAS3.SA,"1239    6211
+Name: CD_CVM, dtype: int64",Fras-le S.A.,"FRAS,LE     ON  EJ  N1",60626061.0,https://ri.fras-le.com.br,Consumer Cyclical,Consumer Cyclical,Auto Parts,Brazil,,95115-550,6211.0
+FRIO3.SA,"1723    20613
+Name: CD_CVM, dtype: int64",Metalfrio Solutions S.A.,METALFRIO   ON      NM,2429024.0,https://www.metalfrio.com.br,Consumer Cyclical,Consumer Cyclical,"Furnishings, Fixtures & Appliances",Brazil,,04186-220,20613.0
+GEPA3.SA,"2100    18368
+2101    18368
+Name: CD_CVM, dtype: int64",Rio Paranapanema Energia S.A.,GER PARANAP ON  EJ,3596964.0,https://www.paranapanemaenergia.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,04551-060,18368.0
+GEPA4.SA,"2100    18368
+2101    18368
+Name: CD_CVM, dtype: int64",Rio Paranapanema Energia S.A.,GER PARANAP PN  EJ,3596964.0,https://www.paranapanemaenergia.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,04551-060,18368.0
+GFSA3.SA,"1254    16101
+Name: CD_CVM, dtype: int64",Gafisa S.A.,GAFISA      ON      NM,60960698.0,https://www.gafisa.com.br,Consumer Cyclical,Consumer Cyclical,Residential Construction,Brazil,,04543-900,16101.0
+GGBR3.SA,"1278    3980
+1729    8656
+1730    8656
+Name: CD_CVM, dtype: int64",Gerdau S.A.,GERDAU      ON      N1,1380463539.0,https://www2.gerdau.com,Basic Materials,Basic Materials,Steel,Brazil,,05425-070,3980.0
+GGBR4.SA,"1278    3980
+1729    8656
+1730    8656
+Name: CD_CVM, dtype: int64",Gerdau S.A.,GERDAU      PN      N1,1380463539.0,https://www2.gerdau.com,Basic Materials,Basic Materials,Steel,Brazil,,05425-070,3980.0
+GGPS3.SA,"1297    25712
+Name: CD_CVM, dtype: int64",GPS Participações e Empreendimentos S.A.,GPS         ON      NM,388369454.0,https://gpssa.com.br,Industrials,Industrials,Specialty Business Services,Brazil,55 11 2197 8888,05345-000,25712.0
+GMAT3.SA,"1311    25186
+1312    25186
+Name: CD_CVM, dtype: int64",Grupo Mateus S.A.,GRUPO MATEUSON      NM,467298491.0,https://www.grupomateus.com.br,Consumer Cyclical,Consumer Cyclical,Department Stores,Brazil,,65074-115,25186.0
+GOAU3.SA,"1729    8656
+1730    8656
+Name: CD_CVM, dtype: int64",Metalurgica Gerdau S.A.,GERDAU MET  ON      N1,702116022.0,https://www2.gerdau.com.br,Basic Materials,Basic Materials,Steel,Brazil,55 51 1323 2000,05425-070,8656.0
+GOAU4.SA,"1729    8656
+1730    8656
+Name: CD_CVM, dtype: int64",Metalurgica Gerdau S.A.,GERDAU MET  PN      N1,702116022.0,https://www2.gerdau.com.br,Basic Materials,Basic Materials,Steel,Brazil,55 51 1323 2000,05425-070,8656.0
+GOLL4.SA,,Gol Linhas Aéreas Inteligentes S.A.,GOL         PN      N2,172768200.0,https://www.voegol.com.br,Industrials,Industrials,Airlines,Brazil,,04626-020,19569.0
+GPAR3.SA,,Companhia CELG de Participações S/A,CELGPAR     ON,2054857.0,https://www.celgpar.com,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,74805-020,21393.0
+GPIV33.SA,,"GP Investments, Ltd.",GP INVEST   DR3,34304473.0,https://www.gp-investments.com,Financial Services,Financial Services,Asset Management,Brazil,,04538-132,80020.0
+GRND3.SA,"1305    19615
+Name: CD_CVM, dtype: int64",Grendene S.A.,GRENDENE    ON      NM,270710350.0,https://www.grendene.com.br,Consumer Cyclical,Consumer Cyclical,Footwear & Accessories,Brazil,,62040-125,19615.0
+GSHP3.SA,"1273    21008
+1274    21008
+Name: CD_CVM, dtype: int64",General Shopping e Outlets do Brasil S.A.,GENERALSHOPPON,534565.0,https://www.generalshopping.com.br,Real Estate,Real Estate,Real Estate - Diversified,Brazil,55 11 3159 3727,01228-200,21008.0
+GUAR3.SA,"1317    4669
+Name: CD_CVM, dtype: int64",Guararapes Confecções S.A.,GUARARAPES  ON      NM,86506833.0,https://ri.riachuelo.com.br,Consumer Cyclical,Consumer Cyclical,Apparel Retail,Brazil,,05501-050,4669.0
+HAGA3.SA,,HAGA S/A Indústria e Comércio,HAGA S/A    ON,8247057.0,https://www.haga.com.br,Industrials,Industrials,Building Products & Equipment,Brazil,55 22 2525 8059,28605-220,13366.0
+HAGA4.SA,,HAGA S/A Indústria e Comércio,HAGA S/A    PN,8247057.0,https://www.haga.com.br,Industrials,Industrials,Building Products & Equipment,Brazil,55 22 2525 8059,28605-220,13366.0
+HAPV3.SA,"1327    24392
+1328    24392
+Name: CD_CVM, dtype: int64",Hapvida Participações e Investimentos S.A.,HAPVIDA     ON      NM,4780955322.0,https://ri.hapvida.com.br,Financial Services,Financial Services,Insurance - Life,Brazil,,60140-060,24392.0
+HBOR3.SA,"1332    20877
+Name: CD_CVM, dtype: int64",Helbor Empreendimentos S.A.,HELBOR      ON      NM,70443548.0,https://www.helbor.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,08780-500,20877.0
+HBRE3.SA,"1331    25402
+Name: CD_CVM, dtype: int64",HBR Realty Empreendimentos Imobiliários S.A.,HBR REALTY  ON      NM,48765970.0,https://www.hbrrealty.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,08710-500,25402.0
+HBSA3.SA,"1336    22675
+Name: CD_CVM, dtype: int64",Hidrovias do Brasil S.A.,HIDROVIAS   ON      NM,411184518.0,https://hbsa.com.br,Industrials,Industrials,Integrated Freight & Logistics,Brazil,,,22675.0
+HBTS5.SA,,Companhia Habitasul de Participações,HABITASUL   PNA,3827198.0,https://www.habitasul.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,90480-900,3298.0
+HETA4.SA,,Hercules S.A - Fábrica de Talheres,HERCULES    PN,126985.0,https://www.hercules.ind.br,Consumer Defensive,Consumer Defensive,Household & Personal Products,Brazil,,,6629.0
+HOOT4.SA,,Hotéis Othon S.A.,HOTEIS OTHONPN,9101692.0,https://www.ciahoteisothon.com.br,Consumer Cyclical,Consumer Cyclical,Lodging,Brazil,,20060-001,6700.0
+HYPE3.SA,"1365    21431
+Name: CD_CVM, dtype: int64",Hypera S.A.,HYPERA      ON      NM,371198389.0,https://www.hypera.com.br,Healthcare,Healthcare,Drug Manufacturers - Specialty & Generic,Brazil,,05676-120,21431.0
+IFCM3.SA,"1439    25747
+Name: CD_CVM, dtype: int64",Infracommerce CXaaS S.A.,INFRACOMM   ON      NM,380016585.0,https://ri.infracommerce.com.br,Industrials,Industrials,Specialty Business Services,Brazil,,04578-910,25747.0
+IGTI11.SA,"1377    20494
+1378     8672
+Name: CD_CVM, dtype: int64",Iguatemi S.A.,IGUATEMI S.AUNT     N1,668525231.0,https://iguatemi.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,55 11 3137 7097,01455-070,20494.0
+IGTI3.SA,"1377    20494
+1378     8672
+Name: CD_CVM, dtype: int64",Iguatemi S.A.,IGUATEMI S.AON      N1,668525231.0,https://iguatemi.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,55 11 3137 7097,01455-070,20494.0
+INTB3.SA,,Intelbras S.A. - Indústria de Telecomunicação Eletrônica Brasileira,INTELBRAS   ON      NM,92297878.0,https://www.intelbras.com,Technology,Technology,Communication Equipment,Brazil,55 48 3281 9505,88104-800,25453.0
+IRBR3.SA,,IRB-Brasil Resseguros S.A.,IRBBRASIL REON      NM,55136879.0,https://www.irbre.com,Financial Services,Financial Services,Insurance - Reinsurance,Brazil,,,24180.0
+ISAE3.SA,,ISA Energía Brasil S.A,ISA ENERGIA ON      N1,187373234.0,https://www.isacteep.com.br,Utilities,Utilities,Utilities - Independent Power Producers,Brazil,55 11 3138 7046,04794-000,18376.0
+ISAE4.SA,,ISA Energía Brasil S.A,ISA ENERGIA PN      N1,187373234.0,https://www.isacteep.com.br,Utilities,Utilities,Utilities - Independent Power Producers,Brazil,55 11 3138 7046,04794-000,18376.0
+ITSA3.SA,,Itaúsa S.A.,ITAUSA      ON      N1,6464740552.0,https://www.itausa.com.br,Industrials,Industrials,Conglomerates,Brazil,,01310-200,7617.0
+ITSA4.SA,,Itaúsa S.A.,ITAUSA      PN      N1,6464740552.0,https://www.itausa.com.br,Industrials,Industrials,Conglomerates,Brazil,,01310-200,7617.0
+ITUB3.SA,"1497    19348
+Name: CD_CVM, dtype: int64",Itaú Unibanco Holding S.A.,ITAUUNIBANCOON      N1,5284719020.0,https://www.itau.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,04344-902,19348.0
+ITUB4.SA,"1497    19348
+Name: CD_CVM, dtype: int64",Itaú Unibanco Holding S.A.,ITAUUNIBANCOPN      N1,5284719020.0,https://www.itau.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,04344-902,19348.0
+JALL3.SA,,Jalles Machado S/A,JALLESMACHADON      NM,102499066.0,https://www.jallesmachado.com,Consumer Defensive,Consumer Defensive,Packaged Foods,Brazil,55 62 3353 4040,76388-899,25496.0
+JBSS3.SA,"1517    20575
+Name: CD_CVM, dtype: int64",JBS S.A.,JBS         ON      NM,670000918.0,https://www.jbs.com.br,Consumer Defensive,Consumer Defensive,Packaged Foods,Brazil,,05118-100,20575.0
+JFEN3.SA,,João Fortes Engenharia S.A.,JOAO FORTES ON,18288842.0,https://www.joaofortes.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,22640-100,7811.0
+JHSF3.SA,"1519    20605
+Name: CD_CVM, dtype: int64",JHSF Participações S.A.,JHSF PART   ON      NM,312247783.0,https://jhsf.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,,20605.0
+JOPA3.SA,,JOSAPAR Joaquim Oliveira S.A. Participações,JOSAPAR     ON,2474473.0,https://josapar.com.br,Consumer Defensive,Consumer Defensive,Packaged Foods,Brazil,,90480-003,13285.0
+JSLG3.SA,"1526    22020
+1527    22020
+Name: CD_CVM, dtype: int64",JSL S.A.,JSL         ON  EDJ NM,78802220.0,https://www.jsl.com.br,Industrials,Industrials,Integrated Freight & Logistics,Brazil,,04530–001,22020.0
+KEPL3.SA,"1537    7870
+Name: CD_CVM, dtype: int64",Kepler Weber S.A.,KEPLER WEBERON      NM,144504701.0,https://www.kepler.com.br,Industrials,Industrials,Farm & Heavy Construction Machinery,Brazil,,04552-000,7870.0
+KLBN11.SA,"1540    12653
+Name: CD_CVM, dtype: int64",Klabin S.A.,KLABIN S/A  UNT EJ  N2,4623768866.0,https://www.klabin.com.br,Basic Materials,Basic Materials,Paper & Paper Products,Brazil,,04538-132,12653.0
+KLBN3.SA,"1540    12653
+Name: CD_CVM, dtype: int64",Klabin S.A.,KLABIN S/A  ON  EJ  N2,4623768866.0,https://www.klabin.com.br,Basic Materials,Basic Materials,Paper & Paper Products,Brazil,,04538-132,12653.0
+KLBN4.SA,"1540    12653
+Name: CD_CVM, dtype: int64",Klabin S.A.,KLABIN S/A  PN  EJ  N2,4623768866.0,https://www.klabin.com.br,Basic Materials,Basic Materials,Paper & Paper Products,Brazil,,04538-132,12653.0
+KRSA3.SA,"1542    25879
+Name: CD_CVM, dtype: int64",Kora Saúde Participações S.A.,KORA SAUDE  ON      NM,17103902.0,https://korasaude.com.br,Healthcare,Healthcare,Medical Care Facilities,Brazil,,,25879.0
+LAND3.SA,"2421    26000
+Name: CD_CVM, dtype: int64",Terra Santa Propriedades Agrícolas S.A.,TERRASANTAPAON      NM,47992899.0,https://www.terrasantapa.com.br,Consumer Defensive,Consumer Defensive,Farm Products,Brazil,,04571-150,26000.0
+LAVV3.SA,"1560    25062
+Name: CD_CVM, dtype: int64",Lavvi Empreendimentos Imobiliários S.A.,LAVVI       ON      NM,51362102.0,https://www.lavvi.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,01228-200,25062.0
+LEVE3.SA,"1641    8575
+Name: CD_CVM, dtype: int64",MAHLE Metal Leve S.A.,METAL LEVE  ON  EJ  NM,52857132.0,https://www.mahle.com/en,Consumer Cyclical,Consumer Cyclical,Auto Parts,Brazil,55 19 3861 9166,13846-146,8575.0
+LIGT3.SA,"1578    23000
+1579    19879
+1580     8036
+1581     8036
+Name: CD_CVM, dtype: int64",Light S.A.,LIGHT S/A   ON      NM,372555324.0,https://ri.light.com.br/en/,Utilities,Utilities,Utilities - Renewable,Brazil,,20080-002,23000.0
+LIPR3.SA,,Eletrobrás Participações S.A. - Eletropar,ELETROPAR   ON,1914065.0,https://eletrobraspar.com/Paginas/default.aspx,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,20090-010,15784.0
+LJQQ3.SA,,Lojas Quero-Quero S.A.,"QUERO,QUERO ON  EJS NM",165624535.0,https://www.queroquero.com.br,Consumer Cyclical,Consumer Cyclical,Specialty Retail,Brazil,,94910-003,25038.0
+LOGG3.SA,"1600    23272
+Name: CD_CVM, dtype: int64",LOG Commercial Properties e Participações S.A.,LOG COM PROPON      NM,16305752.0,https://www.logcp.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,30455-610,23272.0
+LOGN3.SA,,Log-In Logística Intermodal S.A.,"LOG,IN      ON      NM",11143453.0,https://www.loginlogistica.com.br,Industrials,Industrials,Marine Shipping,Brazil,,20021-280,20710.0
+LPSB3.SA,,LPS Brasil - Consultoria de Imóveis S.A.,LOPES BRASILON      NM,69338558.0,https://www.lopes.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,01427-002,20370.0
+LREN3.SA,"1609    8133
+1610    8133
+Name: CD_CVM, dtype: int64",Lojas Renner S.A.,LOJAS RENNERON  EJ  NM,956120000.0,https://www.lojasrenner.com.br,Consumer Cyclical,Consumer Cyclical,Department Stores,Brazil,,91410-400,8133.0
+LUPA3.SA,"1618    20060
+Name: CD_CVM, dtype: int64",Lupatech S.A.,LUPATECH    ON      NM,35058419.0,https://www.lupatech.com.br,Energy,Energy,Oil & Gas Equipment & Services,Brazil,,04583-110,20060.0
+LUXM4.SA,,Trevisa Investimentos S.A.,TREVISA     PN,6308360.0,https://www.trevisa.com.br,Industrials,Industrials,Marine Shipping,Brazil,,90810-240,8192.0
+LVTC3.SA,"1592    25895
+Name: CD_CVM, dtype: int64",Livetech da Bahia Indústria e Comércio S.A.,WDC NETWORKSON      NM,63438217.0,https://wdcnet.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,45658-335,25895.0
+LWSA3.SA,,Locaweb Serviços de Internet S.A.,LWSA        ON      NM,320453913.0,https://www.locaweb.com.br,Technology,Technology,Software - Infrastructure,Brazil,,05707-001,24910.0
+MAPT3.SA,"550    13854
+Name: CD_CVM, dtype: int64",Cemepe Investimentos S.A.,CEMEPE      ON,35690.0,https://www.cemepe.com.br,Financial Services,Financial Services,Asset Management,Brazil,,20060-070,13854.0
+MAPT4.SA,"550    13854
+Name: CD_CVM, dtype: int64",Cemepe Investimentos S.A.,CEMEPE      PN,35690.0,https://www.cemepe.com.br,Financial Services,Financial Services,Asset Management,Brazil,,20060-070,13854.0
+MATD3.SA,"1348    25690
+Name: CD_CVM, dtype: int64",Hospital Mater Dei S.A.,MATER DEI   ON      NM,133048453.0,https://www.materdei.com.br,Healthcare,Healthcare,Medical Care Facilities,Brazil,,30190-081,25690.0
+MBLY3.SA,"1758    25461
+Name: CD_CVM, dtype: int64",Mobly S.A.,MOBLY       ON      NM,46429747.0,https://www.mobly.com.br,Consumer Cyclical,Consumer Cyclical,Specialty Retail,Brazil,,04730-090,25461.0
+MDIA3.SA,,M. Dias Branco S.A. Indústria e Comércio de Alimentos,M.DIASBRANCOON  EJ  NM,23601381.0,https://mdiasbranco.com.br,Consumer Defensive,Consumer Defensive,Packaged Foods,Brazil,,61766-650,20338.0
+MDNE3.SA,"1776    21067
+1777    21067
+Name: CD_CVM, dtype: int64",Moura Dubeux Engenharia S.A.,MOURA DUBEUXON      NM,56454735.0,https://www.mouradubeux.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,,21067.0
+MEAL3.SA,"1452    23574
+Name: CD_CVM, dtype: int64",International Meal Company Alimentação S.A.,IMC S/A     ON      NM,254840683.0,https://www.internationalmealcompany.com,Consumer Cyclical,Consumer Cyclical,Restaurants,Brazil,,,23574.0
+MELK3.SA,"1709    25119
+Name: CD_CVM, dtype: int64",Melnick Desenvolvimento Imobiliário S.A.,MELNICK     ON  ED  NM,151573561.0,https://www.melnickeven.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,90450-120,25119.0
+MERC4.SA,,"Mercantil Financeira S.A. - Crédito, Financiamento e Investimento",MERC FINANC PN,1929231.0,,Financial Services,Financial Services,Banks - Regional,Brazil,,30160-912,8540.0
+MGEL4.SA,"1652    8397
+Name: CD_CVM, dtype: int64",Mangels Industrial S.A.,MANGELS INDLPN,2057833.0,https://www.mangels.com.br,Basic Materials,Basic Materials,Steel,Brazil,,37418-760,8397.0
+MGLU3.SA,"1636    22470
+Name: CD_CVM, dtype: int64",Magazine Luiza S.A.,MAGAZ LUIZA ON      NM,356156962.0,https://www.magazineluiza.com.br,Consumer Cyclical,Consumer Cyclical,Specialty Retail,Brazil,,,22470.0
+MILS3.SA,"1744    22012
+1745    22012
+Name: CD_CVM, dtype: int64","Mills Locação, Serviços e Logística S.A.",MILLS       ON      NM,167410242.0,https://www.mills.com.br,Industrials,Industrials,Rental & Leasing Services,Brazil,,,22012.0
+MLAS3.SA,,Multilaser Industrial S.A.,MULTILASER  ON      NM,191312192.0,https://www.multilaser.com.br,Technology,Technology,Electronics & Computer Distribution,Brazil,,01452-000,26034.0
+MNDL3.SA,,Mundial S.A. - Produtos de Consumo,MUNDIAL     ON,4878248.0,https://www.mundial.com,Consumer Defensive,Consumer Defensive,Household & Personal Products,Brazil,55 11 3520 1523,04103-000,5312.0
+MNPR3.SA,,Minupar Participações S.A.,MINUPAR     ON,1517646.0,https://www.minupar.com.br,Consumer Defensive,Consumer Defensive,Farm Products,Brazil,,95913-162,13765.0
+MOAR3.SA,"1765    8893
+1766    8893
+Name: CD_CVM, dtype: int64",Monteiro Aranha S.A.,MONT ARANHA ON,563679.0,https://www.monteiroaranha.com.br,Industrials,Industrials,Conglomerates,Brazil,55 21 2285 7836,22430-060,8893.0
+MOVI3.SA,"1780    23825
+1781    23825
+Name: CD_CVM, dtype: int64",Movida Participações S.A.,MOVIDA      ON      NM,151219502.0,https://ri.movida.com.br,Industrials,Industrials,Rental & Leasing Services,Brazil,55 11 2377 7000,04530-001,23825.0
+MRFG3.SA,"1661    20788
+Name: CD_CVM, dtype: int64",Marfrig Global Foods S.A.,MARFRIG     ON      NM,285573376.0,https://www.marfrig.com.br,Consumer Defensive,Consumer Defensive,Packaged Foods,Brazil,,05319-000,20788.0
+MRSA3B.SA,"1783    17949
+Name: CD_CVM, dtype: int64",MRS Logística S.A.,MRS LOGISTICA,5187947.0,https://www.mrs.com.br,Industrials,Industrials,Railroads,Brazil,,22250-906,17949.0
+MRSA5B.SA,"1783    17949
+Name: CD_CVM, dtype: int64",MRS Logística S.A.,MRS LOGISTICA,5187947.0,https://www.mrs.com.br,Industrials,Industrials,Railroads,Brazil,,22250-906,17949.0
+MRSA6B.SA,"1783    17949
+Name: CD_CVM, dtype: int64",MRS Logística S.A.,MRS LOGISTICA,5187947.0,https://www.mrs.com.br,Industrials,Industrials,Railroads,Brazil,,22250-906,17949.0
+MRVE3.SA,"1784    20915
+Name: CD_CVM, dtype: int64",MRV Engenharia e Participações S.A.,MRV         ON      NM,318688583.0,https://www.mrv.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,55 31 3615 7155,30455-610,20915.0
+MSPA3.SA,,Companhia Melhoramentos de São Paulo,MELHOR SP   ON,756372.0,https://www.melhoramentos.com.br,Basic Materials,Basic Materials,Lumber & Wood Production,Brazil,,05051-000,3654.0
+MSPA4.SA,,Companhia Melhoramentos de São Paulo,MELHOR SP   PN,756372.0,https://www.melhoramentos.com.br,Basic Materials,Basic Materials,Lumber & Wood Production,Brazil,,05051-000,3654.0
+MTRE3.SA,"1754    24902
+Name: CD_CVM, dtype: int64",Mitre Realty Empreendimentos e Participações S.A.,MITRE REALTYON  ED  NM,52672687.0,https://www.mitrerealty.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,01418-002,24902.0
+MTSA4.SA,,METISA Metalúrgica Timboense S.A.,METISA      PN,3135242.0,https://www.metisa.com.br,Industrials,Industrials,Farm & Heavy Construction Machinery,Brazil,,89120-000,8753.0
+MULT3.SA,,Multiplan Empreendimentos Imobiliários S.A.,MULTIPLAN   ON  EJ  N2,158971682.0,https://www.multiplan.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,55 21 3031 5402,22640-102,20982.0
+MWET3.SA,"2607    11991
+Name: CD_CVM, dtype: int64",Wetzel S.A.,WETZEL S/A  ON,668541.0,https://www.wetzel.com.br,Consumer Cyclical,Consumer Cyclical,Auto Parts,Brazil,,89219-600,11991.0
+MWET4.SA,"2607    11991
+Name: CD_CVM, dtype: int64",Wetzel S.A.,WETZEL S/A  PN,668541.0,https://www.wetzel.com.br,Consumer Cyclical,Consumer Cyclical,Auto Parts,Brazil,,89219-600,11991.0
+MYPK3.SA,,Iochpe-Maxion S.A.,"IOCHP,MAXIONON      NM",127566689.0,https://www.iochpe.com.br,Consumer Cyclical,Consumer Cyclical,Auto Parts,Brazil,,012730-900,11932.0
+NEOE3.SA,"1812    15539
+Name: CD_CVM, dtype: int64",Neoenergia S.A.,NEOENERGIA  ON  EJ  NM,563025966.0,https://www.neoenergia.com,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,15539.0
+NEXP3.SA,"1819    21180
+Name: CD_CVM, dtype: int64",Nexpe Participações S.A.,NEXPE       ON,1038549.0,https://www.nexpe.co/en/,Real Estate,Real Estate,Real Estate Services,Brazil,,04565-001,21180.0
+NGRD3.SA,,Neogrid Participações S.A.,NEOGRID     ON      NM,4165484.0,https://www.neogrid.com,Technology,Technology,Software - Application,Brazil,,89218-105,25399.0
+NINJ3.SA,"1284    25887
+Name: CD_CVM, dtype: int64",GetNinjas S.A.,GETNINJAS   ON      NM,50855716.0,https://www.getninjas.com.br,Technology,Technology,Software - Application,Brazil,,01452-001,25887.0
+NORD3.SA,,Nordon Indústrias Metalúrgicas S/A,NORDON MET  ON,71181.0,https://www.nordon.ind.br,Financial Services,Financial Services,Shell Companies,Brazil,,09080-620,9083.0
+NTCO3.SA,,Natura &Co Holding S.A.,GRUPO NATURAON      NM,811018132.0,https://www.naturaeco.com,Consumer Defensive,Consumer Defensive,Household & Personal Products,Brazil,,05106-000,24783.0
+NUTR3.SA,,Nutriplant Indústria e Comércio S/A,NUTRIPLANT  ON      MA,1264054.0,https://www.nutriplant.com.br,Basic Materials,Basic Materials,Agricultural Inputs,Brazil,55 11 4161 2036,06415-110,21334.0
+ODPV3.SA,"1857    20125
+Name: CD_CVM, dtype: int64",Odontoprev S.A.,ODONTOPREV  ON  EJ  NM,253325955.0,https://www.odontoprev.com.br,Healthcare,Healthcare,Healthcare Plans,Brazil,,06455-000,20125.0
+OFSA3.SA,,Ouro Fino Saúde Animal Participações S.A.,OUROFINO S/AON  EJ  NM,7520475.0,https://www.ourofinosaudeanimal.com,Healthcare,Healthcare,Drug Manufacturers - Specialty & Generic,Brazil,,14140-000,23507.0
+OIBR3.SA,"1142    25577
+1859    11312
+2167    19186
+2227    25160
+2313    23957
+2459    25950
+Name: CD_CVM, dtype: int64",Oi S.A.,OI          ON      N1,59396858.0,https://www.oi.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,20230-070,25577.0
+OIBR4.SA,"1142    25577
+1859    11312
+2167    19186
+2227    25160
+2313    23957
+2459    25950
+Name: CD_CVM, dtype: int64",Oi S.A.,OI          PN      N1,59396858.0,https://www.oi.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,20230-070,25577.0
+ONCO3.SA,"1864    26123
+Name: CD_CVM, dtype: int64",Oncoclínicas do Brasil Serviços Médicos S.A.,ONCOCLINICASON      NM,276176085.0,https://www.grupooncoclinicas.com,Healthcare,Healthcare,Medical Care Facilities,Brazil,,04543-906,26123.0
+OPCT3.SA,"1854    25534
+Name: CD_CVM, dtype: int64",OceanPact Serviços Marítimos S.A.,OCEANPACT   ON      NM,111765863.0,https://www.oceanpact.com,Industrials,Industrials,Specialty Business Services,Brazil,,20241-180,25534.0
+ORVR3.SA,"1875    25550
+1876    25550
+Name: CD_CVM, dtype: int64",Orizon Valorização de Resíduos S.A.,ORIZON      ON      NM,36019765.0,https://orizonvr.com.br,Industrials,Industrials,Waste Management,Brazil,,04578-903,25550.0
+OSXB3.SA,"1878    21342
+Name: CD_CVM, dtype: int64",OSX Brasil S.A.,OSX BRASIL  ON      NM,1288051.0,https://www.osx.com.br,Energy,Energy,Oil & Gas Equipment & Services,Brazil,55 21 3237 5200,22290-906,21342.0
+PATI3.SA,,Panatlântica S.A.,PANATLANTICAON,16033012.0,https://www.panatlantica.com.br,Basic Materials,Basic Materials,Steel,Brazil,55 51 3489 1095,94045-405,94.0
+PATI4.SA,,Panatlântica S.A.,PANATLANTICAPN,16033012.0,https://www.panatlantica.com.br,Basic Materials,Basic Materials,Steel,Brazil,55 51 3489 1095,94045-405,94.0
+PCAR3.SA,,Companhia Brasileira De Distribuicao,"P.ACUCAR,CBDON      NM",447223832.0,https://www.gpari.com.br,Consumer Cyclical,Consumer Cyclical,Department Stores,Brazil,,01402-901,14826.0
+PDTC3.SA,"1885    18414
+Name: CD_CVM, dtype: int64",Padtec Holding S.A.,PADTEC      ON      NM,18310597.0,https://www.padtec.com.br/en/investor/padtec-holding-en/,Technology,Technology,Communication Equipment,Brazil,,13086-510,18414.0
+PEAB3.SA,,Companhia de Participações Aliança da Bahia,PAR AL BAHIAON  ED,7324965.0,https://www.aliancaparticipacoes.com.br,Financial Services,Financial Services,Asset Management,Brazil,,,18708.0
+PEAB4.SA,,Companhia de Participações Aliança da Bahia,PAR AL BAHIAPN,7324965.0,https://www.aliancaparticipacoes.com.br,Financial Services,Financial Services,Asset Management,Brazil,,,18708.0
+PETR3.SA,,Petróleo Brasileiro S.A. - Petrobras,PETROBRAS   ON  EDJ N2,7950930353.0,https://petrobras.com.br,Energy,Energy,Oil & Gas Integrated,Brazil,,20241-030,9512.0
+PETR4.SA,,Petróleo Brasileiro S.A. - Petrobras,PETROBRAS   PN  EDJ N2,7950930353.0,https://petrobras.com.br,Energy,Energy,Oil & Gas Integrated,Brazil,,20241-030,9512.0
+PETZ3.SA,"1932    25089
+1933    25089
+Name: CD_CVM, dtype: int64",Pet Center Comércio e Participações S.A.,PETZ        ON      NM,230836751.0,https://www.petz.com.br,Consumer Cyclical,Consumer Cyclical,Specialty Retail,Brazil,,03035-040,25089.0
+PFRM3.SA,,Profarma Distribuidora de Produtos Farmacêuticos S.A.,PROFARMA    ON      NM,40679802.0,https://www.profarma.com.br,Healthcare,Healthcare,Medical Distribution,Brazil,,,20346.0
+PGMN3.SA,"1106    22608
+Name: CD_CVM, dtype: int64",Empreendimentos Pague Menos S.A.,PAGUE MENOS ON      NM,125498434.0,https://www.paguemenos.com.br,Healthcare,Healthcare,Pharmaceutical Retailers,Brazil,,60025-902,22608.0
+PINE3.SA,"272    20567
+Name: CD_CVM, dtype: int64",Banco Pine S.A.,PINE        ON      N2,46059686.0,https://www.pine.com,Financial Services,Financial Services,Banks - Regional,Brazil,,04543-900,20567.0
+PINE4.SA,"272    20567
+Name: CD_CVM, dtype: int64",Banco Pine S.A.,PINE        PN      N2,46059686.0,https://www.pine.com,Financial Services,Financial Services,Banks - Regional,Brazil,,04543-900,20567.0
+PLAS3.SA,"1959    13471
+Name: CD_CVM, dtype: int64",Plascar Participações Industriais S.A.,PLASCAR PARTON,2281804.0,https://www.plascar.com.br,Consumer Cyclical,Consumer Cyclical,Auto Parts,Brazil,,13213-000,13471.0
+PLPL3.SA,"1958    25070
+Name: CD_CVM, dtype: int64",Plano & Plano Desenvolvimento Imobiliário S.A.,PLANOEPLANO ON      NM,198111273.0,https://www.planoeplano.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,04576-060,25070.0
+PMAM3.SA,"1900     9393
+1901     9393
+2100    18368
+2101    18368
+Name: CD_CVM, dtype: int64",Paranapanema S.A.,PARANAPANEMAON      NM,19520233.0,https://www.paranapanema.com.br,Basic Materials,Basic Materials,Copper,Brazil,,09220-580,9393.0
+PNVL3.SA,,Dimed S.A. Distribuidora de Medicamentos,DIMED       ON  EJ  NM,80131922.0,https://www.dimed.com.br,Healthcare,Healthcare,Drug Manufacturers - General,Brazil,,92990-000,9342.0
+POMO3.SA,"1659    8451
+Name: CD_CVM, dtype: int64",Marcopolo S.A.,MARCOPOLO   ON      N2,842640675.0,https://www.marcopolo.com.br,Industrials,Industrials,Farm & Heavy Construction Machinery,Brazil,,,8451.0
+POMO4.SA,"1659    8451
+Name: CD_CVM, dtype: int64",Marcopolo S.A.,MARCOPOLO   PN      N2,842640675.0,https://www.marcopolo.com.br,Industrials,Industrials,Farm & Heavy Construction Machinery,Brazil,,,8451.0
+PORT3.SA,"2610    26247
+Name: CD_CVM, dtype: int64",Wilson Sons S.A.,WILSON SONS ON      NM,147361082.0,https://www.wilsonsons.com.br,Industrials,Industrials,Marine Shipping,Brazil,,22250-145,26247.0
+POSI3.SA,"1989    20362
+Name: CD_CVM, dtype: int64",Positivo Tecnologia S.A.,POSITIVO TECON      NM,73329494.0,https://www.positivotecnologia.com.br,Technology,Technology,Computer Hardware,Brazil,,81350-000,20362.0
+PRIO3.SA,"2001    27740
+2002    22187
+Name: CD_CVM, dtype: int64",Prio S.A.,PETRORIO    ON      NM,766186496.0,https://www.prio3.com.br,Energy,Energy,Oil & Gas E&P,Brazil,,22250-040,27740.0
+PRNR3.SA,"1998    24236
+1999    24236
+Name: CD_CVM, dtype: int64",Priner Serviços Industriais S.A.,PRINER      ON      NM,31632563.0,https://www.priner.com.br,Industrials,Industrials,Engineering & Construction,Brazil,,22640-102,24236.0
+PSSA3.SA,"1984    16659
+Name: CD_CVM, dtype: int64",Porto Seguro S.A.,PORTO SEGUROON      NM,183823081.0,https://www.portoseguro.com.br,Financial Services,Financial Services,Insurance - Diversified,Brazil,,01216-012,16659.0
+PTBL3.SA,"1916    13773
+Name: CD_CVM, dtype: int64",PBG S.A.,PORTOBELLO  ON      NM,58034432.0,https://www.portobello.com.br,Industrials,Industrials,Building Products & Equipment,Brazil,,88200-000,13773.0
+PTNT3.SA,,Pettenati S.A. Industria Têxtil,PETTENATI   ON,29479403.0,https://www.pettenati.com.br,Consumer Cyclical,Consumer Cyclical,Apparel Manufacturing,Brazil,,95010-550,9539.0
+PTNT4.SA,,Pettenati S.A. Industria Têxtil,PETTENATI   PN,29479403.0,https://www.pettenati.com.br,Consumer Cyclical,Consumer Cyclical,Apparel Manufacturing,Brazil,,95010-550,9539.0
+QUAL3.SA,"2023    22497
+Name: CD_CVM, dtype: int64",Qualicorp Consultoria e Corretora de Seguros S.A.,QUALICORP   ON      NM,148440874.0,https://www.qualicorp.com.br,Healthcare,Healthcare,Healthcare Plans,Brazil,,01311-000,22497.0
+RADL3.SA,"2034    5258
+2035    5258
+Name: CD_CVM, dtype: int64",Raia Drogasil S.A.,RAIADROGASILON      NM,832076378.0,https://rdsaude.com.br,Healthcare,Healthcare,Pharmaceutical Retailers,Brazil,,05339-900,5258.0
+RAIL3.SA,"2126    26484
+2127    15300
+2128    17850
+2129    17930
+2130    15709
+2131    17450
+2132    17450
+Name: CD_CVM, dtype: int64",Rumo S.A.,RUMO S.A.   ON      NM,1217128393.0,https://www.rumolog.com,Industrials,Industrials,Railroads,Brazil,,82920-030,26484.0
+RAIZ4.SA,"2038    23230
+2039    25917
+Name: CD_CVM, dtype: int64",Raízen S.A.,RAIZEN      PN      N2,1210943487.0,https://www.raizen.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,,20031-004,23230.0
+RANI3.SA,"1475    2429
+Name: CD_CVM, dtype: int64",Irani Papel e Embalagem S.A.,IRANI       ON      NM,103779637.0,https://irani.com.br,Consumer Cyclical,Consumer Cyclical,Packaging & Containers,Brazil,,,2429.0
+RAPT3.SA,,Randon S.A. Implementos e Participações,RANDON PART ON  EJ  N1,197328218.0,https://www.randon.com.br/en,Industrials,Industrials,Farm & Heavy Construction Machinery,Brazil,,95055-010,14109.0
+RAPT4.SA,,Randon S.A. Implementos e Participações,RANDON PART PN  EJ  N1,197328218.0,https://www.randon.com.br/en,Industrials,Industrials,Farm & Heavy Construction Machinery,Brazil,,95055-010,14109.0
+RCSL3.SA,,Recrusul S/A,RECRUSUL    ON,19499429.0,https://www.recrusul.com.br,Industrials,Industrials,Specialty Industrial Machinery,Brazil,,,12572.0
+RCSL4.SA,,Recrusul S/A,RECRUSUL    PN,19499429.0,https://www.recrusul.com.br,Industrials,Industrials,Specialty Industrial Machinery,Brazil,,,12572.0
+RDNI3.SA,"2109    20451
+Name: CD_CVM, dtype: int64",RNI Negócios Imobiliários S.A.,RNI         ON      NM,11209764.0,https://rni.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,15085-485,20451.0
+RDOR3.SA,"2062    24821
+Name: CD_CVM, dtype: int64",Rede D'Or São Luiz S.A.,REDE D OR   ON  EJ  NM,1645156463.0,https://www.rededorsaoluiz.com.br,Healthcare,Healthcare,Medical Care Facilities,Brazil,,03313-000,24821.0
+RECV3.SA,,Petroreconcavo S.A.,PETRORECSA  ON      NM,206526807.0,https://petroreconcavo.com.br,Energy,Energy,Oil & Gas E&P,Brazil,,48.280-000,25780.0
+REDE3.SA,"2063    3190
+Name: CD_CVM, dtype: int64",Rede Energia Participações S.A.,REDE ENERGIAON,8968874.0,https://www.energisa.com.br,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,36770-901,3190.0
+RENT3.SA,"1597    19739
+1598    19739
+Name: CD_CVM, dtype: int64",Localiza Rent a Car S.A.,LOCALIZA    ON  EJ  NM,853221789.0,https://www.localiza.com,Industrials,Industrials,Rental & Leasing Services,Brazil,,31150-000,19739.0
+RNEW11.SA,"2076    21636
+Name: CD_CVM, dtype: int64",Renova Energia S.A.,RENOVA      UNT     N2,77794087.0,https://www.renovaenergia.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,,,21636.0
+RNEW3.SA,"2076    21636
+Name: CD_CVM, dtype: int64",Renova Energia S.A.,RENOVA      ON      N2,77794087.0,https://www.renovaenergia.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,,,21636.0
+RNEW4.SA,"2076    21636
+Name: CD_CVM, dtype: int64",Renova Energia S.A.,RENOVA      PN      N2,77794087.0,https://www.renovaenergia.com.br,Utilities,Utilities,Utilities - Renewable,Brazil,,,21636.0
+ROMI3.SA,"1073    25569
+2116     7510
+Name: CD_CVM, dtype: int64",Romi S.A.,ROMI        ON  EJ  NM,49889208.0,https://www.romi.com,Industrials,Industrials,Industrial Distribution,Brazil,,13459-057,25569.0
+RPAD3.SA,"65    9954
+Name: CD_CVM, dtype: int64",Alfa Holdings S.A.,ALFA HOLDINGON,74730409.0,https://www.alfanet.com.br,Industrials,Industrials,Conglomerates,Brazil,,01418-000,9954.0
+RPAD5.SA,"65    9954
+Name: CD_CVM, dtype: int64",Alfa Holdings S.A.,ALFA HOLDINGPNA,74730409.0,https://www.alfanet.com.br,Industrials,Industrials,Conglomerates,Brazil,,01418-000,9954.0
+RPAD6.SA,"65    9954
+Name: CD_CVM, dtype: int64",Alfa Holdings S.A.,ALFA HOLDINGPNB,74730409.0,https://www.alfanet.com.br,Industrials,Industrials,Conglomerates,Brazil,,01418-000,9954.0
+RPMG3.SA,,Refinaria de Petróleos de Manguinhos S.A.,PET MANGUINHON,22553079.0,https://refit.com.br,Energy,Energy,Oil & Gas Refining & Marketing,Brazil,,20930-041,9989.0
+RSID3.SA,"2119    16306
+Name: CD_CVM, dtype: int64",Rossi Residencial S.A.,ROSSI RESID ON      NM,9826492.0,https://www.rossiresidencial.com.br,Consumer Cyclical,Consumer Cyclical,Residential Construction,Brazil,,04709-111,16306.0
+RSUL4.SA,,Metalúrgica Riosulense S.A.,RIOSULENSE  PN,895700.0,https://rio.expert,Consumer Cyclical,Consumer Cyclical,Auto Parts,Brazil,,89164-910,13439.0
+SANB11.SA,"276    20532
+Name: CD_CVM, dtype: int64",Banco Santander (Brasil) S.A.,SANTANDER BRUNT,739257873.0,https://www.santander.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,04543-011,20532.0
+SANB3.SA,"276    20532
+Name: CD_CVM, dtype: int64",Banco Santander (Brasil) S.A.,SANTANDER BRON,739257873.0,https://www.santander.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,04543-011,20532.0
+SANB4.SA,"276    20532
+Name: CD_CVM, dtype: int64",Banco Santander (Brasil) S.A.,SANTANDER BRPN,739257873.0,https://www.santander.com.br,Financial Services,Financial Services,Banks - Regional,Brazil,,04543-011,20532.0
+SAPR11.SA,,Companhia de Saneamento do Paraná - SANEPAR,SANEPAR     UNT     N2,1208556390.0,https://www.sanepar.com.br,Utilities,Utilities,Utilities - Regulated Water,Brazil,,80215-900,18627.0
+SAPR3.SA,,Companhia de Saneamento do Paraná - SANEPAR,SANEPAR     ON      N2,1208556390.0,https://www.sanepar.com.br,Utilities,Utilities,Utilities - Regulated Water,Brazil,,80215-900,18627.0
+SAPR4.SA,,Companhia de Saneamento do Paraná - SANEPAR,SANEPAR     PN      N2,1208556390.0,https://www.sanepar.com.br,Utilities,Utilities,Utilities - Regulated Water,Brazil,,80215-900,18627.0
+SBFG3.SA,"1314    24694
+Name: CD_CVM, dtype: int64",Grupo SBF S.A.,GRUPO SBF   ON      NM,149164707.0,https://ri.gruposbf.com.br,Consumer Cyclical,Consumer Cyclical,Specialty Retail,Brazil,,05425-070,24694.0
+SBSP3.SA,,Companhia de Saneamento Básico do Estado de São Paulo - SABESP,SABESP      ON      NM,457944777.0,https://www.sabesp.com.br,Utilities,Utilities,Utilities - Regulated Water,Brazil,,05429-900,14443.0
+SCAR3.SA,,São Carlos Empreendimentos e Participações S.A.,SAO CARLOS  ON      NM,26517480.0,https://www.scsa.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,04543-904,13781.0
+SEQL3.SA,"2227    25160
+Name: CD_CVM, dtype: int64",Sequoia Logística e Transportes S.A.,SEQUOIA LOG ON      NM,16500200.0,https://www.sequoialog.com.br,Industrials,Industrials,Integrated Freight & Logistics,Brazil,,,25160.0
+SGPS3.SA,"2301    20966
+Name: CD_CVM, dtype: int64",Springs Global Participações S.A.,SPRINGS     ON      NM,4708000.0,https://ri.springs.com,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,39404-005,20966.0
+SHOW3.SA,"2338    22454
+Name: CD_CVM, dtype: int64",T4F Entretenimento S.A.,TIME FOR FUNON      NM,55891811.0,https://www.t4f.com.br,Consumer Cyclical,Consumer Cyclical,Leisure,Brazil,,05411- 000,22454.0
+SHUL4.SA,"2204    14664
+Name: CD_CVM, dtype: int64",Schulz S.A.,SCHULZ      PN,151956076.0,https://www.schulz.com.br,Consumer Cyclical,Consumer Cyclical,Auto Parts,Brazil,,89219-600,14664.0
+SIMH3.SA,"2258    25003
+Name: CD_CVM, dtype: int64",SIMPAR S.A.,SIMPAR      ON      NM,217917177.0,https://ri.simpar.com.br,Industrials,Industrials,Rental & Leasing Services,Brazil,,04530-001,25003.0
+SLCE3.SA,,SLC Agrícola S.A.,SLC AGRICOLAON      NM,195723959.0,https://www.slcagricola.com.br,Consumer Defensive,Consumer Defensive,Farm Products,Brazil,,91330-002,20745.0
+SMFT3.SA,"2269    24260
+2270    24260
+Name: CD_CVM, dtype: int64",Smartfit Escola de Ginástica e Dança S.A.,SMART FIT   ON  EJS NM,254733999.0,https://www.smartfit.com.br,Consumer Cyclical,Consumer Cyclical,Leisure,Brazil,,,24260.0
+SMTO3.SA,"2191    20516
+Name: CD_CVM, dtype: int64",São Martinho S.A.,SAO MARTINHOON      NM,141877031.0,https://www.saomartinho.com.br,Basic Materials,Basic Materials,Specialty Chemicals,Brazil,,14850-000,20516.0
+SNSY5.SA,"2171    12696
+Name: CD_CVM, dtype: int64",Sansuy S.A.,SANSUY      PNA,3102764.0,https://sansuy.com.br,Consumer Cyclical,Consumer Cyclical,Auto Parts,Brazil,,06830-900,12696.0
+SOJA3.SA,"364    25704
+Name: CD_CVM, dtype: int64",Boa Safra Sementes S.A.,BOA SAFRA   ON      NM,56713029.0,https://www.boasafrasementes.com.br,Basic Materials,Basic Materials,Agricultural Inputs,Brazil,,73813-014,25704.0
+SOND3.SA,,Sondotécnica Engenharia de Solos S.A.,SONDOTECNICAON,340222.0,https://www.sondotecnica.com.br,Industrials,Industrials,Engineering & Construction,Brazil,55 21 2102 7100,22270-900,10880.0
+SOND5.SA,,Sondotécnica Engenharia de Solos S.A.,SONDOTECNICAPNA,340222.0,https://www.sondotecnica.com.br,Industrials,Industrials,Engineering & Construction,Brazil,55 21 2102 7100,22270-900,10880.0
+SOND6.SA,,Sondotécnica Engenharia de Solos S.A.,SONDOTECNICAPNB,340222.0,https://www.sondotecnica.com.br,Industrials,Industrials,Engineering & Construction,Brazil,55 21 2102 7100,22270-900,10880.0
+SRNA3.SA,"2229    26441
+Name: CD_CVM, dtype: int64",Serena Energia S.A.,SERENA      ON      NM,495558841.0,https://www.us.srna.co/,Utilities,Utilities,Utilities - Renewable,Brazil,,,26441.0
+STBP3.SA,"2184    17892
+2185    17892
+Name: CD_CVM, dtype: int64",Santos Brasil Participações S.A.,SANTOS BRP  ON      NM,826718712.0,https://www.santosbrasil.com.br,Industrials,Industrials,Marine Shipping,Brazil,,04534-011,17892.0
+SUZB3.SA,"2331     9067
+2332    13986
+Name: CD_CVM, dtype: int64",Suzano S.A.,SUZANO S.A. ON  EJ  NM,184436361.0,https://www.suzano.com.br,Basic Materials,Basic Materials,Paper & Paper Products,Brazil,,41810-012,9067.0
+SYNE3.SA,"2334    21040
+2335    21040
+Name: CD_CVM, dtype: int64",Syn Prop & Tech S.A.,SYN PROP TECON      NM,36914006.0,https://www.syn.com.br/en,Real Estate,Real Estate,Real Estate - Diversified,Brazil,55 11 3018 7680,04538-132,21040.0
+TAEE11.SA,"2451    20257
+2452    20257
+Name: CD_CVM, dtype: int64",Transmissora Aliança de Energia Elétrica S.A.,TAESA       UNT     N2,344498907.0,https://institucional.taesa.com.br/,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,20257.0
+TAEE3.SA,"2451    20257
+2452    20257
+Name: CD_CVM, dtype: int64",Transmissora Aliança de Energia Elétrica S.A.,TAESA       ON      N2,344498907.0,https://institucional.taesa.com.br/,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,20257.0
+TAEE4.SA,"2451    20257
+2452    20257
+Name: CD_CVM, dtype: int64",Transmissora Aliança de Energia Elétrica S.A.,TAESA       PN      N2,344498907.0,https://institucional.taesa.com.br/,Utilities,Utilities,Utilities - Regulated Electric,Brazil,,,20257.0
+TASA3.SA,"2343    6173
+2344    6173
+Name: CD_CVM, dtype: int64",Taurus Armas S.A.,TAURUS ARMASON      N2,60774806.0,https://www.taurusarmas.com.br,Industrials,Industrials,Aerospace & Defense,Brazil,,93035-411,6173.0
+TASA4.SA,"2343    6173
+2344    6173
+Name: CD_CVM, dtype: int64",Taurus Armas S.A.,TAURUS ARMASPN      N2,60774806.0,https://www.taurusarmas.com.br,Industrials,Industrials,Aerospace & Defense,Brazil,,93035-411,6173.0
+TCSA3.SA,"2356    20435
+2357    20435
+Name: CD_CVM, dtype: int64",Tecnisa S.A.,TECNISA     ON      NM,45177177.0,https://www.tecnisa.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,,20435.0
+TECN3.SA,"2354    22519
+Name: CD_CVM, dtype: int64",Technos S.A.,TECHNOS     ON      NM,10769495.0,https://www.grupotechnos.com.br,Consumer Cyclical,Consumer Cyclical,Luxury Goods,Brazil,,,22519.0
+TEKA3.SA,"2365    11223
+Name: CD_CVM, dtype: int64",Teka Tecelagem Kuehnrich S.A.,TEKA        ON,400557.0,https://www.teka.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,89052-900,11223.0
+TEKA4.SA,"2365    11223
+Name: CD_CVM, dtype: int64",Teka Tecelagem Kuehnrich S.A.,TEKA        PN,400557.0,https://www.teka.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,,89052-900,11223.0
+TELB3.SA,,Telecomunicações Brasileiras S.A. - Telebras,TELEBRAS    ON,6517590.0,https://www.telebras.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,70610-440,11258.0
+TELB4.SA,,Telecomunicações Brasileiras S.A. - Telebras,TELEBRAS    PN,6517590.0,https://www.telebras.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,70610-440,11258.0
+TEND3.SA,"907    21148
+Name: CD_CVM, dtype: int64",Construtora Tenda S.A.,TENDA       ON      NM,86365385.0,https://www.tenda.com,Real Estate,Real Estate,Real Estate - Development,Brazil,,01010-001,21148.0
+TFCO4.SA,"2445    25208
+Name: CD_CVM, dtype: int64",Track & Field Co S.A.,TRACK FIELD PN  EJ  N2,53333855.0,https://www.tfco.com.br,Consumer Cyclical,Consumer Cyclical,Apparel Retail,Brazil,,04543-121,25208.0
+TGMA3.SA,"2363    20800
+Name: CD_CVM, dtype: int64",Tegma Gestão Logística S.A.,TEGMA       ON      NM,25695950.0,https://www.tegma.com.br,Industrials,Industrials,Trucking,Brazil,,09820-655,20800.0
+TIMS3.SA,"96      21490
+98      26433
+266      1309
+550     13854
+1009     6076
+1298    25321
+1327    24392
+1328    24392
+1460     6041
+1461    18775
+1462    18775
+1716     8540
+1737     8753
+1854    25534
+2050    26964
+2431    27090
+2434    24929
+2444    19330
+2460     8192
+2591    27189
+2615    27111
+2616    20001
+Name: CD_CVM, dtype: int64",TIM S.A.,TIM         ON  EJ  NM,2514523868.0,https://www.tim.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,22775-057,21490.0
+TKNO4.SA,,Tekno S.A. Indústria e Comércio,TEKNO       PN  EJ,366413.0,https://teknokroma.com.br,Basic Materials,Basic Materials,Steel,Brazil,,02060-040,11231.0
+TOTS3.SA,"2443    19992
+Name: CD_CVM, dtype: int64",TOTVS S.A.,TOTVS       ON      NM,505361322.0,https://www.totvs.com,Technology,Technology,Software - Application,Brazil,,02511-00,19992.0
+TPIS3.SA,,Triunfo Participações e Investimentos S.A.,TRIUNFO PARTON  ED  NM,11415867.0,https://www.triunfo.com,Industrials,Industrials,Infrastructure Operations,Brazil,55 11 2169 3969,04551-000,19330.0
+TRAD3.SA,"955     23981
+1025    18597
+1026    18597
+1457    18589
+2345    26077
+2348    24066
+2613    15741
+2614    16551
+Name: CD_CVM, dtype: int64",TC S.A.,TC          ON      NM,21906288.0,https://tc.com.br,Technology,Technology,Software - Application,Brazil,,04542-100,23981.0
+TRIS3.SA,"2466    21130
+2467    21130
+Name: CD_CVM, dtype: int64",Trisul S.A.,TRISUL      ON      NM,61992929.0,https://www.trisul-sa.com.br,Real Estate,Real Estate,Real Estate Services,Brazil,,01311-902,21130.0
+TRPL3.SA,,ISA Energía Brasil S.A,TRAN PAULISTON      N1,187373234.0,https://www.isacteep.com.br,Utilities,Utilities,Utilities - Independent Power Producers,Brazil,55 11 3138 7046,04794-000,18376.0
+TRPL4.SA,,ISA Energía Brasil S.A,TRAN PAULISTPN      N1,187373234.0,https://www.isacteep.com.br,Utilities,Utilities,Utilities - Independent Power Producers,Brazil,55 11 3138 7046,04794-000,18376.0
+TTEN3.SA,,Três Tentos Agroindustrial S/A,3TENTOS     ON      NM,113315715.0,https://www.3tentos.com.br,Basic Materials,Basic Materials,Agricultural Inputs,Brazil,,98240-000,25950.0
+TUPY3.SA,"2486    6343
+Name: CD_CVM, dtype: int64",Tupy S.A.,TUPY        ON      NM,66413463.0,https://www.tupy.com.br,Industrials,Industrials,Metal Fabrication,Brazil,,89227-901,6343.0
+TXRX3.SA,"2426    7544
+Name: CD_CVM, dtype: int64",Têxtil Renauxview S.A.,TEX RENAUX  ON,632972.0,https://www.renauxview.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,55 47 3255 1001,88351-020,7544.0
+TXRX4.SA,"2426    7544
+Name: CD_CVM, dtype: int64",Têxtil Renauxview S.A.,TEX RENAUX  PN,632972.0,https://www.renauxview.com.br,Consumer Cyclical,Consumer Cyclical,Textile Manufacturing,Brazil,55 47 3255 1001,88351-020,7544.0
+UCAS3.SA,"2504    22780
+Name: CD_CVM, dtype: int64",Unicasa Indústria de Móveis S.A.,UNICASA     ON      NM,29340363.0,https://www.unicasamoveis.com.br,Consumer Cyclical,Consumer Cyclical,"Furnishings, Fixtures & Appliances",Brazil,,95707-540,22780.0
+UGPA3.SA,"2492    18465
+Name: CD_CVM, dtype: int64",Ultrapar Participações S.A.,ULTRAPAR    ON      NM,702901071.0,https://www.ultra.com.br,Energy,Energy,Oil & Gas Refining & Marketing,Brazil,,01317-910,18465.0
+UNIP3.SA,"2509    11592
+2510    11592
+Name: CD_CVM, dtype: int64",Unipar Carbocloro S.A.,UNIPAR      ON,61483806.0,https://www.unipar.com,Basic Materials,Basic Materials,Chemicals,Brazil,,04543-011,11592.0
+UNIP5.SA,"2509    11592
+2510    11592
+Name: CD_CVM, dtype: int64",Unipar Carbocloro S.A.,UNIPAR      PNA,61483806.0,https://www.unipar.com,Basic Materials,Basic Materials,Chemicals,Brazil,,04543-011,11592.0
+UNIP6.SA,"2509    11592
+2510    11592
+Name: CD_CVM, dtype: int64",Unipar Carbocloro S.A.,UNIPAR      PNB,61483806.0,https://www.unipar.com,Basic Materials,Basic Materials,Chemicals,Brazil,,04543-011,11592.0
+USIM3.SA,,Usinas Siderúrgicas de Minas Gerais S.A.,USIMINAS    ON      N1,494568142.0,https://www.usiminas.com,Basic Materials,Basic Materials,Steel,Brazil,,30110-044,14320.0
+USIM5.SA,,Usinas Siderúrgicas de Minas Gerais S.A.,USIMINAS    PNA     N1,494568142.0,https://www.usiminas.com,Basic Materials,Basic Materials,Steel,Brazil,,30110-044,14320.0
+USIM6.SA,,Usinas Siderúrgicas de Minas Gerais S.A.,USIMINAS    PNB     N1,494568142.0,https://www.usiminas.com,Basic Materials,Basic Materials,Steel,Brazil,,30110-044,14320.0
+VALE3.SA,"2533    4170
+2534    4170
+Name: CD_CVM, dtype: int64",Vale S.A.,VALE        ON      NM,3982671501.0,https://www.vale.com,Basic Materials,Basic Materials,Other Industrial Metals & Mining,Brazil,,22250-145,4170.0
+VAMO3.SA,"2539    24716
+Name: CD_CVM, dtype: int64","Vamos Locação de Caminhões, Máquinas e Equipamentos S.A.",VAMOS       ON  EX  NM,487857880.0,https://grupovamos.com.br,Industrials,Industrials,Rental & Leasing Services,Brazil,,04530-001,24716.0
+VBBR3.SA,"2563    24295
+2564    24295
+Name: CD_CVM, dtype: int64",Vibra Energia S.A.,VIBRA       ON  EJ  NM,1114496741.0,https://www.vibraenergia.com.br,Consumer Cyclical,Consumer Cyclical,Specialty Retail,Brazil,,20211-140,24295.0
+VITT3.SA,"2580    25763
+Name: CD_CVM, dtype: int64",Vittia S.A.,VITTIA      ON      NM,55010875.0,https://vittia.com.br,Basic Materials,Basic Materials,Agricultural Inputs,Brazil,,14600-000,25763.0
+VIVA3.SA,"2581    24805
+Name: CD_CVM, dtype: int64",Vivara Participações S.A.,VIVARA S.A. ON      NM,116103796.0,https://www.vivara.com.br,Consumer Cyclical,Consumer Cyclical,Luxury Goods,Brazil,,04719-901,24805.0
+VIVR3.SA,"2583    20702
+Name: CD_CVM, dtype: int64",Viver Incorporadora e Construtora S.A.,VIVER       ON      NM,25648591.0,https://www.viver.com.br,Real Estate,Real Estate,Real Estate - Development,Brazil,,01452-921,20702.0
+VIVT3.SA,"2387    17671
+Name: CD_CVM, dtype: int64",Telefônica Brasil S.A.,TELEF BRASILON  EJ,388383140.0,https://www.telefonica.com.br,Communication Services,Communication Services,Telecom Services,Brazil,,04571-936,17671.0
+VLID3.SA,"2536    20028
+Name: CD_CVM, dtype: int64",Valid Soluções S.A.,VALID       ON  EJ  NM,79995571.0,https://www.valid.com,Industrials,Industrials,Specialty Business Services,Brazil,,18052-445,20028.0
+VTRU3.SA,"2579    27057
+Name: CD_CVM, dtype: int64","Vitru Brasil Empreendimentos, Participações e Comércio S.A",VITRUEDUCA  ON      NM,134172428.0,https://www.vitru.com.br,Consumer Defensive,Consumer Defensive,Education & Training Services,Brazil,,88032-005,27057.0
+VULC3.SA,"2595    11762
+Name: CD_CVM, dtype: int64",Vulcabras S.A.,VULCABRAS   ON  ED  NM,101002532.0,https://www.vulcabrasri.com,Consumer Cyclical,Consumer Cyclical,Footwear & Accessories,Brazil,,13219-001,11762.0
+VVEO3.SA,,CM Hospitalar S/A,VIVEO       ON      NM,221576560.0,https://www.mafrasaude.com.br,Healthcare,Healthcare,Medical Distribution,Brazil,,14072-055,25682.0
+WEGE3.SA,"2599    5410
+Name: CD_CVM, dtype: int64",WEG S.A.,WEG         ON  EJ  NM,1484916986.0,https://www.weg.net/institutional/BR/en/,Industrials,Industrials,Specialty Industrial Machinery,Brazil,,89256-900,5410.0
+WEST3.SA,"2605    25518
+Name: CD_CVM, dtype: int64",Westwing Comércio Varejista S.A.,WESTWING    ON      NM,80875650.0,https://www.westwing.com.br,Consumer Cyclical,Consumer Cyclical,Specialty Retail,Brazil,,,25518.0
+WHRL3.SA,"2608    14346
+Name: CD_CVM, dtype: int64",Whirlpool S.A.,WHIRLPOOL   ON,24029548.0,https://www.whirlpool.com.br,Consumer Cyclical,Consumer Cyclical,"Furnishings, Fixtures & Appliances",Brazil,,04183-090,14346.0
+WHRL4.SA,"2608    14346
+Name: CD_CVM, dtype: int64",Whirlpool S.A.,WHIRLPOOL   PN,24029548.0,https://www.whirlpool.com.br,Consumer Cyclical,Consumer Cyclical,"Furnishings, Fixtures & Appliances",Brazil,,04183-090,14346.0
+WIZC3.SA,"2611    23590
+Name: CD_CVM, dtype: int64",Wiz Co Participações e Corretagem de Seguros S.A.,WIZ CO      ON      NM,75354708.0,https://wiz.co,Financial Services,Financial Services,Insurance Brokers,Brazil,,70712-903,23590.0
+WLMM3.SA,,WLM Participações e Comércio de Máquinas e Veículos S.A.,WLM IND COM ON,5500436.0,https://www.wlm.com.br,Consumer Cyclical,Consumer Cyclical,Auto & Truck Dealerships,Brazil,,22210-901,11070.0
+WLMM4.SA,,WLM Participações e Comércio de Máquinas e Veículos S.A.,WLM IND COM PN,5500436.0,https://www.wlm.com.br,Consumer Cyclical,Consumer Cyclical,Auto & Truck Dealerships,Brazil,,22210-901,11070.0
+YDUQ3.SA,,Yduqs Participações S.A.,YDUQS PART  ON      NM,175043389.0,https://www.yduqs.com.br,Consumer Defensive,Consumer Defensive,Education & Training Services,Brazil,,,21016.0
+ZAMP3.SA,"2624    24317
+Name: CD_CVM, dtype: int64",Zamp S.A.,ZAMP S.A.   ON,81347813.0,https://zamp.com.br,Consumer Cyclical,Consumer Cyclical,Restaurants,Brazil,,,24317.0

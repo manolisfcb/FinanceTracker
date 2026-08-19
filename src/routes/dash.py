@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template
-from .main import main_bp
+from flask import render_template
+from .portfolio import portfolio_bp
 from flask_login import login_required
 
-@main_bp.route('/dash', methods=['GET'])
-# @login_required
+@portfolio_bp.route('/dash', methods=['GET'])
+@login_required
 def dash_page():
     
     context = {

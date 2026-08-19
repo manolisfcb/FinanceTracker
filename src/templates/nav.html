@@ -8,11 +8,11 @@
 
             {% if current_user.is_authenticated %}
             <div class="hidden md:flex items-center gap-6 text-[13.5px] font-medium">
-                <a href="{{ url_for('main.dash_page') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'main.dash_page' }}">Dashboard</a>
-                <a href="{{ url_for('main.portfolio') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'main.portfolio' }}">Portafolio</a>
-                <a href="{{ url_for('main.get_stocks') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'main.get_stocks' }}">Acciones</a>
-                <a href="{{ url_for('main.transactions') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['main.transactions', 'main.add_transactions', 'main.edit_transactions', 'main.upload_transactions'] }}">Transacciones</a>
-                <a href="{{ url_for('main.transactions_charts') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'main.transactions_charts' }}">Gráficos</a>
+                <a href="{{ url_for('portfolio.dash_page') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'portfolio.dash_page' }}">Dashboard</a>
+                <a href="{{ url_for('portfolio.portfolio') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'portfolio.portfolio' }}">Portafolio</a>
+                <a href="{{ url_for('stocks.get_stocks') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'stocks.get_stocks' }}">Acciones</a>
+                <a href="{{ url_for('personal_finance.transactions') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['personal_finance.transactions', 'personal_finance.add_transactions', 'personal_finance.edit_transactions', 'personal_finance.upload_transactions'] }}">Transacciones</a>
+                <a href="{{ url_for('personal_finance.transactions_charts') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'personal_finance.transactions_charts' }}">Gráficos</a>
             </div>
             {% endif %}
         </div>
@@ -35,13 +35,13 @@
                                 <div class="text-muted text-xs">Sesión iniciada como</div>
                                 <div class="font-medium truncate">{{ current_user.username }}</div>
                             </div>
-                            <a href="{{ url_for('main.logout') }}" class="block px-4 py-2.5 text-sm text-ink hover:bg-[#fbfaf8]">Cerrar sesión</a>
+                            <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2.5 text-sm text-ink hover:bg-[#fbfaf8]">Cerrar sesión</a>
                         </div>
                     </div>
                 </div>
             {% else %}
-                <a href="{{ url_for('main.login') }}" class="btn">Iniciar sesión</a>
-                <a href="{{ url_for('main.register') }}" class="btn btn-primary">Registrarse</a>
+                <a href="{{ url_for('auth.login') }}" class="btn">Iniciar sesión</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Registrarse</a>
             {% endif %}
         </div>
     </div>

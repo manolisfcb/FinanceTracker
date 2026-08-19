@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
 from sqlalchemy.orm import relationship
-from app import db
+from src.extensions import db
 from .Orders import OrderModel
 
 
@@ -14,7 +14,6 @@ class StockModel(db.Model):
     long_name = db.Column(db.String(100), nullable=True)
     short_name = db.Column(db.String(10), nullable=True)
     website = db.Column(db.String(100), nullable=True)
-    cvm_code = db.Column(db.Integer, nullable=True)
     floatShares = db.Column(db.Integer, nullable=True)
     sector = db.Column(db.String(100), nullable=True)
     industry = db.Column(db.String(100), nullable=True)
@@ -36,7 +35,6 @@ class StockModel(db.Model):
             "id": self.id,
             "symbol": self.symbol,
             "root_symbol": self.root_symbol,
-            "cvm_code": self.cvm_code,
             "sector": self.sector,
             "industry": self.industry,
             "country": self.country,

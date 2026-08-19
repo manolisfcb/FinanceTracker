@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriSnap - Descubre las calorías de tu comida con una foto</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --accent-color: #FF9800;
+            --text-color: #333;
+            --light-color: #f8f8f8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+        }
+        
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80') center/cover;
+            margin-top: 60px;
+        }
+        
+        .hero-content {
+            width: 50%;
+            padding: 30px;
+        }
+        
+        .hero-form {
+            width: 40%;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .features {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background-color: var(--light-color);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+        
+        footer {
+            background-color: var(--text-color);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                height: auto;
+                padding: 60px 0;
+            }
+            
+            .hero-content, .hero-form {
+                width: 100%;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Nutri<span>Snap</span></div>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div class="hero-content">
+                <h1>Descubre las calorías de tu comida con solo una foto</h1>
+                <p>NutriSnap te permite conocer el valor nutricional de tus alimentos simplemente enviando una foto a través de WhatsApp. ¡Regístrate ahora y comienza tu camino hacia una alimentación más consciente!</p>
+                <p><strong>¡Es fácil!</strong> Solo toma una foto de tu comida, envíala por WhatsApp y recibe al instante información sobre calorías y nutrientes.</p>
+            </div>
+            
+            <div class="hero-form">
+                <h2>Únete a NutriSnap</h2>
+                <form id="registration-form">
+                    <div class="form-group">
+                        <label for="name">Nombre completo</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="whatsapp">WhatsApp (con código de país)</label>
+                        <input type="tel" id="whatsapp" name="whatsapp" placeholder="+34 123456789" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">Edad</label>
+                        <input type="number" id="age" name="age" min="18" max="100" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">Sexo</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="male">Masculino</option>
+                            <option value="female">Femenino</option>
+                            <option value="other">Otro</option>
+                            <option value="prefer-not-to-say">Prefiero no decirlo</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit">Registrarme ahora</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <section class="features">
+        <div class="container">
+            <h2 style="text-align: center;">¿Por qué elegir NutriSnap?</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Fácil de usar</h3>
+                    <p>Sin instalaciones complicadas. Utiliza WhatsApp, una app que ya conoces y usas todos los días.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Rápido y preciso</h3>
+                    <p>Recibe información detallada sobre las calorías y nutrientes en segundos.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🥗</div>
+                    <h3>Come consciente</h3>
+                    <p>Toma mejores decisiones alimenticias conociendo exactamente lo que consumes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 NutriSnap. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('registration-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Aquí puedes agregar el código para enviar los datos a tu backend
+            // Por ejemplo, usando fetch() para enviar a una API
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value
+            };
+            
+            console.log('Datos del formulario:', formData);
+            
+            // Ejemplo de cómo podrías enviar los datos a un endpoint:
+            /*
+            fetch('https://tu-api.com/registrar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('¡Registro exitoso! Te contactaremos pronto.');
+                this.reset();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Hubo un error al procesar tu registro. Por favor, intenta nuevamente.');
+            });
+            */
+            
+            // Por ahora, solo mostramos un mensaje de éxito
+            alert('¡Registro exitoso! Pronto recibirás instrucciones en tu WhatsApp para comenzar a usar NutriSnap.');
+            this.reset();
+        });
+    </script>
+</body>
+</html>

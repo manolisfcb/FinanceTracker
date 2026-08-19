@@ -1,32 +1,13 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, make_response
-from .main import main_bp
-from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
-import plotly.express as px
-from flask import Blueprint, render_template, request
-from app import db
-from src.models.Transaction import TransactionModel, Category, TransactionType
-from sqlalchemy import or_, and_, case, func
-from src.utils.filter import filter, get_totals
-from app import htmx
-from werkzeug.utils import secure_filename
-from src.resources.charting import plot_income_expense_bar_char, plot_category_pie_chart
-from io import TextIOWrapper
-import csv
-from datetime import datetime
-import pandas as pd
-from src.resources.TransactionFactory import TransactionFactory, allowed_banks
-from src.utils.filter import filter_by_columns_ilike
-# @main_bp.route('/transactions', methods=['GET', 'POST'])
-# @login_required
-# def transactions():
-from flask import Blueprint, render_template, request
-from flask_login import current_user
-from app import db
+from flask import render_template, request
+from .personal_finance import personal_finance_bp
+from flask_login import login_required, current_user
 from src.models.Transaction import TransactionModel, Category
 from src.utils.filter import filter_by_columns_ilike, get_totals
 import pandas as pd
 
-@main_bp.route('/transactions_charts', methods=['GET'])
+
+@personal_finance_bp.route('/transactions_charts', methods=['GET'])
+@login_required
 def transactions_charts():
     # Recuperar filtros
     category = request.args.getlist('categories')
@@ -47,7 +28,7 @@ def transactions_charts():
     
     # Serializar las transacciones y convertir a DataFrame
     transactions = [transaction.serialize() for transaction in query.all()]
-    df = pd.DataFrame(transactions)
+    df = pd.DataFrame(transactions, columns=['type', 'amount', 'category_id'])
 
     # Preparar datos para el gráfico de ingresos vs gastos
     income_expense_group = df.groupby('type')['amount'].sum().reset_index()

@@ -1,4 +1,4 @@
-from app import db, app, scheduler
+from src.extensions import scheduler
 import random
 from src.models import StockModel
 import yfinance as yf

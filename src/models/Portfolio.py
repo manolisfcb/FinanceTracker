@@ -1,4 +1,4 @@
-from app import db
+from src.extensions import db
 
 
 class PortfolioModel(db.Model):

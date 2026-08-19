@@ -1,11 +1,11 @@
-from app import db
+from src.extensions import db
 
 
 class PortfolioSnapshotModel(db.Model):
     __tablename__ = 'portfolio_snapshots'
-    
+
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeingKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     patrimony = db.Column(db.Float, nullable=False)
     total_invested = db.Column(db.Float, nullable=False)

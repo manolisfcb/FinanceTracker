@@ -79,14 +79,6 @@ class PortfolioByTransaction(PortfolioStrategy):
     def _get_symbol(row):
         return row['Código de Negociação']
 
-    def get_cvm_code(symbol, cvm_codes):
-        try:
-            symbol = symbol[0:4]
-            return cvm_codes[cvm_codes['base_symbol'] == symbol]['cvm_code'].values[0]
-        except:
-            return None
-
-      
 
 # Concrete strategy for Upload by Position
 

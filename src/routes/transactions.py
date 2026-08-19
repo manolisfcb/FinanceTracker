@@ -1,25 +1,18 @@
-from flask import  render_template, flash, redirect, url_for, make_response
-from .main import main_bp
-from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
-
-from flask import  render_template, request
-from app import db
+from flask import render_template, flash, redirect, url_for, make_response, request
+from .personal_finance import personal_finance_bp
+from flask_login import login_required, current_user
+from src.extensions import db
 from src.models.Transaction import TransactionModel, Category, TransactionType
-from src.utils.filter import  get_totals
-from app import htmx
-from werkzeug.utils import secure_filename
+from src.utils.filter import get_totals
 from io import TextIOWrapper
 import csv
 from datetime import datetime
 from src.resources.TransactionFactory import TransactionFactory, allowed_banks
 from src.utils.filter import filter_by_columns_ilike
-# @main_bp.route('/transactions', methods=['GET', 'POST'])
-# @login_required
-# def transactions():
 
 
-    
-@main_bp.route('/transactions', methods=['GET'])
+@personal_finance_bp.route('/transactions', methods=['GET'])
+@login_required
 def transactions():
     # Recuperar filtros enviados por el formulario
     category = request.args.getlist('categories')
@@ -67,22 +60,23 @@ def transactions():
 
 
 ## -- Upload transactions
-@main_bp.route('/transactions/upload', methods=['GET', 'POST'])
+@personal_finance_bp.route('/transactions/upload', methods=['GET', 'POST'])
+@login_required
 def upload_transactions():
     if request.method == "POST":
         if not 'file' in request.files:
             flash('No file part', 'error')
-            return redirect(url_for('main.upload_transactions'))
+            return redirect(url_for('personal_finance.upload_transactions'))
         file = request.files['file']
         if not file.filename.endswith('.csv'):
             flash('Invalid file format, please upload a CSV file', 'error')
-            return redirect(url_for('main.upload_transactions'))
-        
-        
+            return redirect(url_for('personal_finance.upload_transactions'))
+
+
         bank_name = request.form['bank']
         if bank_name not in allowed_banks:
             flash('Invalid bank name', 'error')
-            return redirect(url_for('main.upload_transactions'))
+            return redirect(url_for('personal_finance.upload_transactions'))
         
         csv_file = TextIOWrapper(request.files['file'].stream, encoding='utf-8')
         
@@ -95,7 +89,7 @@ def upload_transactions():
             transactions = transactions.create_transaction()
         except ValueError as e:
             flash(f'Error processing CSV file: {e}', 'error')
-            return redirect(url_for('main.upload_transactions'))
+            return redirect(url_for('personal_finance.upload_transactions'))
         
         for transaction in transactions:
             transaction['user_id'] = current_user.id
@@ -109,7 +103,8 @@ def upload_transactions():
 
 
 ## -- Add transactions
-@main_bp.route('/transactions/add', methods=['GET', 'POST'])
+@personal_finance_bp.route('/transactions/add', methods=['GET', 'POST'])
+@login_required
 def add_transactions():
     if request.method == "POST":
         category = request.form['category']
@@ -121,7 +116,7 @@ def add_transactions():
         date = datetime.strptime(date, '%Y-%m-%d')
         if date > datetime.now():
             flash('Invalid date, please select a date in the past or today', 'error')
-            return redirect(url_for('main.add_transactions')) 
+            return redirect(url_for('personal_finance.add_transactions'))
         
         category = Category.query.filter_by(name=category).first()
         if not category:
@@ -143,11 +138,12 @@ def add_transactions():
         db.session.add(transaction_model)
         db.session.commit()
         flash('Transaction added successfully', 'success')
-        return redirect(url_for('main.transactions'))    
+        return redirect(url_for('personal_finance.transactions'))
     return render_template('add_transaction.html'), 200
 
 ## -- Edit transactions
-@main_bp.route('/transactions/edit/<int:id>', methods=['GET', 'PUT'])
+@personal_finance_bp.route('/transactions/edit/<int:id>', methods=['GET', 'PUT'])
+@login_required
 def edit_transactions(id):
     if request.method == 'PUT':
         transaction = TransactionModel.query.get(id)
@@ -170,7 +166,7 @@ def edit_transactions(id):
         
         db.session.commit()
         flash('Transaction updated successfully', 'success')
-        return redirect(url_for('main.transactions'))
+        return redirect(url_for('personal_finance.transactions'))
     else:
         transaction = TransactionModel.query.get(id)
         if not transaction:
@@ -182,7 +178,8 @@ def edit_transactions(id):
         return render_template('edit_transaction.html', **context), 200
 
 
-@main_bp.route('/transactions/delete/<int:id>', methods=['DELETE'])
+@personal_finance_bp.route('/transactions/delete/<int:id>', methods=['DELETE'])
+@login_required
 def delete_transactions(id):
     transaction = TransactionModel.query.get(id)
     if not transaction:
@@ -193,6 +190,6 @@ def delete_transactions(id):
     
     response = '', 204  # Respuesta vacía con código 204
     response = make_response(response)
-    response.headers['HX-Redirect'] = url_for('main.transactions')  # Redirigir a /transactions
+    response.headers['HX-Redirect'] = url_for('personal_finance.transactions')  # Redirigir a /transactions
     flash('Transaction deleted successfully', 'success')
     return response

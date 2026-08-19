@@ -1,13 +1,15 @@
 from flask import Blueprint, render_template, flash, redirect, url_for
-from .main import main_bp
 from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
 from src.forms.UserRegistratioForm import NamerForm
 from src.forms.LoginForm import LoginForm
-from flask import Blueprint, render_template, request
+from flask import render_template, request
 from src.models.UserModel import UserModel
-from app import db
+from src.extensions import db
 
-@main_bp.route('/register', methods=['GET', 'POST'])
+auth_bp = Blueprint('auth', __name__)
+
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     name = None
     password = None
@@ -42,7 +44,7 @@ def register():
     return render_template('register.html', name=None, form=form, users= all_users)
 
 
-@main_bp.route('/login', methods=['GET', 'POST'])
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -58,7 +60,7 @@ def login():
     return render_template('login.html', form=form)  # Muestra el formulario
 
 
-@main_bp.route('/logout')
+@auth_bp.route('/logout')
 @login_required
 def logout():
     logout_user()

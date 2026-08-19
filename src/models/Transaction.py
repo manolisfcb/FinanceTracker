@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
 
-from app import db
+from src.extensions import db
 # Enum para TransactionType
 class TransactionType(Enum):
     INCOME = 'income'
