@@ -1,17 +1,11 @@
 from flask import Blueprint, render_template, flash, redirect, url_for
-from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
+from flask_login import login_required, current_user
 
-from flask import render_template, request
+from flask import request
 from src.extensions import db
 from src.models.Orders import OrderModel
 
-from src.utils.filter import get_totals
-from werkzeug.utils import secure_filename
-from io import TextIOWrapper
-import csv
 from datetime import datetime
-from src.resources.TransactionFactory import TransactionFactory, allowed_banks
-from src.utils.filter import filter_by_columns_ilike
 from src.forms.StockForm import Stock
 from src.models.Stocks import StockModel
 

@@ -1,8 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-from enum import Enum
-from sqlalchemy.orm import relationship
 from src.extensions import db
-from .Orders import OrderModel
 
 
 class StockModel(db.Model):

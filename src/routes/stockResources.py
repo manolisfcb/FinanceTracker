@@ -3,7 +3,6 @@ from flask import request
 from flask_login import current_user
 import pandas as pd
 from src.extensions import db
-from src.models import StockModel, OrderModel
 from src.resources.OrdersFactory import Orders, OrdersFromB3
 from src.resources.PortfolioFactory import Portfolio, PortfolioByTransaction, PortfolioByPosition
 class StockResources(Resource):
@@ -32,7 +31,6 @@ class UploadPortfolio(Resource):
         if 'file' not in request.files:
             return {"error": "No file part"}, 400
         file = request.files['file']
-        file_type = request.form['file_type']
         # Verifica si se seleccionó un archivo
         if file.filename == '':
             return {"error": "No selected file"}, 400

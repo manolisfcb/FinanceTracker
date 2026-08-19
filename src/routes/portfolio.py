@@ -1,21 +1,8 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, make_response
-from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
+from flask import Blueprint, render_template
+from flask_login import login_required, current_user
 
-from flask import render_template, request
 from src.extensions import db
-from src.models.Transaction import TransactionModel, Category, TransactionType
-from src.models.Portfolio import PortfolioModel
-from src.utils.filter import get_totals
-from werkzeug.utils import secure_filename
-from io import TextIOWrapper
-import csv
-import pandas as pd
-from datetime import datetime
-from src.resources.TransactionFactory import TransactionFactory, allowed_banks
-from src.utils.filter import filter_by_columns_ilike
-from src.models.Stocks import StockModel
 from src.forms.StockForm import Stock
-import yfinance as yf
 
 portfolio_bp = Blueprint('portfolio', __name__)
 

@@ -1,4 +1,4 @@
-from sqlalchemy import and_, case, func
+from sqlalchemy import case, func
 from src.models.Transaction import TransactionModel, TransactionType
 
 from sqlalchemy import or_

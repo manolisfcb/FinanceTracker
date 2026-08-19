@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check src app.py config.py tests
+
+      - name: Test (pytest)
+        env:
+          ENV: testing
+          SECRET_KEY: ci-testing-secret-key
+          JWT_SECRET_KEY: ci-testing-jwt-key
+        run: pytest tests/ -v

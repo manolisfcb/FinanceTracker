@@ -1,7 +1,7 @@
 from .TransactionsBase import TransactionBase
 import csv
 from datetime import datetime
-from src.models.Transaction import TransactionModel, Category, TransactionType
+from src.models.Transaction import Category, TransactionType
 
 class RicoTransaction(TransactionBase):
     def convert_to_transaction(csv_reader: csv.DictReader):

@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import pandas as pd
-import yfinance as yf
 from src.models import StockModel
 # Strategy interface
 class PortfolioStrategy(ABC):
@@ -33,7 +32,7 @@ class PortfolioByTransaction(PortfolioStrategy):
         return new_df
 
     def _get_average_price(data):
-        data_stock = data.groupby('symbol').agg({'price': 'mean'}).reset_index()
+        return data.groupby('symbol').agg({'price': 'mean'}).reset_index()
 
     def _get_date(row):
         date = row["Data do Negócio"]

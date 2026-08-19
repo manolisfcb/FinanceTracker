@@ -1,0 +1,14 @@
+[tool.ruff]
+line-length = 120
+exclude = ["migrations", "scripts", ".venv"]
+
+[tool.ruff.lint]
+# Scoped to real bugs (syntax errors, unused/undefined names) rather than
+# the full stylistic ruleset — the legacy code has a lot of pre-existing
+# style debt (import order, line length) that's out of scope to reformat
+# wholesale here. Widen this over time as the codebase is touched.
+select = ["E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+# These re-export their imports as the package's public API.
+"src/models/__init__.py" = ["F401"]

@@ -1,10 +1,9 @@
 from flask import Blueprint, render_template, flash, redirect, url_for
-from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager
+from flask_login import login_user, logout_user, login_required
 from src.forms.UserRegistratioForm import NamerForm
 from src.forms.LoginForm import LoginForm
-from flask import render_template, request
+from flask import request
 from src.models.UserModel import UserModel
-from src.extensions import db
 
 auth_bp = Blueprint('auth', __name__)
 

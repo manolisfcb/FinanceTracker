@@ -8,33 +8,65 @@
 ## Fase 0 — Saneamiento técnico (1–2 semanas)
 
 ### 0.1 Arquitectura
-- [ ] `[M]` **App factory real**: mover creación de app a `src/__init__.py :: create_app(config)`;
+- [x] `[M]` **App factory real**: mover creación de app a `src/__init__.py :: create_app(config)`;
       instanciar `db`, `migrate`, `login_manager`, `scheduler` en `src/extensions.py` sin app;
       `app.py` queda como entrypoint (`app = create_app()`). Elimina imports circulares.
-- [ ] `[S]` Corregir `db.ForeingKey` → `db.ForeignKey` en `PortfolioSnapshots.py` y registrarlo en `src/models/__init__.py`.
-- [ ] `[S]` Reemplazar SQL f-string en `src/utils/querys.py` por query parametrizada (`text(...).bindparams(user_id=...)`) o SQLAlchemy ORM.
-- [ ] `[S]` Reactivar `@login_required` en `/portfolio`, `/dash`, `/stocks`; manejar usuario anónimo.
-- [ ] `[S]` Separar blueprints: `auth`, `portfolio`, `stocks`, `personal_finance` (o eliminar este último del alcance — **decisión**).
-- [ ] `[M]` Mover scripts sueltos de la raíz a `/scripts` (o borrar): teste.py, teste.html, binance.ipynb, PDFs, generate_*.py, upload_*.py, get_*.py.
-- [ ] `[S]` `.gitignore`: agregar `instance/`, `.DS_Store`, `*.db`.
+- [x] `[S]` Corregir `db.ForeingKey` → `db.ForeignKey` en `PortfolioSnapshots.py` y registrarlo en `src/models/__init__.py`.
+- [x] `[S]` Reemplazar SQL f-string en `src/utils/querys.py` por query parametrizada (`text(...).bindparams(user_id=...)`) o SQLAlchemy ORM.
+- [x] `[S]` Reactivar `@login_required` en `/portfolio`, `/dash`, `/stocks`; manejar usuario anónimo.
+      También en `/transactions*` (no estaban listadas pero tenían el mismo problema).
+- [x] `[S]` Separar blueprints: `auth`, `portfolio`, `stocks`, `personal_finance`. **Decisión tomada 2026-08-19**:
+      se mantiene `personal_finance` (transacciones/gastos) en su propio blueprint sin eliminarlo — no se borró
+      funcionalidad, queda para decidir su lugar en el producto más adelante. `/dash` (patrimonio, proventos)
+      se agrupó bajo `portfolio`, no `personal_finance`, porque es un dashboard de inversión, no de gastos.
+- [x] `[M]` Mover scripts sueltos de la raíz a `/scripts` (`git mv`, preserva historial): teste.py, teste.html,
+      binance.ipynb, documento.pdf, generate_transactions.py → `/scripts`; TicketModel.csv, cvm_1363054.pdf,
+      generate_tickets.py, get_stocks_info.py, upload_orders.py, upload_current_portfolio.py, get_portfolio.py,
+      schemas.py (todo lo de sabor Brasil/CVM) → `/scripts/legacy`.
+- [x] `[S]` `.gitignore`: agregado `instance/`, `.DS_Store`, `*.db`. `instance/finance.db` (~8MB) y 3 `.DS_Store`
+      ya estaban commiteados — se hizo `git rm --cached` (dejan de trackearse, siguen en el historial viejo).
 
 ### 0.2 Seguridad y configuración
-- [ ] `[S]` Quitar defaults `'xxx'` de SECRET_KEY/JWT_SECRET_KEY → fallar si faltan en producción.
-- [ ] `[S]` Quitar `app.config["DEBUG"] = True` global; respetar config por entorno.
-- [ ] `[S]` `.env.example` documentando todas las variables.
+- [x] `[S]` Quitar defaults `'xxx'` de SECRET_KEY/JWT_SECRET_KEY → `ProductionConfig` ya no tiene default;
+      `create_app()` falla con `RuntimeError` explícito si faltan en `ENV=production`. Dev/testing mantienen
+      defaults claramente marcados como inseguros.
+- [x] `[S]` Quitar `app.config["DEBUG"] = True` global; ahora respeta el `DEBUG` de cada config por entorno.
+- [x] `[S]` `.env.example` documentando todas las variables (ENV, HOST, PORT, DATABASE_URL, SECRET_KEY, JWT_SECRET_KEY).
 
 ### 0.3 Limpieza Brasil
-- [ ] `[S]` Eliminar `src/utils/brfinance/` y `check_stocks_news.py` (CVM).
-- [ ] `[S]` Quitar `cvm_code` de StockModel (migración Alembic).
-- [ ] `[S]` Archivar `TicketModel.csv` (tickers .SA) en `/scripts/legacy`.
-- [ ] `[M]` Renombrar dominio: `TransactionModel` (gastos) vs. futuro módulo de inversiones — evitar colisión de nombres.
+- [x] `[S]` Eliminar `src/utils/brfinance/` y `check_stocks_news.py` (CVM) — ambos ya estaban muertos/rotos.
+- [x] `[S]` Quitar `cvm_code` de StockModel (migración Alembic `00202d658c38`).
+- [x] `[S]` Archivar `TicketModel.csv` (tickers .SA) en `/scripts/legacy`.
+- [x] `[M]` Renombrar dominio `TransactionModel` vs. inversiones: **investigado, no hay colisión real hoy** —
+      el dominio de inversión ya usa `OrderModel`/`orders`, no `TransactionModel`. Queda como decisión de
+      naming a futuro, no como bug a corregir.
 
 ### 0.4 Calidad
-- [ ] `[M]` Pytest + fixtures con app factory y SQLite en memoria; tests de humo para auth y portfolio.
-- [ ] `[S]` GitHub Actions: lint (ruff) + tests en cada push.
-- [ ] `[S]` Congelar requirements con `pip-tools` o migrar a `uv`/`pyproject.toml`.
+- [x] `[M]` Pytest + fixtures con app factory y SQLite en memoria (`tests/conftest.py`); smoke tests de auth,
+      home, blueprints registrados, y acceso anónimo/autenticado a las 5 rutas protegidas (`tests/`).
+- [x] `[S]` GitHub Actions: lint (ruff) + tests en cada push (`.github/workflows/ci.yml`).
+- [x] `[S]` Requirements ya estaban pinneados (`requirements.txt`); se agregó `requirements-dev.txt` +
+      `pyproject.toml` con config de ruff (acotada a reglas de correctitud `E9,F` — el resto del codebase
+      tiene deuda de estilo pre-existente fuera de alcance de este pase).
 
-**Criterio de salida**: la app arranca con `create_app()`, tests verdes, ninguna referencia a CVM/B3 en el flujo principal.
+**Criterio de salida**: ✅ la app arranca con `create_app()` (`python app.py`), `pytest` en verde (15 passed,
+1 xfail conocido), sin referencias a CVM/B3 en el flujo principal.
+
+**Encontrado durante la ejecución, fuera del alcance original de Fase 0** (documentado, no resuelto salvo donde
+se indica):
+- `instance/finance.db` (el sqlite de dev) tiene mezcladas tablas de otro proyecto sin relación
+  (`Permit`, `Ward`, `Street`, `Builder`, etc. — un esquema de permisos de construcción). No se tocaron esas
+  tablas; vale la pena confirmar si ese archivo se está compartiendo entre proyectos por accidente.
+- El historial de migraciones de Alembic nunca capturó la creación de `users`/`stocks`/`transactions`/`categories`
+  (se crearon con `db.create_all()` en algún momento, no con una migración) — en una DB nueva `flask db upgrade`
+  no las crea. No se reescribió el historial de migraciones; se trabajó sobre la DB de dev existente.
+- `/stocks` sigue rota: el formulario `Stock` tiene campos `ticket/quantity/price/date` pero el template
+  esperaba `form.stock` — bug pre-existente, cubierto por un test `xfail`. Como la Fase 1 reconstruye esta
+  pantalla como screener real, no se intentó adivinar el fix correcto.
+- `transactions_charts.py` tenía un bug real (500 para un usuario sin transacciones aún, `KeyError` de pandas
+  en DataFrame vacío) — se corrigió con un guard mínimo al construir el DataFrame.
+- `src/forms/StockForm.py` importaba mal (`from src.forms import StockForm` en vez de la clase `Stock`) —
+  corregido, ya que bloqueaba directamente la verificación de esta fase.
 
 ---
 

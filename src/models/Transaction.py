@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
 
 from src.extensions import db
