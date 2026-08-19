@@ -18,7 +18,7 @@ migration = Migrate()
 login_manager = LoginManager()
 htmx = HTMX(app)
 
-ENVIROMENT = os.getenv("ENV")
+ENVIROMENT = os.getenv("ENV", "development")
 
 env = {
     "development": "config.DevelopmentConfig",
@@ -28,7 +28,7 @@ env = {
 from src.models import UserModel, TransactionModel, Category
 
 # Create the application instance and load the configuration
-app.config.from_object(ENVIROMENT)
+app.config.from_object(env[ENVIROMENT])
 app.template_folder = app.config['TEMPLATES_PATH']
 app.static_folder = app.config['STATICS_PATH']
 app.config["PROPAGATE_EXCEPTIONS"] = True
