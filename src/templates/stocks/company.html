@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+    {{ asset.symbol }} · {{ asset.name }} | TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-1.5 text-[13px] text-muted2 mb-4">
+    <a href="{{ url_for('stocks.get_stocks') }}" class="hover:text-ink">Acciones</a>
+    <span>/</span>
+    <a href="{{ url_for('stocks.get_stocks', exchange=[asset.exchange]) }}" class="hover:text-ink">{{ asset.exchange }}</a>
+    <span>/</span>
+    <span class="text-ink font-medium">{{ asset.symbol }}</span>
+</div>
+
+<!-- Header -->
+<div class="card p-5 mb-5">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="flex items-start gap-4">
+            {% if asset.logo_url %}
+            <img src="{{ asset.logo_url }}" alt="" class="w-12 h-12 rounded-lg border border-border object-contain bg-white" onerror="this.style.display='none'" />
+            {% else %}
+            <div class="w-12 h-12 rounded-lg border border-border bg-[#fbfaf8] flex items-center justify-center font-serif-display text-xl text-muted2">
+                {{ asset.symbol[0] }}
+            </div>
+            {% endif %}
+            <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h1 class="font-serif-display text-2xl text-ink">{{ asset.name }}</h1>
+                    <span class="num text-xs font-semibold border border-border rounded-md px-2 py-0.5 bg-[#fbfaf8]">{{ asset.symbol }}</span>
+                    <span class="text-xs font-semibold border border-border rounded-md px-2 py-0.5 bg-[#fbfaf8]">{{ asset.exchange }}</span>
+                </div>
+                <div class="text-[13px] text-muted2 mt-1">
+                    {{ asset.sector or 'Sector no disponible' }}{% if asset.industry %} · {{ asset.industry }}{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="text-right">
+            <div class="num text-2xl font-semibold">
+                {% if price is not none %}{{ asset.currency }} {{ price|ratio }}{% else %}—{% endif %}
+            </div>
+            {% if change_percent is not none %}
+            <div class="num text-sm font-semibold {{ 'pos' if change_amount >= 0 else 'neg' }}">
+                {{ '+' if change_amount >= 0 }}{{ change_amount|ratio }} ({{ '+' if change_percent >= 0 }}{{ change_percent|ratio }}%)
+            </div>
+            {% else %}
+            <div class="text-sm text-faint">Variación no disponible</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex flex-wrap gap-2 mt-4">
+        <a href="#ADD_TO_PORTFOLIO" class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+            Agregar a portafolio
+        </a>
+        {% if asset.website %}
+        <a href="{{ asset.website }}" target="_blank" rel="noopener noreferrer" class="btn">Website</a>
+        {% endif %}
+        {% if asset.ir_website %}
+        <a href="{{ asset.ir_website }}" target="_blank" rel="noopener noreferrer" class="btn">IR site</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Indicator grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-5">
+    {% for group_name, rows in indicator_groups %}
+    <div class="card p-4">
+        <div class="lbl mb-3">{{ group_name }}</div>
+        <div class="space-y-2">
+            {% for key, label, kind in rows %}
+            {% set value = fundamentals|attr(key) if fundamentals else none %}
+            <div class="flex justify-between items-center text-[13px]">
+                <span class="text-muted2">{{ label }}</span>
+                <span class="num font-semibold">
+                    {% if kind == 'percent' %}{{ value|percent }}
+                    {% elif kind == 'compact_number' %}{{ value|compact_number }}
+                    {% else %}{{ value|ratio }}
+                    {% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Price chart -->
+<div class="card p-5 mb-5">
+    <div class="flex justify-between items-center mb-3">
+        <div class="text-sm font-semibold">Precio histórico</div>
+        <div class="flex gap-1.5" id="rangeButtons">
+            {% for range_key in price_ranges %}
+            <button type="button" class="btn px-2.5 py-1 text-[12px] range-btn{{ ' btn-primary' if range_key == '1Y' }}" data-range="{{ range_key }}">{{ range_key }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="h-72 relative">
+        <div id="priceChartLoading" class="absolute inset-0 flex items-center justify-center text-[13px] text-faint">Cargando…</div>
+        <div id="priceChartEmpty" class="absolute inset-0 hidden items-center justify-center text-[13px] text-faint">No hay datos de precio disponibles.</div>
+        <canvas id="priceHistoryChart"></canvas>
+    </div>
+</div>
+
+<!-- Dividends -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5 mb-5">
+    <div class="card p-5">
+        <div class="text-sm font-semibold mb-3">Historial de dividendos</div>
+        {% if dividends %}
+        <div class="overflow-x-auto">
+            <table class="tn-card-table">
+                <thead>
+                    <tr>
+                        <th>Ex-date</th>
+                        <th>Pay date</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dividend in dividends %}
+                    <tr>
+                        <td>{{ dividend.ex_date }}</td>
+                        <td>{{ dividend.pay_date or '—' }}</td>
+                        <td class="num">{{ dividend.currency }} {{ dividend.amount|ratio }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-8 text-[13px] text-faint">Sin historial de dividendos registrado.</div>
+        {% endif %}
+    </div>
+
+    <div class="card p-5">
+        <div class="text-sm font-semibold mb-3">Dividendos por año</div>
+        {% if dividend_years %}
+        <div class="h-56">
+            <canvas id="dividendsByYearChart"></canvas>
+        </div>
+        {% else %}
+        <div class="flex items-center justify-center h-56 text-[13px] text-faint">Sin datos suficientes para el gráfico.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Description -->
+<div class="card p-5 mb-5">
+    <div class="text-sm font-semibold mb-3">Sobre {{ asset.name }}</div>
+    {% if asset.description %}
+    <p class="text-[13.5px] text-muted2 leading-relaxed">{{ asset.description }}</p>
+    {% else %}
+    <p class="text-[13.5px] text-faint">No hay descripción disponible todavía.</p>
+    {% endif %}
+</div>
+
+<!-- ADD_TO_PORTFOLIO MODAL -->
+<div class="tn-modal" id="ADD_TO_PORTFOLIO">
+    <div class="tn-modal-box">
+        <h3 class="font-semibold text-base mb-4">Nueva orden — {{ asset.symbol }}</h3>
+
+        <form method="POST" action="/api/stock">
+            {{ form.hidden_tag() }}
+
+            <div class="space-y-1.5 mb-3">
+                <label class="lbl">{{ form.ticket.label.text }}</label>
+                {{ form.ticket(class="tn-input", readonly=true) }}
+            </div>
+
+            <div class="space-y-1.5 mb-3">
+                <label class="lbl">{{ form.quantity.label.text }}</label>
+                {{ form.quantity(class="tn-input", type="number", step="0.01", autofocus=true) }}
+            </div>
+
+            <div class="space-y-1.5 mb-3">
+                <label class="lbl">{{ form.price.label.text }}</label>
+                {{ form.price(class="tn-input", type="number", step="0.01") }}
+            </div>
+
+            <div class="space-y-1.5 mb-4">
+                <label class="lbl">{{ form.date.label.text }}</label>
+                {{ form.date(class="tn-input", type="date") }}
+            </div>
+
+            <div class="flex justify-between gap-2">
+                <button type="submit" name="action" value="BUY" class="btn" style="background:#1a7f4e;border-color:#1a7f4e;color:#fff">Comprar</button>
+                <button type="submit" name="action" value="SELL" class="btn" style="background:#c23934;border-color:#c23934;color:#fff">Vender</button>
+                <a href="#" class="btn">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+    Chart.defaults.color = '#6f6b60';
+    const tnGridColor = '#efede7';
+
+    const priceCtx = document.getElementById('priceHistoryChart').getContext('2d');
+    const priceChart = new Chart(priceCtx, {
+        type: 'line',
+        data: { labels: [], datasets: [{
+            label: 'Precio de cierre',
+            data: [],
+            borderColor: '#b3372b',
+            backgroundColor: 'rgba(179, 55, 43, 0.08)',
+            tension: 0.2,
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 0,
+        }] },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: tnGridColor } },
+                y: { grid: { color: tnGridColor } }
+            }
+        }
+    });
+
+    async function loadPriceHistory(range) {
+        const loading = document.getElementById('priceChartLoading');
+        const empty = document.getElementById('priceChartEmpty');
+        loading.classList.remove('hidden');
+        loading.classList.add('flex');
+        empty.classList.add('hidden');
+        empty.classList.remove('flex');
+
+        document.querySelectorAll('.range-btn').forEach(btn => {
+            btn.classList.toggle('btn-primary', btn.dataset.range === range);
+        });
+
+        try {
+            const resp = await fetch(`/api/assets/{{ asset.id }}/prices?range=${range}`);
+            const data = await resp.json();
+            loading.classList.add('hidden');
+            loading.classList.remove('flex');
+
+            if (!data.dates || data.dates.length === 0) {
+                empty.classList.remove('hidden');
+                empty.classList.add('flex');
+                priceChart.data.labels = [];
+                priceChart.data.datasets[0].data = [];
+                priceChart.update();
+                return;
+            }
+
+            priceChart.data.labels = data.dates;
+            priceChart.data.datasets[0].data = data.close;
+            priceChart.update();
+        } catch (err) {
+            loading.classList.add('hidden');
+            loading.classList.remove('flex');
+            empty.classList.remove('hidden');
+            empty.classList.add('flex');
+        }
+    }
+
+    document.querySelectorAll('.range-btn').forEach(btn => {
+        btn.addEventListener('click', () => loadPriceHistory(btn.dataset.range));
+    });
+
+    loadPriceHistory('1Y');
+
+    {% if dividend_years %}
+    const dividendsCtx = document.getElementById('dividendsByYearChart').getContext('2d');
+    new Chart(dividendsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ dividend_years|safe }},
+            datasets: [{
+                label: 'Dividendos pagados',
+                data: {{ dividend_totals|safe }},
+                backgroundColor: '#1a7f4e',
+                borderRadius: 3,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: tnGridColor } },
+                y: { grid: { color: tnGridColor } }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

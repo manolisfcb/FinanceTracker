@@ -73,60 +73,125 @@ se indica):
 ## Fase 1 — Universo de acciones + fundamentales (2–3 semanas)
 
 ### 1.1 Modelo de datos
-- [ ] `[M]` Refactor `StockModel` → `Asset`:
+- [x] `[M]` Refactor `StockModel` → `Asset`:
       `symbol`, `yahoo_symbol` (AAPL vs RY.TO), `exchange` (TSX/TSXV/NYSE/NASDAQ), `currency` (CAD/USD),
       `name`, `sector`, `industry`, `country`, `website`, **`ir_website`**, `logo_url`, `is_active`.
       Índice único `(symbol, exchange)`.
-- [ ] `[M]` Nueva tabla `Fundamentals` (1-N con Asset, snapshot con `as_of_date`):
+- [x] `[M]` Nueva tabla `Fundamentals` (1-N con Asset, snapshot con `as_of_date`):
       `market_cap, pe, forward_pe, pb, ps, ev_ebitda, roe, roa, roic, gross_margin, operating_margin,
       net_margin, debt_to_equity, current_ratio, quick_ratio, dividend_yield, payout_ratio,
       dividend_rate, eps, eps_growth_5y, revenue_growth_5y, beta, fifty_two_week_high/low, price`.
-- [ ] `[S]` Tabla `DividendHistory` (asset_id, ex_date, pay_date, amount, currency).
-- [ ] `[S]` Migraciones Alembic para todo lo anterior.
+      `roic` queda siempre `None` — yfinance no lo expone en `info`. `eps_growth_5y`/`revenue_growth_5y`
+      se llenan con el YoY más cercano (`earningsGrowth`/`revenueGrowth`), no un CAGR real a 5 años.
+- [x] `[S]` Tabla `DividendHistory` (asset_id, ex_date, pay_date, amount, currency).
+- [x] `[S]` Migraciones Alembic para todo lo anterior. **No autogenerada**: `flask db migrate` choca
+      con el mismo hallazgo de Fase 0 (`Permit.ward_id → Ward` inexistente en esta DB de dev) —
+      migración escrita a mano (`migrations/versions/a1f42e9c8b3d_.py`). Aplicada y verificada contra
+      la DB de dev real (backup previo en session scratchpad).
+      **Decisión de producto durante la ejecución**: la DB de dev tenía 424 `stocks` heredadas de
+      Brasil (.SA) con 1098 `orders`/13 `portfolios` dependientes. Manuel eligió **mantenerlas** en
+      vez de borrarlas — se migraron con placeholders (`exchange='BR'`, `currency='BRL'`,
+      `yahoo_symbol=symbol`, `name` desde `long_name`) en vez de fabricar datos CA/US falsos. Van a
+      aparecer en el screener como 424 filas no-CA/US reales; no se cuentan para el criterio de
+      salida de abajo.
 
 ### 1.2 Capa de proveedores de datos
-- [ ] `[L]` `src/services/market_data/` con interfaz `MarketDataProvider`
+- [x] `[L]` `src/services/market_data/` con interfaz `MarketDataProvider`
       (`get_profile`, `get_quote`, `get_fundamentals`, `get_dividends`) y primera implementación
-      `YahooProvider` (yfinance). Retries/backoff centralizados, rate-limit configurable.
-- [ ] `[S]` Config `MARKET_DATA_PROVIDER=yahoo|eodhd|fmp` para swap futuro.
+      `YahooProvider` (yfinance). Retries/backoff centralizados, rate-limit configurable
+      (`min_interval_seconds`). Tests con `yfinance.Ticker` mockeado (ver hallazgo de red abajo).
+- [x] `[S]` Config `MARKET_DATA_PROVIDER=yahoo` (documentado en `.env.example`) para swap futuro.
 
 ### 1.3 Seed del universo CA/US
-- [ ] `[M]` Script `scripts/seed_universe.py`: cargar emisores TSX/TSXV desde los listados de
-      TMX Group + S&P500/NASDAQ100 para US (fuente CSV pública). Normalizar símbolo Yahoo (`.TO`, `.V`).
-- [ ] `[M]` Enriquecer cada asset con perfil yfinance (sector, industria, website) en batch con
-      ThreadPool + rate limit.
-- [ ] `[M]` Campo `ir_website`: heurística (website + `/investors`|`/investor-relations`) + verificación
-      HTTP + posibilidad de corrección manual vía admin.
+- [x] `[M]` Script `scripts/seed_universe.py`: **fuente cambiada** de TMX/NASDAQ100 (no se encontró
+      CSV público confiable para ninguna de las dos en esta sesión) a **Wikipedia**: S&P/TSX Composite
+      (CA) + S&P 500 (US), ambas verificadas accesibles y parseadas en vivo. Corrida real: **219 CA +
+      503 US = 722 empresas reales sembradas**. Símbolo Yahoo normalizado (`.TO` para CA, `.`→`-` para
+      US tipo BRK.B→BRK-B). Idempotente (upsert por symbol+exchange).
+- [x] `[M]` Enriquecimiento (`YahooProvider.get_profile`) implementado, resumible (reintenta solo
+      assets sin `website` aún) y tolerante a fallos — verificado correcto en un smoke test real, pero
+      **Yahoo devuelve 429 de forma consistente desde la IP de salida de este sandbox** (confirmado con
+      `curl` y con `yfinance` real contra varios símbolos), así que el enriquecimiento no completó en
+      esta sesión. El mecanismo queda listo para correr desde un entorno sin ese rate-limit.
+- [x] `[M]` Campo `ir_website`: heurística implementada (website + `/investors`|`/investor-relations`
+      + `HEAD` best-effort). No verificable en esta sesión — depende de que `website` se haya llenado
+      vía enriquecimiento, bloqueado por el mismo 429.
 
 ### 1.4 Jobs de actualización
-- [ ] `[M]` Job diario `refresh_fundamentals` (después del cierre de mercado, 18:00 ET) — inserta snapshot en `Fundamentals`.
-- [ ] `[S]` Job cada 15 min en horario de mercado `refresh_quotes` (solo precio) para assets en portafolios.
-- [ ] `[S]` Job diario FX: tasa CAD/USD (Banco de Canadá tiene [API pública de valet](https://www.bankofcanada.ca/valet/docs)) → tabla `FxRate`.
-- [ ] `[S]` Logging estructurado + tabla `JobRun` (job, started, finished, status, items) para monitoreo.
+- [x] `[M]` Job diario `refresh_fundamentals` (cron 18:00 `America/Toronto`, maneja DST correctamente
+      a diferencia de un offset UTC fijo) — snapshot en `Fundamentals` por asset activo.
+- [x] `[S]` Job cada 15 min `refresh_quotes` (solo precio) — solo para `asset_id` presentes en
+      `OrderModel` (ya funciona hoy, no depende del rediseño de `Order` de Fase 3).
+- [x] `[S]` Job diario FX `refresh_fx` (cron 18:30 ET) — Banco de Canadá Valet API, **respuesta real
+      verificada en vivo** (`{"observations":[{"d":"...","FXUSDCAD":{"v":"..."}}]}`) → tabla `FxRate`.
+- [x] `[S]` Tabla `JobRun` (job, started_at, finished_at, status, items_processed, **+ `error`** para
+      que un fallo sea diagnosticable, no solo "failed"). Los 3 jobs quedan registrados en el scheduler
+      (mismo patrón/guard que el job viejo, fuera de `app.testing`) — verificado que arrancan
+      correctamente; no se esperó a una ejecución real por cron dentro de esta sesión.
 
 ### 1.5 Screener (pantalla "Acciones")
-- [ ] `[L]` Ruta `/stocks`: tabla server-rendered con HTMX — columnas: symbol, nombre, exchange,
-      sector, precio, P/E, P/B, ROE, D/E, DY, payout, market cap. Orden por columna, paginación,
-      filtros (exchange, sector, rangos de indicadores), búsqueda por nombre/símbolo.
-- [ ] `[S]` Export CSV del screener filtrado.
+- [x] `[L]` Ruta `/stocks` reescrita por completo (reemplaza el form roto `form.stock`, ya cubierto
+      antes por un test `xfail` que ahora pasa de verdad): tabla server-rendered con HTMX — columnas
+      symbol+nombre, exchange, sector, precio, P/E, P/B, ROE, D/E, DY, payout, margen neto, market cap.
+      Orden por columna, paginación, filtros (exchange, sector, rango por cada indicador — sidebar
+      generada desde la misma lista que valida el backend, no puede desincronizarse), búsqueda por
+      nombre/símbolo. Nulos (fundamentals aún no calculados) muestran "—", no "0.00" ni un crash.
+- [x] `[S]` Export CSV del screener filtrado (`/stocks/export.csv`, misma lógica de filtros/orden).
 
-**Criterio de salida**: universo ≥ 500 empresas CA + índices US sembrado; screener navegable con fundamentales reales actualizados a diario.
+**Desviación del plan original descubierta en ejecución**: `src/forms/StockForm.py` iba a eliminarse
+(la asunción era que solo la alimentaba el `/stocks` roto) — **se mantuvo**, porque `/portfolio` la usa
+de verdad para el modal "Nueva operación" (`ticket`/`quantity`/`price`/`date`). Borrarla hubiera roto
+`/portfolio`.
+
+**Hallazgo, no corregido (pre-existente, no introducido en esta fase)**: 486 de las 1098 `orders`
+heredadas tienen `asset_id` (antes `stock_id`) con un símbolo de texto en vez de un id válido — bug
+pre-existente en `OrdersFactory.check_stock_exists`, que al no encontrar el stock devuelve el símbolo
+crudo como fallback. Confirmado idéntico antes y después de la migración (no es una regresión). Se
+deja documentado; el importador B3 completo se reemplaza en Fase 3.
+
+**Criterio de salida**: ⚠️ parcial — screener navegable y funcional con datos reales (722 empresas
+CA+US reales de Wikipedia, sort/filtros/paginación/CSV todos verificados), pero **no llega a las
+"≥500 empresas CA"** originales (TSX Composite son ~220; el universo TSXV completo no tiene fuente
+gratuita confirmada) y **los fundamentales no están poblados** (bloqueado por el 429 de Yahoo desde
+este sandbox, no por un bug — mecanismo verificado correcto). Pendiente para cerrar el criterio al
+100%: (a) correr `python scripts/seed_universe.py` (sin `--limit`) desde una máquina sin ese
+rate-limit para completar el enriquecimiento, (b) decidir una fuente real para TSXV, (c) opcional:
+separar NYSE de NASDAQ para las 503 US (hoy `exchange='US'` genérico — la tabla de Wikipedia usada no
+distingue) y sembrar Nasdaq-100 (su página de Wikipedia ya no incluye la tabla de componentes).
 
 ---
 
 ## Fase 2 — Página de empresa (1–2 semanas)
 
-- [ ] `[L]` Ruta `/stocks/<exchange>/<symbol>`:
+- [x] `[L]` Ruta `/stocks/<exchange>/<symbol>`:
       - Header: logo, nombre, symbol, exchange, sector, precio + variación día, botón "IR site" y "Website".
       - Grid de indicadores (los de Fundamentals) agrupados: Valuación / Rentabilidad / Endeudamiento / Dividendos.
       - Gráfico de precio histórico (1M/6M/1Y/5Y) — endpoint JSON + Chart.js.
       - Historial de dividendos (tabla + gráfico anual).
       - Descripción de la empresa (longBusinessSummary de yfinance).
-- [ ] `[M]` Endpoint `/api/assets/<id>/prices?range=` con caching (tabla `PriceHistory` EOD o fetch on-demand con cache).
-- [ ] `[S]` Botón "Agregar a portafolio" → modal de nueva orden pre-llenado.
-- [ ] `[S]` SEO/UX: breadcrumbs, estados de carga HTMX, empty states.
+- [x] `[M]` Endpoint `/api/assets/<id>/prices?range=` con caching (tabla `PriceHistory` EOD o fetch on-demand con cache).
+      **Decisión**: fetch on-demand vía `YahooProvider.get_price_history` (yfinance `.history(period=...)`),
+      con caché en memoria a nivel de módulo (`_price_history_cache`, TTL 15 min, keyed por
+      `(yahoo_symbol, period)`) en vez de una tabla `PriceHistory` — evita el costo de un backfill/job
+      diario para este pase y sirve datos "stale" si Yahoo falla en un refetch. Se puede migrar a tabla
+      EOD más adelante si el volumen de tráfico lo justifica.
+- [x] `[S]` Botón "Agregar a portafolio" → modal de nueva orden pre-llenado (mismo `StockForm`/endpoint
+      stub `/api/stock` que usa el modal "Nueva orden" de `/portfolio`; la creación real de órdenes se
+      aborda en Fase 3).
+- [x] `[S]` SEO/UX: breadcrumbs (Acciones / exchange / symbol), estados de carga y empty states para el
+      gráfico de precio (fetch vía JS, no HTMX — el endpoint devuelve JSON, no HTML parcial) y para
+      dividendos/fundamentales sin datos aún.
 
-**Criterio de salida**: cualquier empresa del universo tiene página completa tipo Suno Analítica.
+**Hallazgo/decisión durante la ejecución**: el precio + variación día usa una cotización en vivo
+(`provider.get_quote`) con `max_retries=1`/sin backoff (vs. el `YahooProvider` por defecto de los jobs,
+que reintenta 3x con sleep) para no bloquear la carga de la página si Yahoo está rate-limitando desde
+este sandbox; si la cotización en vivo falla, cae al último precio guardado en `Fundamentals`. Se agregó
+columna `description` a `Asset` (migración `1779d5844790`) para persistir el `longBusinessSummary`,
+poblada por el mismo paso de enriquecimiento de `seed_universe.py`.
+
+**Criterio de salida**: ✅ cualquier empresa del universo tiene página completa (probado end-to-end con
+datos reales de Yahoo vía AAPL — precio histórico, fundamentales, header — y con fixtures en los tests
+automatizados para los casos sin datos).
 
 ---
 

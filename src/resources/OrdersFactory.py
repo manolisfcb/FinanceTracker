@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod 
+from abc import ABC, abstractmethod
 import pandas as pd
-from src.models import StockModel
+from src.models import Asset
 
 class OrdersStrategy(ABC):
     @abstractmethod
@@ -14,7 +14,7 @@ class OrdersFromB3(OrdersStrategy):
         orders['Data do Negócio'] = orders['Data do Negócio'].apply(self.get_date)
         orders['Tipo de Movimentação'] = orders['Tipo de Movimentação'].apply(self.check_negotiation_type)
         orders['Código de Negociação'] = orders['Código de Negociação'].apply(self.adjust_stock_symbol)
-        orders['stock_id'] = orders['Código de Negociação'].apply(self.check_stock_exists)
+        orders['asset_id'] = orders['Código de Negociação'].apply(self.check_stock_exists)
         orders.rename(columns={'Preço': 'price', 'Quantidade': 'quantity', 'Data do Negócio': 'date', 'Tipo de Movimentação': 'type'}, inplace=True)
         orders.drop(columns=['Prazo/Vencimento', 'Valor', 'Instituição',  'Mercado', 'Código de Negociação'], inplace=True)    
 
@@ -27,8 +27,8 @@ class OrdersFromB3(OrdersStrategy):
     
     def check_stock_exists(self, symbol):
         try:
-            stock_id = StockModel.query.filter_by(symbol=symbol).first().id
-            return stock_id
+            asset_id = Asset.query.filter_by(symbol=symbol).first().id
+            return asset_id
         except:
             print(f"Stock {symbol} not found")
             return symbol

@@ -1,0 +1,79 @@
+<div id="screener-container">
+    <div class="flex justify-between items-center mb-3">
+        <div class="text-sm font-semibold">{{ pagination.total }} empresas</div>
+        <a href="/stocks/export.csv?{{ request.query_string.decode() }}" class="flex items-center gap-1.5 text-[13px] font-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Exportar CSV
+        </a>
+    </div>
+
+    <div class="card p-5 overflow-x-auto">
+        <table class="tn-card-table">
+            <thead>
+                <tr>
+                    {% for key, label in columns %}
+                    <th>
+                        <a href="/stocks?{{ sort_links[key] }}"
+                           hx-get="/stocks?{{ sort_links[key] }}"
+                           hx-target="#screener-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
+                           class="hover:text-ink whitespace-nowrap">
+                            {{ label }}{% if sort == key %} {{ '↑' if dir == 'asc' else '↓' }}{% endif %}
+                        </a>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if rows %}
+                    {% for asset, fundamentals in rows %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('stocks.get_stock_detail', exchange=asset.exchange, symbol=asset.symbol) }}" class="font-semibold text-ink hover:text-maple">{{ asset.symbol }}</a>
+                            <div class="text-[12px] text-muted2">{{ asset.name }}</div>
+                        </td>
+                        <td>{{ asset.exchange }}</td>
+                        <td>{{ asset.sector or '—' }}</td>
+                        <td class="num">{{ fundamentals.price|ratio if fundamentals else '—' }}</td>
+                        <td class="num">{{ fundamentals.pe|ratio if fundamentals else '—' }}</td>
+                        <td class="num">{{ fundamentals.pb|ratio if fundamentals else '—' }}</td>
+                        <td class="num">{{ fundamentals.roe|percent if fundamentals else '—' }}</td>
+                        <td class="num">{{ fundamentals.debt_to_equity|ratio if fundamentals else '—' }}</td>
+                        <td class="num">{{ fundamentals.dividend_yield|percent if fundamentals else '—' }}</td>
+                        <td class="num">{{ fundamentals.payout_ratio|percent if fundamentals else '—' }}</td>
+                        <td class="num">{{ fundamentals.net_margin|percent if fundamentals else '—' }}</td>
+                        <td class="num">{{ fundamentals.market_cap|compact_number if fundamentals else '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="{{ columns|length }}" class="text-center text-faint py-6">No hay empresas que coincidan con estos filtros.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <div class="flex items-center gap-3 mt-4 text-[13px]">
+            {% if pagination.has_prev %}
+                <button
+                    hx-get="?page={{ pagination.prev_num }}{% for key, values in request.args.lists() %}{% for value in values %}&{{ key }}={{ value|urlencode }}{% endfor %}{% endfor %}"
+                    class="btn"
+                    hx-target="#screener-container"
+                    hx-swap="outerHTML">Anterior</button>
+            {% endif %}
+
+            <span class="text-muted2">Página {{ pagination.page }} de {{ pagination.pages or 1 }}</span>
+
+            {% if pagination.has_next %}
+                <button
+                    hx-get="?page={{ pagination.next_num }}{% for key, values in request.args.lists() %}{% for value in values %}&{{ key }}={{ value|urlencode }}{% endfor %}{% endfor %}"
+                    class="btn"
+                    hx-target="#screener-container"
+                    hx-swap="outerHTML">Siguiente</button>
+            {% endif %}
+        </div>
+    </div>
+</div>

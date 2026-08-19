@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+    Acciones | TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<h1 class="font-serif-display text-3xl text-ink mb-6 flex items-center gap-3">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-maple">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+    </svg>
+    Acciones
+</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+    <div class="md:col-span-3">
+        <div class="mb-4">
+            <form hx-get="/stocks" hx-target="#screener-container" hx-swap="outerHTML" hx-push-url="true">
+                <input type="text" name="q" value="{{ request.args.get('q', '') }}" class="tn-input w-full"
+                       placeholder="Buscar ticker o empresa…" />
+            </form>
+        </div>
+        {% include 'partials/screener_table.html' %}
+    </div>
+
+    <div class="md:col-span-1">
+        <div class="card p-5">
+            <div class="lbl mb-3">Filtros</div>
+            <form hx-get="/stocks" hx-target="#screener-container" hx-swap="outerHTML" hx-push-url="true" class="space-y-4">
+                <input type="hidden" name="q" value="{{ request.args.get('q', '') }}" />
+
+                <div class="space-y-1.5">
+                    <label class="text-[13px] text-muted2">Exchange</label>
+                    <div class="space-y-1.5">
+                        {% for exchange in exchanges %}
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="exchange-{{ exchange }}" name="exchange" value="{{ exchange }}"
+                                   {{ 'checked' if exchange in request.args.getlist('exchange') }}
+                                   style="accent-color:#b3372b" />
+                            <label for="exchange-{{ exchange }}" class="text-[13px]">{{ exchange }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[13px] text-muted2">Sector</label>
+                    <div class="space-y-1.5">
+                        {% for sector in sectors %}
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="sector-{{ loop.index }}" name="sector" value="{{ sector }}"
+                                   {{ 'checked' if sector in request.args.getlist('sector') }}
+                                   style="accent-color:#b3372b" />
+                            <label for="sector-{{ loop.index }}" class="text-[13px]">{{ sector }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="text-[13px] text-muted2">Rango de indicadores</label>
+                    {% for key, label in range_filters.items() %}
+                    <div class="space-y-1">
+                        <div class="text-[12px] text-muted2">{{ label }}</div>
+                        <div class="flex items-center gap-2">
+                            <input type="number" step="any" name="{{ key }}_min" value="{{ request.args.get(key ~ '_min', '') }}"
+                                   class="tn-input" placeholder="Mín" />
+                            <input type="number" step="any" name="{{ key }}_max" value="{{ request.args.get(key ~ '_max', '') }}"
+                                   class="tn-input" placeholder="Máx" />
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full justify-center">Aplicar filtros</button>
+                <a href="/stocks" class="block text-center text-[13px] text-muted2 hover:text-ink">Limpiar filtros</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

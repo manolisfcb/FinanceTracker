@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import pandas as pd
-from src.models import StockModel
 # Strategy interface
 class PortfolioStrategy(ABC):
     @abstractmethod
@@ -14,16 +13,16 @@ class PortfolioByTransaction(PortfolioStrategy):
     def create_portfolio(self, data: pd.DataFrame, user_id):
         
         # First, we need to group the data by symbol
-        data_grouped = data.groupby('stock_id')
+        data_grouped = data.groupby('asset_id')
         average_price = data_grouped['price'].mean()
         quantity = data_grouped.apply(self._get_actual_quantity)
         total_cost = data_grouped.apply(self._get_total_cost)
-        
-        new_df = pd.DataFrame({'stock_id': average_price.index, 'avg_price': average_price.values, 'quantity': quantity.values, 'adquisition_cost': total_cost.values})
+
+        new_df = pd.DataFrame({'asset_id': average_price.index, 'avg_price': average_price.values, 'quantity': quantity.values, 'adquisition_cost': total_cost.values})
         new_df = new_df[new_df['quantity'] > 0]
-        new_df['user_id'] = user_id 
+        new_df['user_id'] = user_id
         new_df['dividend_amount'] = 0
-        new_df['actual_price'] = new_df['stock_id'].apply(self._get_actual_price)
+        new_df['actual_price'] = new_df['asset_id'].apply(self._get_actual_price)
         new_df['current_cost'] = new_df['actual_price'] * new_df['quantity']
         new_df['profit'] = new_df['current_cost'] - new_df['adquisition_cost']
         new_df['percent_return'] = (new_df['profit'] / new_df['adquisition_cost']) * 100
@@ -62,10 +61,15 @@ class PortfolioByTransaction(PortfolioStrategy):
         return total_buy_quantity - total_sell_quantity
         
     def _get_actual_price(self, symbol_id):
-        
+        from src.models import Fundamentals
+
         try:
-            price = StockModel.query.filter_by(id=symbol_id).first().current_price
-            return price
+            latest = (
+                Fundamentals.query.filter_by(asset_id=symbol_id)
+                .order_by(Fundamentals.as_of_date.desc())
+                .first()
+            )
+            return latest.price if latest else None
         except:
             return None
         

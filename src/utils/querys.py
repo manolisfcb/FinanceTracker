@@ -5,7 +5,6 @@ def get_portfolio(user_id: int):
 
     PORTFOLIO = text("""
     SELECT
-    st.root_symbol,
     st.symbol,
     pt.actual_price,
     pt.quantity,
@@ -15,7 +14,7 @@ def get_portfolio(user_id: int):
     pt.percent_return,
     0 as percent_return_dividends
     FROM portfolios pt
-    JOIN stocks st ON pt.stock_id = st.id
+    JOIN assets st ON pt.asset_id = st.id
     WHERE
     pt.user_id = :user_id
     """).bindparams(user_id=user_id)

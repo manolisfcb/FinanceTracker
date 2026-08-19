@@ -16,6 +16,9 @@ class Config(object):
     STATICS_PATH = os.path.join(BASE_PATH, 'src/static')
     SCHEDULER_API_ENABLED = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # yahoo (yfinance, free/MVP) today; swappable to eodhd|fmp later without
+    # touching the domain — see src/services/market_data.
+    MARKET_DATA_PROVIDER = os.getenv("MARKET_DATA_PROVIDER", "yahoo")
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

@@ -78,12 +78,40 @@ def create_app(config_name=None):
             return "0.00"
         return f"{value:,.2f}"
 
-    # The scheduler hits yfinance on an interval — keep it out of tests so
-    # test runs stay hermetic and fast, and so repeated create_app("testing")
-    # calls don't fail trying to start an already-running APScheduler.
+    @app.template_filter("ratio")
+    def format_ratio_filter(value):
+        """Plain 2-decimal number for nullable indicators (P/E, P/B, D/E...)
+        — unlike `currency`, None renders as '—' rather than '0.00', since a
+        missing indicator is not the same as an actual zero."""
+        if value is None:
+            return "—"
+        return f"{value:,.2f}"
+
+    @app.template_filter("percent")
+    def format_percent_filter(value):
+        """yfinance exposes yields/margins/payout as 0-1 fractions."""
+        if value is None:
+            return "—"
+        return f"{value * 100:.2f}%"
+
+    @app.template_filter("compact_number")
+    def format_compact_number_filter(value):
+        if value is None:
+            return "—"
+        for threshold, suffix in ((1e12, "T"), (1e9, "B"), (1e6, "M"), (1e3, "K")):
+            if abs(value) >= threshold:
+                return f"{value / threshold:,.2f}{suffix}"
+        return f"{value:,.2f}"
+
+    # The scheduler hits market data providers on an interval — keep it out
+    # of tests so test runs stay hermetic and fast, and so repeated
+    # create_app("testing") calls don't fail trying to start an
+    # already-running APScheduler.
     if not app.testing:
         scheduler.init_app(app)
-        from src.resources.jobs.update_stocks_info import update_stocks_info  # noqa: F401
+        from src.resources.jobs import refresh_fundamentals  # noqa: F401
+        from src.resources.jobs import refresh_quotes  # noqa: F401
+        from src.resources.jobs import refresh_fx  # noqa: F401
 
         if not scheduler.running:
             scheduler.start()
