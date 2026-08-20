@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% from 'partials/company_icon.html' import company_icon %}
+
+{% block head_title %}Rankings de acciones | TrueNorth Analytics{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4 mb-5">
+    <div>
+        <div class="lbl text-maple mb-1">Insights</div>
+        <h1 class="font-serif-display text-3xl text-ink mb-1">Rankings de acciones</h1>
+        <p class="text-[13px] text-muted max-w-3xl">
+            Tres lecturas del universo canadiense con datos almacenados{% if latest_update %} · snapshot {{ latest_update|date_es }}{% endif %}.
+        </p>
+    </div>
+    <a href="{{ url_for('tools.comparator') }}" class="btn btn-primary">Abrir comparador</a>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-5">
+    <section class="card overflow-hidden">
+        <div class="px-5 py-4 border-b border-border bg-[#fbfaf8]">
+            <div class="lbl text-maple mb-1">TSX</div>
+            <h2 class="text-[16px] font-semibold">Mayor dividend yield</h2>
+            <p class="text-[11.5px] text-muted mt-1">Yield reportado positivo; un valor alto puede anticipar un recorte.</p>
+        </div>
+        {% if yield_ranking %}
+        <div class="overflow-x-auto">
+            <table class="tn-card-table">
+                <thead><tr><th>#</th><th>Empresa</th><th>Sector</th><th class="text-right">Yield</th><th class="text-right">Payout</th></tr></thead>
+                <tbody>
+                {% for row in yield_ranking %}
+                    <tr>
+                        <td class="num text-muted">{{ row.rank }}</td>
+                        <td>
+                            <a href="{{ url_for('stocks.get_stock_detail', exchange=row.asset.exchange, symbol=row.asset.symbol) }}" class="flex items-center gap-2.5 text-ink">
+                                {{ company_icon(row.asset, 'sm') }}
+                                <span><span class="num font-semibold block">{{ row.asset.symbol }}</span><span class="text-[11px] text-muted block">{{ row.asset.name }}</span></span>
+                            </a>
+                        </td>
+                        <td class="text-[12px] text-muted2">{{ row.asset.sector or '—' }}</td>
+                        <td class="num text-right font-semibold pos">{{ row.fundamentals.dividend_yield|percent }}</td>
+                        <td class="num text-right">{{ row.fundamentals.payout_ratio|percent }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="py-12 px-5 text-center text-[13px] text-faint">No hay compañías TSX con yield disponible.</div>
+        {% endif %}
+    </section>
+
+    <section class="card overflow-hidden">
+        <div class="px-5 py-4 border-b border-border bg-[#fbfaf8]">
+            <div class="lbl text-maple mb-1">Constancia</div>
+            <h2 class="text-[16px] font-semibold">Aristócratas canadienses</h2>
+            <p class="text-[11.5px] text-muted mt-1">Al menos cinco aumentos anuales consecutivos, usando años calendario completos.</p>
+        </div>
+        {% if aristocrats %}
+        <div class="overflow-x-auto">
+            <table class="tn-card-table">
+                <thead><tr><th>#</th><th>Empresa</th><th class="text-right">Racha</th><th class="text-right">Dividendo {{ aristocrats[0].latest_year }}</th></tr></thead>
+                <tbody>
+                {% for row in aristocrats %}
+                    <tr>
+                        <td class="num text-muted">{{ row.rank }}</td>
+                        <td>
+                            <a href="{{ url_for('stocks.get_stock_detail', exchange=row.asset.exchange, symbol=row.asset.symbol) }}" class="flex items-center gap-2.5 text-ink">
+                                {{ company_icon(row.asset, 'sm') }}
+                                <span><span class="num font-semibold block">{{ row.asset.symbol }}</span><span class="text-[11px] text-muted block">{{ row.asset.name }}</span></span>
+                            </a>
+                        </td>
+                        <td class="num text-right font-semibold">{{ row.streak }} años</td>
+                        <td class="num text-right">{{ row.asset.currency }} {{ row.latest_annual_dividend|ratio }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="py-12 px-6 text-center">
+            <div class="font-serif-display text-xl mb-1">Aún no hay una racha verificable</div>
+            <p class="text-[12px] text-muted max-w-md mx-auto">Se necesitan seis años calendario completos para confirmar cinco aumentos consecutivos.</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+<section class="card overflow-hidden">
+    <div class="px-5 py-4 border-b border-border bg-[#fbfaf8]">
+        <div class="lbl text-maple mb-1">Rentabilidad</div>
+        <h2 class="text-[16px] font-semibold">Mejor ROE por sector</h2>
+        <p class="text-[11.5px] text-muted mt-1">Top 5 de retorno sobre patrimonio dentro de cada grupo comparable.</p>
+    </div>
+    {% if roe_groups %}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+        {% for group in roe_groups %}
+        <div class="p-5 border-b md:border-r border-border last:border-r-0">
+            <div class="text-[13px] font-semibold mb-3">{{ group.sector }}</div>
+            <div class="space-y-2">
+                {% for row in group.rows %}
+                <a href="{{ url_for('stocks.get_stock_detail', exchange=row.asset.exchange, symbol=row.asset.symbol) }}" class="flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#fbfaf8] text-ink">
+                    <span class="tn-rank-badge tn-rank-{{ row.rank }} num">{{ row.rank }}</span>
+                    {{ company_icon(row.asset, 'sm') }}
+                    <span class="min-w-0 flex-1"><span class="num font-semibold text-[12.5px]">{{ row.asset.symbol }}</span><span class="block text-[10.5px] text-muted truncate">{{ row.asset.name }}</span></span>
+                    <span class="num font-semibold pos text-[12px]">{{ row.fundamentals.roe|percent }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="py-12 px-5 text-center text-[13px] text-faint">No hay ROE positivo disponible.</div>
+    {% endif %}
+</section>
+
+<p class="text-[11px] text-muted mt-4">Los rankings son cribas educativas basadas en snapshots; no constituyen asesoramiento ni sustituyen revisar la calidad de los datos.</p>
+{% endblock %}

@@ -36,6 +36,7 @@
   const choose = (asset) => {
     input.value = asset.symbol;
     selectedId.value = asset.id;
+    selectedId.dispatchEvent(new Event('change', { bubbles: true }));
     closeMenu();
     input.focus();
   };

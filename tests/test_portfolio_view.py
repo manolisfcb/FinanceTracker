@@ -192,7 +192,15 @@ def test_portfolio_ideal_defaults_and_new_analytics_sections_render(auth_client,
     body = auth_client.get('/portfolio').get_data(as_text=True)
 
     assert 'Tu portafolio ideal' in body
+    assert 'Barras agrupadas' in body
+    assert 'Anillos comparativos' in body
+    assert 'Barras 100%' in body
+    assert 'id="allocationViewGroupedTab" aria-selected="true"' in body
+    assert 'id="allocationViewRingsTab" aria-selected="false"' in body
+    assert 'id="allocationViewStackedTab" aria-selected="false"' in body
+    assert 'groupedAllocationChart' in body
     assert 'targetAllocationChart' in body
+    assert 'stackedAllocationChart' in body
     assert 'Rentabilidad comparada' in body
     assert 'Composición por tipo y segmento' in body
     assert 'Dividendos por activo' in body

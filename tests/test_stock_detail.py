@@ -37,6 +37,8 @@ def test_stock_detail_renders_asset_info(mock_get_provider, auth_client, db):
     assert 'Royal Bank' in body
     assert 'A diversified Canadian financial institution.' in body
     assert 'IR site' in body
+    assert f'href="/tools/comparator?asset={asset.id}"' in body
+    assert 'Comparar' in body
 
 
 @patch('src.routes.stockViews.get_provider')

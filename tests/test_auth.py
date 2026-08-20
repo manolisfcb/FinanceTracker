@@ -50,6 +50,7 @@ def test_expense_control_links_live_in_profile_menu(auth_client):
     assert primary_navigation is not None
     assert "Transacciones" not in primary_navigation.get_text()
     assert "Gráficos" not in primary_navigation.get_text()
+    assert "Inbox" not in primary_navigation.get_text()
 
     profile_button = soup.find("button", attrs={"aria-label": "Abrir menú de perfil"})
     assert profile_button is not None
@@ -57,4 +58,7 @@ def test_expense_control_links_live_in_profile_menu(auth_client):
     assert "Control de gastos" in profile_menu.get_text()
     assert profile_menu.find("a", href="/transactions") is not None
     assert profile_menu.find("a", href="/transactions_charts") is not None
+    assert profile_menu.find("a", href="/inbox") is not None
+    assert profile_menu.find("a", href="/tools/rankings") is not None
+    assert profile_menu.find("a", href="/tools/comparator") is not None
     assert profile_menu.find("a", href="/logout") is not None

@@ -324,8 +324,15 @@ puede descartar alguna nota legítima que no nombre a la empresa en el titular n
       cobertura, score/peso/indicadores disponibles y explicación favorable/neutral/atención por componente;
       los datos ausentes se excluyen y la cobertura hace visible la incertidumbre. No se persiste para evitar
       que quede desincronizado del snapshot que lo origina.
-- [ ] `[M]` Rankings: top dividend yield TSX, aristócratas canadienses (≥5 años subiendo dividendo — calculable desde `DividendHistory`), mejores ROE por sector.
-- [ ] `[M]` Comparador de 2–4 empresas lado a lado.
+- [x] `[M]` Rankings: nueva pantalla `/tools/rankings`, accesible desde el perfil, con top dividend
+      yield TSX, aristócratas canadienses y top ROE por sector. Aristócratas exige cinco aumentos
+      interanuales consecutivos (seis totales anuales) y excluye el año calendario incompleto.
+- [x] `[M]` Comparador de 2–4 empresas lado a lado en `/tools/comparator`, accesible desde el perfil:
+      selección siempre explícita (nunca elige empresas por el usuario), columnas independientes con 27
+      indicadores agrupados, ranking global, medallas por indicador, semáforos y score; autocomplete y ranura
+      visible para agregar/quitar activos. Desde cada página de empresa, el botón "Comparar" abre la herramienta
+      con ese activo preseleccionado y lista para sumar otro. Incluye gráfico de rentabilidad normalizada
+      1M/6M/1A/5A y calculadora de una inversión hipotética, usando series reales del proveedor configurado.
 - [ ] `[M]` Alertas por email: precio objetivo, ex-date próxima, nuevo filing.
 - [ ] `[L]` (Opcional) Migrar proveedor a EODHD/FMP cuando yfinance quede corto.
 

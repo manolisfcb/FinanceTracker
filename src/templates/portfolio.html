@@ -107,19 +107,63 @@
         </details>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[0.8fr_0.8fr_1.4fr] gap-4 items-stretch">
-        <div class="tn-chart-panel">
-            <div class="text-center text-[12px] font-semibold text-muted2 mb-2">OBJETIVO</div>
-            <div class="h-48"><canvas id="targetAllocationChart"></canvas></div>
+    <div class="tn-allocation-view-switch mb-4" role="tablist" aria-label="Vista de comparación del portafolio">
+        <button type="button" class="tn-allocation-view-tab is-active" role="tab"
+                id="allocationViewGroupedTab" aria-selected="true" aria-controls="allocationViewGrouped"
+                data-allocation-view-target="grouped">
+            Barras agrupadas
+        </button>
+        <button type="button" class="tn-allocation-view-tab" role="tab" tabindex="-1"
+                id="allocationViewRingsTab" aria-selected="false" aria-controls="allocationViewRings"
+                data-allocation-view-target="rings">
+            Anillos comparativos
+        </button>
+        <button type="button" class="tn-allocation-view-tab" role="tab" tabindex="-1"
+                id="allocationViewStackedTab" aria-selected="false" aria-controls="allocationViewStacked"
+                data-allocation-view-target="stacked">
+            Barras 100%
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.75fr)_minmax(285px,0.75fr)] gap-4 items-stretch">
+        <div class="min-w-0">
+            <div id="allocationViewGrouped" role="tabpanel" aria-labelledby="allocationViewGroupedTab"
+                 data-allocation-view="grouped" class="tn-chart-panel tn-allocation-comparison-panel">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <span class="text-[12px] font-semibold text-muted2">IDEAL VS. ACTUAL</span>
+                    <span class="text-[11.5px] text-faint">Comparación por clase de activo</span>
+                </div>
+                <div class="h-64"><canvas id="groupedAllocationChart"></canvas></div>
+            </div>
+
+            <div id="allocationViewRings" role="tabpanel" aria-labelledby="allocationViewRingsTab"
+                 data-allocation-view="rings" hidden>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                    <div class="tn-chart-panel">
+                        <div class="text-center text-[12px] font-semibold text-muted2 mb-2">OBJETIVO</div>
+                        <div class="h-52"><canvas id="targetAllocationChart"></canvas></div>
+                    </div>
+                    <div class="tn-chart-panel">
+                        <div class="text-center text-[12px] font-semibold text-muted2 mb-2">ACTUAL</div>
+                        {% if strategic_allocation.has_holdings %}
+                        <div class="h-52"><canvas id="currentAllocationChart"></canvas></div>
+                        {% else %}
+                        <div class="h-52 flex items-center justify-center text-center text-[12.5px] text-faint px-4">Agregá posiciones o indicá tu cash actual para comparar.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div id="allocationViewStacked" role="tabpanel" aria-labelledby="allocationViewStackedTab"
+                 data-allocation-view="stacked" class="tn-chart-panel tn-allocation-comparison-panel" hidden>
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <span class="text-[12px] font-semibold text-muted2">COMPOSICIÓN 100%</span>
+                    <span class="text-[11.5px] text-faint">Cada barra representa el portafolio completo</span>
+                </div>
+                <div class="h-64"><canvas id="stackedAllocationChart"></canvas></div>
+            </div>
         </div>
-        <div class="tn-chart-panel">
-            <div class="text-center text-[12px] font-semibold text-muted2 mb-2">ACTUAL</div>
-            {% if strategic_allocation.has_holdings %}
-            <div class="h-48"><canvas id="currentAllocationChart"></canvas></div>
-            {% else %}
-            <div class="h-48 flex items-center justify-center text-center text-[12.5px] text-faint px-4">Agregá posiciones o indicá tu cash actual para comparar.</div>
-            {% endif %}
-        </div>
+
         <div class="tn-chart-panel">
             <div class="flex items-center justify-between gap-3 mb-3">
                 <span class="text-[12px] font-semibold text-muted2">REBALANCEO ESTIMADO</span>
@@ -368,6 +412,41 @@
 
     const allocationLabels = {{ strategic_allocation.labels|tojson }};
     const allocationColors = {{ strategic_allocation.colors|tojson }};
+    const targetAllocationValues = {{ strategic_allocation.target_values|tojson }};
+    const currentAllocationValues = {{ strategic_allocation.current_values|tojson }};
+    const allocationCharts = {};
+    const formatAllocationPercent = value => `${Number(value).toFixed(Number(value) % 1 === 0 ? 0 : 1)}%`;
+
+    const allocationValueLabels = {
+        id: 'allocationValueLabels',
+        afterDatasetsDraw(chart, _args, pluginOptions) {
+            const { ctx } = chart;
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            chart.data.datasets.forEach((dataset, datasetIndex) => {
+                const meta = chart.getDatasetMeta(datasetIndex);
+                meta.data.forEach((element, dataIndex) => {
+                    const value = Number(dataset.data[dataIndex] || 0);
+                    if (pluginOptions.stacked && value < 6) return;
+                    const position = element.tooltipPosition();
+                    ctx.font = `600 ${pluginOptions.stacked ? 11 : 10}px 'IBM Plex Sans'`;
+                    ctx.fillStyle = pluginOptions.stacked ? '#ffffff' : '#1c1b18';
+                    ctx.fillText(
+                        formatAllocationPercent(value),
+                        position.x,
+                        pluginOptions.stacked ? position.y : position.y - 9,
+                    );
+                });
+            });
+            ctx.restore();
+        },
+    };
+
+    const comparisonLegend = {
+        position: 'top',
+        labels: { color: '#6f6b60', boxWidth: 10, boxHeight: 10, padding: 18, font: { size: 11.5 } },
+    };
     const doughnutOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -381,35 +460,172 @@
         },
     };
 
-    new Chart(document.getElementById('targetAllocationChart').getContext('2d'), {
-        type: 'doughnut',
-        data: {
-            labels: allocationLabels,
-            datasets: [{
-                data: {{ strategic_allocation.target_values|tojson }},
-                backgroundColor: allocationColors,
-                borderColor: '#ffffff',
-                borderWidth: 3,
-            }],
-        },
-        options: doughnutOptions,
-    });
+    function createGroupedAllocationChart() {
+        if (allocationCharts.grouped) return allocationCharts.grouped;
+        allocationCharts.grouped = new Chart(document.getElementById('groupedAllocationChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: allocationLabels,
+                datasets: [
+                    {
+                        label: 'Ideal',
+                        data: targetAllocationValues,
+                        backgroundColor: '#4a6b8a',
+                        borderColor: '#3c5b78',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Actual',
+                        data: currentAllocationValues,
+                        backgroundColor: '#b3372b',
+                        borderColor: '#8f2b22',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    },
+                ],
+            },
+            plugins: [allocationValueLabels],
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                layout: { padding: { top: 12 } },
+                plugins: {
+                    legend: comparisonLegend,
+                    allocationValueLabels: { stacked: false },
+                    tooltip: { callbacks: { label: item => `${item.dataset.label}: ${formatAllocationPercent(item.parsed.y)}` } },
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#1c1b18', font: { size: 11.5 } } },
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: 50,
+                        grid: { color: '#e7e4dc' },
+                        border: { display: false },
+                        ticks: { callback: value => `${value}%` },
+                    },
+                },
+            },
+        });
+        return allocationCharts.grouped;
+    }
 
-    {% if strategic_allocation.has_holdings %}
-    new Chart(document.getElementById('currentAllocationChart').getContext('2d'), {
-        type: 'doughnut',
-        data: {
-            labels: allocationLabels,
-            datasets: [{
-                data: {{ strategic_allocation.current_values|tojson }},
-                backgroundColor: allocationColors,
-                borderColor: '#ffffff',
-                borderWidth: 3,
-            }],
-        },
-        options: doughnutOptions,
+    function createRingAllocationCharts() {
+        if (!allocationCharts.target) {
+            allocationCharts.target = new Chart(document.getElementById('targetAllocationChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: allocationLabels,
+                    datasets: [{
+                        data: targetAllocationValues,
+                        backgroundColor: allocationColors,
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                    }],
+                },
+                options: doughnutOptions,
+            });
+        }
+
+        {% if strategic_allocation.has_holdings %}
+        if (!allocationCharts.current) {
+            allocationCharts.current = new Chart(document.getElementById('currentAllocationChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: allocationLabels,
+                    datasets: [{
+                        data: currentAllocationValues,
+                        backgroundColor: allocationColors,
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                    }],
+                },
+                options: doughnutOptions,
+            });
+        }
+        {% endif %}
+    }
+
+    function createStackedAllocationChart() {
+        if (allocationCharts.stacked) return allocationCharts.stacked;
+        allocationCharts.stacked = new Chart(document.getElementById('stackedAllocationChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Ideal', 'Actual'],
+                datasets: allocationLabels.map((label, index) => ({
+                    label,
+                    data: [targetAllocationValues[index], currentAllocationValues[index]],
+                    backgroundColor: allocationColors[index],
+                    borderColor: '#ffffff',
+                    borderWidth: 1,
+                    borderSkipped: false,
+                })),
+            },
+            plugins: [allocationValueLabels],
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: comparisonLegend,
+                    allocationValueLabels: { stacked: true },
+                    tooltip: { callbacks: { label: item => `${item.dataset.label}: ${formatAllocationPercent(item.parsed.x)}` } },
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        min: 0,
+                        max: 100,
+                        grid: { color: '#e7e4dc' },
+                        border: { display: false },
+                        ticks: { stepSize: 25, callback: value => `${value}%` },
+                    },
+                    y: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: { color: '#1c1b18', font: { size: 12, weight: '600' } },
+                    },
+                },
+            },
+        });
+        return allocationCharts.stacked;
+    }
+
+    const allocationViewTabs = Array.from(document.querySelectorAll('[data-allocation-view-target]'));
+    const allocationViews = Array.from(document.querySelectorAll('[data-allocation-view]'));
+    function setAllocationView(viewName) {
+        allocationViewTabs.forEach(tab => {
+            const isSelected = tab.dataset.allocationViewTarget === viewName;
+            tab.classList.toggle('is-active', isSelected);
+            tab.setAttribute('aria-selected', String(isSelected));
+            tab.tabIndex = isSelected ? 0 : -1;
+        });
+        allocationViews.forEach(view => { view.hidden = view.dataset.allocationView !== viewName; });
+
+        window.requestAnimationFrame(() => {
+            if (viewName === 'rings') createRingAllocationCharts();
+            if (viewName === 'stacked') createStackedAllocationChart();
+            if (viewName === 'grouped') createGroupedAllocationChart();
+            Object.values(allocationCharts).forEach(chart => chart.resize());
+        });
+    }
+    allocationViewTabs.forEach((tab, tabIndex) => {
+        tab.addEventListener('click', () => setAllocationView(tab.dataset.allocationViewTarget));
+        tab.addEventListener('keydown', event => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            event.preventDefault();
+            let nextIndex = tabIndex;
+            if (event.key === 'ArrowLeft') nextIndex = (tabIndex - 1 + allocationViewTabs.length) % allocationViewTabs.length;
+            if (event.key === 'ArrowRight') nextIndex = (tabIndex + 1) % allocationViewTabs.length;
+            if (event.key === 'Home') nextIndex = 0;
+            if (event.key === 'End') nextIndex = allocationViewTabs.length - 1;
+            allocationViewTabs[nextIndex].focus();
+            setAllocationView(allocationViewTabs[nextIndex].dataset.allocationViewTarget);
+        });
     });
-    {% endif %}
+    createGroupedAllocationChart();
 
     const planInputs = Array.from(document.querySelectorAll('.plan-percent'));
     const planTotal = document.getElementById('planPercentTotal');
