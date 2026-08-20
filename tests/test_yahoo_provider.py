@@ -148,6 +148,39 @@ def test_get_quote_maps_fast_info(mock_ticker_cls):
 
 
 @patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_quote_falls_back_to_history_when_fast_info_has_no_crypto_price(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.fast_info = {'lastPrice': None, 'previousClose': None, 'currency': 'CAD'}
+    mock_ticker.history.return_value = pd.DataFrame(
+        {'Close': [95_000.0, 98_500.0]},
+        index=pd.to_datetime(['2026-08-19', '2026-08-20']),
+    )
+    mock_ticker_cls.return_value = mock_ticker
+
+    quote = _provider().get_quote('BTC-CAD')
+
+    assert quote == {'price': 98_500.0, 'previous_close': 95_000.0, 'currency': 'CAD'}
+    mock_ticker.history.assert_called_once_with(period='5d', interval='1d', auto_adjust=False)
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_quote_falls_back_to_history_when_fast_info_raises(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    type(mock_ticker).fast_info = property(lambda _self: (_ for _ in ()).throw(KeyError('currentTradingPeriod')))
+    mock_ticker.history.return_value = pd.DataFrame(
+        {'Close': [34.1, 34.4]},
+        index=pd.to_datetime(['2026-08-19', '2026-08-20']),
+    )
+    mock_ticker_cls.return_value = mock_ticker
+
+    quote = _provider().get_quote('D-UN.TO')
+
+    assert quote['price'] == 34.4
+    assert quote['previous_close'] == 34.1
+    assert quote['currency'] is None
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
 def test_get_dividends_maps_series_to_dicts(mock_ticker_cls):
     mock_ticker = MagicMock()
     mock_ticker.dividends = pd.Series(

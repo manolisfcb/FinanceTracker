@@ -1,6 +1,7 @@
 import io
 from datetime import datetime
 
+from src.data.asset_catalog import CRYPTO_ASSETS, REIT_ASSETS
 from src.models import Asset
 from src.resources.orders_import.ibkr import IBKRFlexImporter
 from src.resources.orders_import.questrade import QuestradeCSVImporter
@@ -91,3 +92,10 @@ def test_manual_asset_resolver_creates_supported_crypto_in_cad(db):
 def test_manual_asset_resolver_does_not_create_unknown_symbol(db):
     assert resolve_or_create_manual_asset('NOTACOIN') is None
     assert Asset.query.filter_by(symbol='NOTACOIN').first() is None
+
+
+def test_supplemental_catalog_has_broad_crypto_and_reit_coverage():
+    assert len(CRYPTO_ASSETS) >= 35
+    assert len(REIT_ASSETS) >= 50
+    assert {'BTC', 'ETH', 'SOL', 'XRP', 'SHIB'} <= {row['symbol'] for row in CRYPTO_ASSETS}
+    assert {'O', 'PLD', 'REI.UN', 'MRG.UN'} <= {row['symbol'] for row in REIT_ASSETS}

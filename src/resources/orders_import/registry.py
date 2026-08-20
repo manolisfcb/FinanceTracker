@@ -1,3 +1,4 @@
+from src.data.asset_catalog import CRYPTO_ASSETS
 from src.extensions import db
 from src.models import Asset
 from src.resources.orders_import.ibkr import IBKRFlexImporter
@@ -11,21 +12,7 @@ IMPORTERS = {
 }
 
 
-# Yahoo publishes these pairs directly in CAD. Keeping the catalog explicit
-# prevents a typo in the manual form from silently creating a bogus asset,
-# while covering the cryptoassets commonly held at Canadian brokers.
-CRYPTO_ASSETS = {
-    "BTC": "Bitcoin",
-    "ETH": "Ethereum",
-    "SOL": "Solana",
-    "XRP": "XRP",
-    "ADA": "Cardano",
-    "DOGE": "Dogecoin",
-    "AVAX": "Avalanche",
-    "LINK": "Chainlink",
-    "LTC": "Litecoin",
-    "BCH": "Bitcoin Cash",
-}
+CRYPTO_ASSETS_BY_SYMBOL = {row["symbol"]: row for row in CRYPTO_ASSETS}
 
 
 def get_importer(broker_key: str):
@@ -60,8 +47,8 @@ def resolve_or_create_manual_asset(symbol: str):
     normalized = symbol.strip().upper()
     crypto_symbol = normalized.removesuffix("-CAD").removesuffix("-USD")
 
-    name = CRYPTO_ASSETS.get(crypto_symbol)
-    if name is None:
+    catalog_row = CRYPTO_ASSETS_BY_SYMBOL.get(crypto_symbol)
+    if catalog_row is None:
         return resolve_asset_id(normalized)
 
     # Prefer the explicit CRYPTO listing. A stock universe may legitimately
@@ -69,18 +56,12 @@ def resolve_or_create_manual_asset(symbol: str):
     # that unrelated security.
     asset = Asset.query.filter_by(symbol=crypto_symbol, exchange="CRYPTO").first()
     if asset is None:
-        asset = Asset.query.filter_by(yahoo_symbol=f"{crypto_symbol}-CAD").first()
+        asset = Asset.query.filter_by(yahoo_symbol=catalog_row["yahoo_symbol"]).first()
     if asset is not None:
         return asset.id
 
     asset = Asset(
-        symbol=crypto_symbol,
-        yahoo_symbol=f"{crypto_symbol}-CAD",
-        exchange="CRYPTO",
-        currency="CAD",
-        name=name,
-        sector="Cryptoassets",
-        country="Global",
+        **catalog_row,
     )
     db.session.add(asset)
     db.session.flush()

@@ -149,11 +149,36 @@ class YahooProvider(MarketDataProvider):
 
     def get_quote(self, yahoo_symbol: str) -> dict | None:
         def _fetch():
-            fast = self._ticker(yahoo_symbol).fast_info
+            ticker = self._ticker(yahoo_symbol)
+            try:
+                fast = ticker.fast_info
+                price = _float(fast.get("lastPrice"))
+                previous_close = _float(fast.get("previousClose"))
+                currency = fast.get("currency")
+            except Exception:
+                # A failed fast-info endpoint should not prevent the chart
+                # endpoint fallback below from supplying a usable price.
+                price = previous_close = currency = None
+
+            # Yahoo's fast-info endpoint occasionally omits crypto prices even
+            # though the chart endpoint has them.  Falling back to the latest
+            # daily close prevents a valid pair such as BTC-CAD from being
+            # treated as unknown.  It also makes the quote path resilient to
+            # partial fast-info payloads for thinly traded REITs.
+            if price is None:
+                history = ticker.history(period="5d", interval="1d", auto_adjust=False)
+                closes = history["Close"].dropna() if history is not None and not history.empty else []
+                if len(closes):
+                    price = _float(closes.iloc[-1])
+                    if previous_close is None and len(closes) > 1:
+                        previous_close = _float(closes.iloc[-2])
+
+            if price is None:
+                return None
             return {
-                "price": fast.get("lastPrice"),
-                "previous_close": fast.get("previousClose"),
-                "currency": fast.get("currency"),
+                "price": price,
+                "previous_close": previous_close,
+                "currency": currency,
             }
         return self._with_retries(_fetch)
 

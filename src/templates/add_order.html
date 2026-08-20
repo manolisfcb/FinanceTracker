@@ -20,7 +20,30 @@
 
         <div class="space-y-1.5">
             <label class="text-[13px] text-muted2">{{ form.asset_symbol.label.text }}</label>
-            {{ form.asset_symbol(class="tn-input", placeholder="ej. RY, AAPL, BTC") }}
+            <div
+                class="tn-combobox"
+                data-asset-autocomplete
+                data-search-url="{{ url_for('portfolio.search_order_assets') }}"
+            >
+                {{ form.asset_id() }}
+                {{ form.asset_symbol(
+                    class="tn-input",
+                    placeholder="Buscar por símbolo o empresa",
+                    autocomplete="off",
+                    role="combobox",
+                    aria_autocomplete="list",
+                    aria_expanded="false",
+                    aria_controls="asset-suggestions"
+                ) }}
+                <div
+                    id="asset-suggestions"
+                    class="tn-combobox-menu"
+                    role="listbox"
+                    aria-label="Activos sugeridos"
+                    hidden
+                ></div>
+            </div>
+            <p class="text-[11px] text-muted">Escribí un ticker o el nombre de una empresa.</p>
         </div>
 
         <div class="space-y-1.5">
@@ -56,4 +79,8 @@
         <button type="submit" class="btn btn-primary">Guardar orden</button>
     </form>
 </div>
+{% endblock %}
+
+{% block extra_head %}
+    <script src="{{ url_for('static', filename='js/asset_autocomplete.js') }}" defer></script>
 {% endblock %}

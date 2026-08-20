@@ -1,4 +1,4 @@
-"""Seed the Asset catalog with the CA/US investable universe.
+"""Seed the Asset catalog with equities, cryptoassets and REITs.
 
 CA: S&P/TSX Composite constituents (Wikipedia) — the largest clean, freely
 scrapable CA list found for this pass; it's large/mid-cap TSX only, it does
@@ -16,6 +16,7 @@ Usage:
     python scripts/seed_universe.py                    # seed + enrich
     python scripts/seed_universe.py --skip-enrichment   # seed symbols/names only
     python scripts/seed_universe.py --limit 20          # cap enrichment calls (smoke test)
+    python scripts/seed_universe.py --supplements-only --skip-enrichment
 """
 import argparse
 import os
@@ -29,6 +30,7 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src import create_app
+from src.data.asset_catalog import CRYPTO_ASSETS, REIT_ASSETS, SUPPLEMENTAL_ASSETS
 from src.extensions import db
 from src.models import Asset, Fundamentals
 from src.resources.jobs._common import get_or_create_snapshot
@@ -100,8 +102,11 @@ def upsert_asset(row):
     else:
         asset.name = row['name']
         asset.yahoo_symbol = row['yahoo_symbol']
+        asset.currency = row['currency']
         asset.sector = asset.sector or row['sector']
         asset.industry = asset.industry or row['industry']
+        asset.country = asset.country or row.get('country')
+        asset.is_active = True
     return asset
 
 
@@ -163,21 +168,31 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--skip-enrichment', action='store_true', help="Seed symbols/names only, skip the yfinance profile pass")
     parser.add_argument('--limit', type=int, default=None, help="Cap how many assets to enrich (smoke testing)")
+    parser.add_argument(
+        '--supplements-only', action='store_true',
+        help="Seed only the built-in crypto/REIT catalog (no Wikipedia requests)",
+    )
     args = parser.parse_args()
 
     app = create_app()
     with app.app_context():
-        print("Fetching S&P/TSX Composite (CA)...")
-        ca_rows = fetch_tsx_composite()
-        print(f"  {len(ca_rows)} CA tickers")
+        if args.supplements_only:
+            ca_rows, us_rows = [], []
+        else:
+            print("Fetching S&P/TSX Composite (CA)...")
+            ca_rows = fetch_tsx_composite()
+            print(f"  {len(ca_rows)} CA tickers")
 
-        print("Fetching S&P 500 (US)...")
-        us_rows = fetch_sp500()
-        print(f"  {len(us_rows)} US tickers")
+            print("Fetching S&P 500 (US)...")
+            us_rows = fetch_sp500()
+            print(f"  {len(us_rows)} US tickers")
 
-        assets = [upsert_asset(row) for row in ca_rows + us_rows]
+        assets = [upsert_asset(row) for row in ca_rows + us_rows + list(SUPPLEMENTAL_ASSETS)]
         db.session.commit()
-        print(f"Upserted {len(assets)} assets ({len(ca_rows)} CA + {len(us_rows)} US).")
+        print(
+            f"Upserted {len(assets)} assets ({len(ca_rows)} index CA + {len(us_rows)} index US + "
+            f"{len(CRYPTO_ASSETS)} crypto + {len(REIT_ASSETS)} REIT catalog rows)."
+        )
 
         if args.skip_enrichment:
             print("Skipping enrichment (--skip-enrichment).")

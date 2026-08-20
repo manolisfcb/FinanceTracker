@@ -19,6 +19,9 @@ class Config(object):
     # yahoo (yfinance, free/MVP) today; swappable to eodhd|fmp later without
     # touching the domain — see src/services/market_data.
     MARKET_DATA_PROVIDER = os.getenv("MARKET_DATA_PROVIDER", "yahoo")
+    # A new holding should have a value on its first portfolio view rather
+    # than wait for the next 15-minute quote job.
+    REFRESH_QUOTE_ON_ORDER_CREATE = True
     # SEC's fair access policy requires a User-Agent naming the app and a
     # contact email, or EDGAR returns 403.
     SEC_EDGAR_USER_AGENT = os.getenv(
@@ -73,6 +76,8 @@ class TestingConfig(Config):
     JWT_SECRET_KEY = 'testing-jwt-key'
     SECRET_KEY = 'testing-secret-key'
     WTF_CSRF_ENABLED = False
+    # Tests use explicit provider mocks; never let a form POST reach Yahoo.
+    REFRESH_QUOTE_ON_ORDER_CREATE = False
     # In-memory SQLite is per-connection — without a single shared
     # connection, tables created via db.create_all() are invisible to the
     # next request's connection.

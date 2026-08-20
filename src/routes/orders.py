@@ -2,13 +2,15 @@ import uuid
 from datetime import datetime
 from io import TextIOWrapper
 
-from flask import flash, redirect, render_template, request, session, url_for
+from flask import current_app, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required
+from sqlalchemy import case, or_
 
 from src.extensions import db
 from src.forms.ManualOrderForm import ManualOrderForm
 from src.forms.OrdersImportForm import OrdersImportForm
-from src.models import Account, OrderModel, OrderType
+from src.models import Account, Asset, OrderModel, OrderType
+from src.resources.jobs.refresh_quotes import refresh_asset_quote
 from src.resources.orders_import.registry import (
     get_importer,
     resolve_asset_id,
@@ -47,6 +49,53 @@ def delete_order(id):
     return '', 204
 
 
+@portfolio_bp.route('/orders/assets/search', methods=['GET'])
+@login_required
+def search_order_assets():
+    """Return a small, ranked result set for the order asset combobox."""
+    search_term = request.args.get('q', '').strip()[:50]
+    if not search_term:
+        return {'assets': []}
+
+    prefix = f'{search_term}%'
+    contains = f'%{search_term}%'
+    assets = (
+        Asset.query
+        .filter(
+            Asset.is_active.is_(True),
+            or_(
+                Asset.symbol.ilike(contains),
+                Asset.yahoo_symbol.ilike(contains),
+                Asset.name.ilike(contains),
+            ),
+        )
+        .order_by(
+            case(
+                (Asset.symbol.ilike(prefix), 0),
+                (Asset.yahoo_symbol.ilike(prefix), 1),
+                (Asset.name.ilike(prefix), 2),
+                else_=3,
+            ),
+            Asset.symbol.asc(),
+            Asset.exchange.asc(),
+        )
+        .limit(8)
+        .all()
+    )
+    return {
+        'assets': [
+            {
+                'id': asset.id,
+                'symbol': asset.symbol,
+                'name': asset.name,
+                'exchange': asset.exchange,
+                'currency': asset.currency,
+            }
+            for asset in assets
+        ]
+    }
+
+
 @portfolio_bp.route('/orders/add', methods=['GET', 'POST'])
 @login_required
 def add_order():
@@ -54,7 +103,26 @@ def add_order():
     form.account.choices = _account_choices()
 
     if form.validate_on_submit():
-        asset_id = resolve_or_create_manual_asset(form.asset_symbol.data)
+        asset_id = None
+        if form.asset_id.data:
+            try:
+                selected_asset = db.session.get(Asset, int(form.asset_id.data))
+            except (TypeError, ValueError):
+                selected_asset = None
+
+            normalized_symbol = form.asset_symbol.data.strip().upper()
+            if (
+                selected_asset is not None
+                and selected_asset.is_active
+                and normalized_symbol in {
+                    selected_asset.symbol.upper(),
+                    selected_asset.yahoo_symbol.upper(),
+                }
+            ):
+                asset_id = selected_asset.id
+
+        if asset_id is None:
+            asset_id = resolve_or_create_manual_asset(form.asset_symbol.data)
         if asset_id is None:
             flash(f'No se encontró el activo "{form.asset_symbol.data}" en el universo', 'error')
             return render_template('add_order.html', form=form)
@@ -89,6 +157,20 @@ def add_order():
         )
         db.session.add(order)
         db.session.commit()
+
+        # Best effort only: saving a valid order must never depend on Yahoo
+        # being reachable.  The scheduler will retry later if this first
+        # quote fails.
+        if current_app.config.get('REFRESH_QUOTE_ON_ORDER_CREATE', True):
+            asset = db.session.get(Asset, asset_id)
+            try:
+                if asset is not None and refresh_asset_quote(asset):
+                    db.session.commit()
+            except Exception as exc:
+                db.session.rollback()
+                current_app.logger.warning(
+                    'Initial quote failed for asset %s: %s', asset_id, exc,
+                )
         flash('Orden agregada correctamente', 'success')
         return redirect(url_for('portfolio.list_orders'))
 
