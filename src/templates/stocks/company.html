@@ -68,46 +68,97 @@
     </div>
 </div>
 
-<!-- Indicator grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-5 items-start">
-    {% for group_name, rows in indicator_groups %}
-    <div class="card p-4">
-        <div class="lbl mb-3">{{ group_name }}</div>
-        <div class="space-y-2">
-            {% for key, label, kind, help_text in rows %}
-            {% set value = fundamentals|attr(key) if fundamentals else none %}
-            <div class="tn-help-row flex justify-between items-center gap-3 text-[13px]">
-                <span class="text-muted2 flex items-center min-w-0">
-                    <span class="truncate">{{ label }}</span>
-                    {{ help_tip(help_text, label) }}
-                </span>
-                <span class="num font-semibold whitespace-nowrap">
-                    {% if kind == 'percent' %}{{ value|percent }}
-                    {% elif kind == 'compact_number' %}{{ value|compact_number }}
-                    {% else %}{{ value|ratio }}
-                    {% endif %}
+<!-- Price chart + key stats -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 mb-4">
+    <div class="card p-5 lg:col-span-2">
+        <div class="flex justify-between items-center mb-3">
+            <div class="text-sm font-semibold">Precio</div>
+            <div class="flex gap-1.5" id="rangeButtons">
+                {% for range_key in price_ranges %}
+                <button type="button" class="tn-range range-btn{{ ' tn-range-active' if range_key == '1Y' }}" data-range="{{ range_key }}">{{ range_key }}</button>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="h-[230px] relative">
+            <div id="priceChartLoading" class="absolute inset-0 flex items-center justify-center text-[13px] text-faint">Cargando…</div>
+            <div id="priceChartEmpty" class="absolute inset-0 hidden items-center justify-center text-[13px] text-faint">No hay datos de precio disponibles.</div>
+            <canvas id="priceHistoryChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card p-5">
+        <div class="text-sm font-semibold mb-3">Datos clave</div>
+        <div class="text-[13px]">
+            <div class="tn-help-row tn-keystat">
+                <span class="text-muted2 flex items-center">Market cap {{ help_tip(key_stat_help.market_cap, 'Market cap') }}</span>
+                <span class="num font-semibold">{{ asset.currency }} {{ (fundamentals.market_cap if fundamentals else none)|compact_number }}</span>
+            </div>
+            <div class="tn-help-row tn-keystat">
+                <span class="text-muted2 flex items-center">Rango 52 semanas {{ help_tip(key_stat_help.fifty_two_week_range, 'el rango de 52 semanas') }}</span>
+                <span class="num">
+                    {% if fundamentals and fundamentals.fifty_two_week_low and fundamentals.fifty_two_week_high %}
+                    {{ fundamentals.fifty_two_week_low|ratio }} – {{ fundamentals.fifty_two_week_high|ratio }}
+                    {% else %}—{% endif %}
                 </span>
             </div>
-            {% endfor %}
+            <div class="tn-help-row tn-keystat">
+                <span class="text-muted2 flex items-center">Volumen prom. {{ help_tip(key_stat_help.average_volume, 'el volumen promedio') }}</span>
+                <span class="num">{{ (fundamentals.average_volume if fundamentals else none)|compact_number }}</span>
+            </div>
+            <div class="tn-help-row tn-keystat">
+                <span class="text-muted2 flex items-center">Beta {{ help_tip(key_stat_help.beta, 'Beta') }}</span>
+                <span class="num">{{ (fundamentals.beta if fundamentals else none)|ratio }}</span>
+            </div>
+            <div class="tn-help-row tn-keystat">
+                <span class="text-muted2 flex items-center">LPA (ttm) {{ help_tip(key_stat_help.eps, 'el LPA') }}</span>
+                <span class="num">{{ (fundamentals.eps if fundamentals else none)|ratio }}</span>
+            </div>
+            <div class="tn-keystat">
+                <span class="text-muted2">Próximo resultado</span>
+                <span class="num">{% if next_earnings %}{{ next_earnings.event_date|date_es }}{% else %}—{% endif %}</span>
+            </div>
+            <div class="tn-keystat tn-keystat-last">
+                <span class="text-muted2">Sitio web</span>
+                {% if asset.website %}
+                <a href="{{ asset.website }}" target="_blank" rel="noopener noreferrer" class="font-semibold">{{ asset.website|domain }} ↗</a>
+                {% else %}
+                <span class="num">—</span>
+                {% endif %}
+            </div>
         </div>
     </div>
-    {% endfor %}
 </div>
 
-<!-- Price chart -->
-<div class="card p-5 mb-5">
-    <div class="flex justify-between items-center mb-3">
-        <div class="text-sm font-semibold">Precio histórico</div>
-        <div class="flex gap-1.5" id="rangeButtons">
-            {% for range_key in price_ranges %}
-            <button type="button" class="btn px-2.5 py-1 text-[12px] range-btn{{ ' btn-primary' if range_key == '1Y' }}" data-range="{{ range_key }}">{{ range_key }}</button>
-            {% endfor %}
-        </div>
+<!-- Fundamental indicators -->
+<div class="card p-5 mb-4">
+    <div class="flex flex-wrap gap-2 justify-between items-center mb-4">
+        <div class="text-[15px] font-semibold">Indicadores fundamentales</div>
+        {% if fundamentals %}
+        <span class="text-[12px] text-muted">Snapshot del {{ fundamentals.as_of_date|date_es }}</span>
+        {% endif %}
     </div>
-    <div class="h-72 relative">
-        <div id="priceChartLoading" class="absolute inset-0 flex items-center justify-center text-[13px] text-faint">Cargando…</div>
-        <div id="priceChartEmpty" class="absolute inset-0 hidden items-center justify-center text-[13px] text-faint">No hay datos de precio disponibles.</div>
-        <canvas id="priceHistoryChart"></canvas>
+    <div class="tn-ind-groups">
+        {% for group_name, rows in indicator_groups %}
+        <div class="tn-ind-group">
+            <div class="lbl mb-2.5 text-maple">{{ group_name }}</div>
+            <div class="grid grid-cols-2 gap-2">
+                {% for key, label, kind, help_text in rows %}
+                {% set value = fundamentals|attr(key) if fundamentals else none %}
+                <div class="ind">
+                    <span class="lbl tn-ind-label">
+                        {{ label }}{{ help_tip(help_text, label) }}
+                    </span>
+                    <span class="num text-[17px] font-semibold">
+                        {% if kind == 'percent' %}{{ value|percent }}
+                        {% elif kind == 'compact_number' %}{{ value|compact_number }}
+                        {% else %}{{ value|ratio }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 
@@ -294,7 +345,7 @@
         empty.classList.remove('flex');
 
         document.querySelectorAll('.range-btn').forEach(btn => {
-            btn.classList.toggle('btn-primary', btn.dataset.range === range);
+            btn.classList.toggle('tn-range-active', btn.dataset.range === range);
         });
 
         try {

@@ -15,6 +15,7 @@ branch_labels = None
 depends_on = None
 
 NEW_COLUMNS = (
+    'average_volume',
     'revenue',
     'ebit',
     'ebitda',

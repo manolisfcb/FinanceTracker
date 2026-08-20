@@ -34,6 +34,7 @@ class Fundamentals(db.Model):
     eps_growth_5y = db.Column(db.Float, nullable=True)
     revenue_growth_5y = db.Column(db.Float, nullable=True)
     beta = db.Column(db.Float, nullable=True)
+    average_volume = db.Column(db.Float, nullable=True)
     fifty_two_week_high = db.Column(db.Float, nullable=True)
     fifty_two_week_low = db.Column(db.Float, nullable=True)
 
@@ -105,6 +106,7 @@ class Fundamentals(db.Model):
             "eps_growth_5y": self.eps_growth_5y,
             "revenue_growth_5y": self.revenue_growth_5y,
             "beta": self.beta,
+            "average_volume": self.average_volume,
             "fifty_two_week_high": self.fifty_two_week_high,
             "fifty_two_week_low": self.fifty_two_week_low,
             "revenue": self.revenue,

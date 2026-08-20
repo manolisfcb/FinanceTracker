@@ -218,6 +218,7 @@ class YahooProvider(MarketDataProvider):
             "eps_growth_5y": info.get("earningsGrowth"),
             "revenue_growth_5y": info.get("revenueGrowth"),
             "beta": info.get("beta"),
+            "average_volume": info.get("averageVolume"),
             "fifty_two_week_high": info.get("fiftyTwoWeekHigh"),
             "fifty_two_week_low": info.get("fiftyTwoWeekLow"),
             # VPA: patrimonio neto por acción, as reported by Yahoo.

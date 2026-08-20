@@ -141,6 +141,15 @@ def create_app(config_name=None):
             return "—"
         return MONTHS_ES[value.month - 1][:3]
 
+    @app.template_filter("domain")
+    def format_domain_filter(value):
+        """Bare hostname of a URL — a full https://www.… doesn't fit the
+        narrow key-stats column and reads as noise next to a label."""
+        if not value:
+            return "—"
+        host = value.split("://")[-1].split("/")[0]
+        return host[4:] if host.startswith("www.") else host
+
     @app.template_filter("compact_number")
     def format_compact_number_filter(value):
         if value is None:

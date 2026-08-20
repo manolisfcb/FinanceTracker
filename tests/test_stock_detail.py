@@ -154,7 +154,7 @@ def test_stock_detail_renders_indicators_with_their_explanations(
 
     # Suno-style indicators the page didn't have before.
     assert 'P/EBIT' in body
-    assert 'Deuda neta/EBITDA' in body
+    assert 'D. neta/EBITDA' in body
     assert 'Giro del activo' in body
     assert 'ROIC' in body
     assert 'VPA' in body
@@ -183,5 +183,46 @@ def test_cagr_label_states_the_span_it_measured(
 
     body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
 
-    assert 'CAGR ingresos (3A)' in body
-    assert 'CAGR ingresos (5A)' not in body
+    assert 'CAGR ing. 3A' in body
+    assert 'CAGR ing. 5A' not in body
+
+
+@patch('src.services.fundamentals.get_provider')
+@patch('src.routes.stockViews.get_provider')
+def test_key_stats_card_renders_next_to_the_chart(
+    mock_view_provider, mock_fundamentals_provider, auth_client, db
+):
+    mock_view_provider.return_value.get_quote.return_value = None
+    mock_fundamentals_provider.return_value.get_statement_metrics.return_value = None
+    mock_fundamentals_provider.return_value.get_fundamentals.return_value = None
+    asset = _seed_asset(db)
+    db.session.add(Fundamentals(
+        asset_id=asset.id, as_of_date=date(2026, 8, 19), total_assets=1.0,
+        market_cap=252_400_000_000.0, fifty_two_week_low=142.10,
+        fifty_two_week_high=181.55, average_volume=4_200_000.0, beta=0.84, eps=13.52,
+    ))
+    db.session.commit()
+
+    body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
+
+    assert 'Datos clave' in body
+    assert '252.40B' in body
+    assert '142.10 – 181.55' in body
+    assert '4.20M' in body
+    # The website is shown as a bare domain, not the full URL.
+    assert 'rbc.com ↗' in body
+
+
+@patch('src.services.fundamentals.get_provider')
+@patch('src.routes.stockViews.get_provider')
+def test_price_chart_comes_before_the_indicators(
+    mock_view_provider, mock_fundamentals_provider, auth_client, db
+):
+    mock_view_provider.return_value.get_quote.return_value = None
+    mock_fundamentals_provider.return_value.get_statement_metrics.return_value = None
+    mock_fundamentals_provider.return_value.get_fundamentals.return_value = None
+    _seed_asset(db)
+
+    body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
+
+    assert body.index('priceHistoryChart') < body.index('Indicadores fundamentales')

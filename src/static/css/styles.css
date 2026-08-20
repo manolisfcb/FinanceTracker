@@ -170,49 +170,106 @@ a:hover { color: var(--tn-maple-dark); }
 }
 .tn-dropdown-menu a:hover, .tn-dropdown-menu button:hover { background: var(--tn-input-bg); }
 
-/* Indicator help: a "?" next to a label, explained on hover, focus or tap.
-   The bubble is anchored to the whole row (.tn-help stays position:static so
-   the nearest positioned ancestor is .tn-help-row) rather than to the icon.
-   Anchoring to the icon puts the bubble wherever the label happens to end,
-   which pushes it past the card — and in the right-hand column, past the
-   viewport. Spanning the row instead keeps it inside the card at every
-   breakpoint. */
-.tn-help-row { position: relative; }
+/* Compact range switch for the price chart (.btn is too heavy at this size). */
+.tn-range {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tn-muted);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 9px;
+  cursor: pointer;
+}
+.tn-range:hover { background: var(--tn-border-soft); color: var(--tn-ink); }
+.tn-range-active, .tn-range-active:hover { background: var(--tn-ink); color: #ffffff; }
 
+/* "Datos clave" rows: hairline-separated, like the design's key-stat list. */
+.tn-keystat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--tn-border-soft);
+}
+.tn-keystat-last { border-bottom: none; }
+
+/* Indicator groups. Masonry rather than a row-aligned grid: the groups have
+   very different tile counts (nine valuation ratios against three dividend
+   ones), so a grid leaves a ragged block of white under every short group.
+   Columns pack them tight; order runs down each column, which is fine for
+   groups nobody reads in sequence. */
+.tn-ind-groups { column-count: 1; column-gap: 22px; }
+.tn-ind-group {
+  break-inside: avoid;
+  /* Safari still needs the old page-break alias. */
+  page-break-inside: avoid;
+  margin-bottom: 18px;
+}
+@media (min-width: 640px) { .tn-ind-groups { column-count: 2; } }
+@media (min-width: 1024px) { .tn-ind-groups { column-count: 3; } }
+@media (min-width: 1280px) { .tn-ind-groups { column-count: 4; } }
+
+/* Tighter than the default .lbl: a tile is ~105px of usable width, and at
+   .07em tracking half these names would need an ellipsis. Wrapping is the
+   fallback for the longest ones — losing the end of "Pasivo/Activos" to a
+   "…" defeats the point of labelling the tile at all. */
+.tn-ind-label {
+  font-size: 10.5px;
+  letter-spacing: .03em;
+  line-height: 1.3;
+  /* Two lines reserved whether or not this label needs them, so the values
+     underneath sit on the same baseline across a row of tiles. */
+  min-height: 27px;
+}
+
+.ind {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--tn-divider);
+  border-radius: 8px;
+  background: var(--tn-input-bg);
+}
+
+/* Indicator help: a "?" next to a label, explained on hover, focus or tap. */
 .tn-help {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: none;
-  width: 14px;
-  height: 14px;
-  margin-left: 5px;
+  width: 13px;
+  height: 13px;
+  margin-left: 4px;
   padding: 0;
-  border: 1px solid var(--tn-border);
+  border: none;
   border-radius: 50%;
-  background: var(--tn-input-bg);
+  background: var(--tn-border);
   color: var(--tn-muted);
   font-family: inherit;
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
   line-height: 1;
+  letter-spacing: normal;
   cursor: help;
   vertical-align: middle;
+  transition: background-color .12s ease, color .12s ease;
 }
 .tn-help:hover, .tn-help.is-open, .tn-help:focus-visible {
-  color: var(--tn-maple);
-  border-color: var(--tn-maple);
+  background: var(--tn-maple);
+  color: #ffffff;
   outline: none;
 }
 
 .tn-help-bubble {
   display: none;
   position: absolute;
-  left: 0;
-  right: 0;
   bottom: calc(100% + 7px);
-  /* Above the cards that come later in the grid, which would otherwise paint
-     over a bubble escaping an earlier card. */
+  /* Above the tiles and cards that come later in the flow, which would
+     otherwise paint over a bubble escaping its own tile. */
   z-index: 60;
   padding: 9px 11px;
   border-radius: 8px;
@@ -232,3 +289,15 @@ a:hover { color: var(--tn-maple-dark); }
 .tn-help:hover .tn-help-bubble,
 .tn-help:focus-visible .tn-help-bubble,
 .tn-help.is-open .tn-help-bubble { display: block; }
+
+/* A tile is far too narrow for a paragraph, so the bubble spans the group
+   column: two tiles wide plus the 8px gap between them, opening rightwards
+   from the left tile and leftwards from the right one. That keeps it inside
+   the card at every breakpoint without needing to measure anything. */
+.ind:nth-child(odd) .tn-help-bubble { left: 0; width: calc(200% + 8px); }
+.ind:nth-child(even) .tn-help-bubble { right: 0; width: calc(200% + 8px); }
+
+/* Outside the tile grid (the "Datos clave" rows), the row itself is the
+   anchor and the bubble spans it. */
+.tn-help-row { position: relative; }
+.tn-help-row > * > .tn-help > .tn-help-bubble { left: 0; right: 0; width: auto; }
