@@ -93,67 +93,18 @@ def test_headline_return_counts_dividends_and_realized_trades(auth_client, db, u
     assert '+30.00%' in body
 
 
-def test_plan_vs_real_renders_a_bar_per_sector_target(auth_client, db, user):
+def test_legacy_sector_plan_card_is_not_rendered(auth_client, db, user):
     account = _account(db, user)
-    _position(db, user, account, quantity=10, cost=100.0, price=100.0, dividends=0,
-              sector='Financial Services')
-    db.session.add(AllocationTarget(user_id=user.id, sector='Financial Services', target_percent=60.0))
-    db.session.commit()
-
-    body = auth_client.get('/portfolio').get_data(as_text=True)
-
-    assert 'Plan vs. real' in body
-    assert 'tn-bar-target' in body
-    assert 'Financial Services' in body
-    assert 'meta 60.00%' in body
-    # Sole sector, so it's 100% of the book against a 60% target: 40 points over.
-    assert 'Mayor desvío' in body
-    assert '+40.00 pt' in body
-
-
-def test_plan_vs_real_pools_every_holding_in_the_same_sector(auth_client, db, user):
-    account = _account(db, user)
-    _position(db, user, account, symbol='RY', quantity=10, cost=100.0, price=100.0,
-              dividends=0, sector='Financial Services')
-    _position(db, user, account, symbol='TD', quantity=10, cost=100.0, price=100.0,
-              dividends=0, sector='Financial Services')
+    _position(db, user, account, dividends=0, sector='Financial Services')
     db.session.add(AllocationTarget(user_id=user.id, sector='Financial Services', target_percent=100.0))
     db.session.commit()
 
     body = auth_client.get('/portfolio').get_data(as_text=True)
 
-    # Two names, one bar — the plan is about the sector, not the tickers.
-    assert body.count('tn-bar-target') == 1
-    assert 'meta 100.00%' in body
-
-
-def test_a_held_sector_without_a_target_is_shown_at_meta_none(auth_client, db, user):
-    account = _account(db, user)
-    _position(db, user, account, symbol='RY', quantity=10, cost=100.0, price=100.0,
-              dividends=0, sector='Financial Services')
-    _position(db, user, account, symbol='ENB', quantity=10, cost=100.0, price=100.0,
-              dividends=0, sector='Energy')
-    db.session.add(AllocationTarget(user_id=user.id, sector='Financial Services', target_percent=100.0))
-    db.session.commit()
-
-    body = auth_client.get('/portfolio').get_data(as_text=True)
-
-    assert 'Energy' in body
-    assert 'meta —' in body
-
-
-def test_setting_a_sector_target_saves_and_redirects(auth_client, db, user):
-    account = _account(db, user)
-    _position(db, user, account, sector='Energy', dividends=0)
-
-    response = auth_client.post(
-        '/portfolio/allocation-targets',
-        data={'sector': 'Energy', 'target_percent': '25'},
-    )
-
-    assert response.status_code == 302
-    target = AllocationTarget.query.filter_by(user_id=user.id, sector='Energy').one()
-    assert target.target_percent == 25.0
+    assert 'Plan vs. real' not in body
+    assert 'tn-bar-target' not in body
+    assert '/portfolio/allocation-targets' not in body
+    assert 'Alocación por activo' in body
 
 
 def test_footnote_shows_the_usd_rate_at_four_decimals(auth_client, db, user):

@@ -2,17 +2,19 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from src.models import Asset, Comment, Post, PostCategory, PostTickerMention, Vote
+from src.models import (Asset, AssetCategory, Comment, Post, PostCategory,
+                        PostTickerMention, Vote)
 from src.services import community
 
 
-def _asset(db, symbol, exchange="TSX", name=None):
+def _asset(db, symbol, exchange="TSX", name=None, category=None):
     asset = Asset(
         symbol=symbol,
         yahoo_symbol=f"{symbol}.TO" if exchange == "TSX" else symbol,
         exchange=exchange,
         currency="CAD" if exchange == "TSX" else "USD",
         name=name or f"{symbol} Corp",
+        category=category,
     )
     db.session.add(asset)
     db.session.commit()
@@ -236,3 +238,45 @@ def test_the_title_is_not_linkified(db, user):
     html = str(community.render_body("Payout cómodo.", lambda a: f"/x/{a.symbol}"))
 
     assert "<a" not in html
+
+
+# ── Ticker collisions across categories ──────────────────────────────────
+
+def test_a_security_outranks_a_coin_with_the_same_ticker(db):
+    """$DASH is both DoorDash and the Dash coin; $VET both Vermilion Energy
+    and VeChain. Someone discussing dividends means the company."""
+    _asset(db, "DASH", exchange="CRYPTO", name="Dash")
+    doordash = _asset(db, "DASH", exchange="US", name="DoorDash")
+
+    resolved = community.resolve_mentions("Miro $DASH")
+    assert resolved["DASH"].id == doordash.id
+    assert resolved["DASH"].category == AssetCategory.EQUITY
+
+
+def test_the_coin_still_resolves_when_no_security_shares_its_ticker(db):
+    coin = _asset(db, "BTC", exchange="CRYPTO", name="Bitcoin")
+    assert community.resolve_mentions("Miro $BTC")["BTC"].id == coin.id
+
+
+def test_category_outranks_exchange_in_a_three_way_collision(db):
+    """A Canadian coin listing must not beat a US-listed security: category
+    is the first tie-break, exchange only the second."""
+    _asset(db, "VET", exchange="TSX", name="VeChain", category=AssetCategory.CRYPTO)
+    vermilion = _asset(db, "VET", exchange="US", name="Vermilion Energy")
+
+    assert community.resolve_mentions("Miro $VET").get("VET").id == vermilion.id
+
+
+def test_canada_still_wins_between_two_securities(db):
+    telus = _asset(db, "T", exchange="TSX", name="Telus")
+    _asset(db, "T", exchange="US", name="AT&T")
+
+    assert community.resolve_mentions("Miro $T")["T"].id == telus.id
+
+
+def test_a_reit_is_treated_as_a_security_not_a_coin(db):
+    reit = _asset(db, "REI", exchange="TSX", name="RioCan REIT",
+                  category=AssetCategory.REIT)
+    _asset(db, "REI", exchange="CRYPTO", name="Rei Network")
+
+    assert community.resolve_mentions("Miro $REI")["REI"].id == reit.id

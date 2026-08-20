@@ -288,66 +288,8 @@
         {% endif %}
     </div>
 
-    <!-- Plan vs. real + allocation -->
+    <!-- Supporting portfolio charts -->
     <div class="flex flex-col gap-3.5">
-        <div class="card p-5">
-            <details class="tn-plan-edit">
-                <summary class="flex justify-between items-center mb-4 cursor-pointer list-none">
-                    <span class="text-sm font-semibold">Plan vs. real</span>
-                    <span class="text-[12px] font-semibold text-maple">Editar plan</span>
-                </summary>
-                {% if allocation_target_form.sector.choices %}
-                <form method="POST" action="{{ url_for('portfolio.set_allocation_target') }}" class="flex flex-wrap items-end gap-2.5 mb-4">
-                    {{ allocation_target_form.hidden_tag() }}
-                    <div class="space-y-1.5 flex-1 min-w-[110px]">
-                        <label class="lbl">{{ allocation_target_form.sector.label.text }}</label>
-                        {{ allocation_target_form.sector(class="tn-input") }}
-                    </div>
-                    <div class="space-y-1.5 flex-1 min-w-[90px]">
-                        <label class="lbl">{{ allocation_target_form.target_percent.label.text }}</label>
-                        {{ allocation_target_form.target_percent(class="tn-input", placeholder="ej. 30") }}
-                    </div>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </form>
-                {% else %}
-                <p class="text-faint text-[13px] mb-4">Agregá posiciones para poder planificar sus sectores.</p>
-                {% endif %}
-            </details>
-
-            {% if allocation_rows %}
-            <div class="flex flex-col gap-3.5 text-[12px]">
-                {% for row in allocation_rows %}
-                <div>
-                    <div class="flex justify-between gap-2 mb-1.5">
-                        <span class="font-semibold truncate">{{ row.sector }}</span>
-                        <span class="num text-muted2 shrink-0">
-                            {{ row.current_percent|ratio }}% / meta {% if row.has_target %}{{ row.target_percent|ratio }}%{% else %}—{% endif %}
-                        </span>
-                    </div>
-                    <div class="tn-bar">
-                        <div class="tn-bar-fill" style="width:{{ [row.current_percent, 100]|min }}%; background:{{ row.color }}"></div>
-                        <div class="tn-bar-target" style="left:{{ [row.target_percent, 100]|min }}%"></div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            {% if biggest_deviation %}
-            <div class="border-t border-[#efede7] mt-4 pt-3.5 text-[12.5px] text-muted2 leading-relaxed">
-                Mayor desvío:
-                <span class="font-semibold text-ink">{{ biggest_deviation.sector }}
-                    {{ '+' if biggest_deviation.deviation >= 0 }}{{ biggest_deviation.deviation|ratio }} pt</span>.
-                {% if biggest_deviation.amount_to_trade_cad >= 0 %}Comprar{% else %}Vender{% endif %}
-                ≈ <span class="num font-semibold text-ink">C$ {{ biggest_deviation.amount_to_trade_abs_cad|currency }}</span>
-                en {{ biggest_deviation.sector }} te acerca al plan.
-            </div>
-            {% endif %}
-            {% else %}
-            <p class="text-faint text-[13px]">Todavía no definiste objetivos de alocación por sector.</p>
-            {% endif %}
-
-        </div>
-
         <div class="card p-5">
             <div class="text-sm font-semibold mb-3">Alocación por activo</div>
             {% if portfolio %}

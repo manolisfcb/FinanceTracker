@@ -7,7 +7,15 @@ from markupsafe import Markup, escape
 from sqlalchemy import func
 
 from src.extensions import db
-from src.models import Asset, Comment, Post, PostCategory, PostTickerMention, Vote
+from src.models import (
+    Asset,
+    AssetCategory,
+    Comment,
+    Post,
+    PostCategory,
+    PostTickerMention,
+    Vote,
+)
 
 # A mention is `$` plus a ticker: at least one letter first, then letters,
 # digits, dot or dash (BRK.B, RY, ENB). The trailing boundary keeps `$SU,`
@@ -17,6 +25,19 @@ _MENTION_RE = re.compile(r"\$([A-Za-z][A-Za-z0-9]{0,6}(?:[.\-][A-Za-z0-9]{1,4})?
 # The same ticker can exist on more than one exchange (ENB trades on both TSX
 # and NYSE). A Canadian-first product resolves the ambiguity towards Canada.
 _EXCHANGE_PRIORITY = {"TSX": 0, "TSXV": 1, "US": 2}
+
+# Tickers also collide *across categories*: $DASH is both DoorDash and the Dash
+# coin, $VET both Vermilion Energy and VeChain. Someone writing $DASH in a
+# discussion about dividends means the company, so a tradable security always
+# outranks a coin regardless of which exchange it sits on. Ranked before the
+# exchange so this holds even if a crypto venue is ever added to the map above.
+_CATEGORY_PRIORITY = {
+    AssetCategory.EQUITY: 0,
+    AssetCategory.REIT: 0,
+    AssetCategory.FIXED_INCOME: 0,
+    AssetCategory.CRYPTO: 1,
+    AssetCategory.CASH: 1,
+}
 
 SORTS = [
     ("recent", "Recientes"),
@@ -67,13 +88,18 @@ def resolve_mentions(body: str) -> dict[str, Asset]:
     for asset in assets:
         key = asset.symbol.upper()
         current = resolved.get(key)
-        if current is None or _exchange_rank(asset) < _exchange_rank(current):
+        if current is None or _resolution_rank(asset) < _resolution_rank(current):
             resolved[key] = asset
     return resolved
 
 
-def _exchange_rank(asset: Asset) -> int:
-    return _EXCHANGE_PRIORITY.get(asset.exchange, 99)
+def _resolution_rank(asset: Asset) -> tuple[int, int]:
+    """Sort key for picking between assets that share a ticker: security
+    before coin, then Canadian listing before foreign one."""
+    return (
+        _CATEGORY_PRIORITY.get(asset.category, 1),
+        _EXCHANGE_PRIORITY.get(asset.exchange, 99),
+    )
 
 
 def sync_mentions(post: Post) -> list[PostTickerMention]:

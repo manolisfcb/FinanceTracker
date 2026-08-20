@@ -1,15 +1,11 @@
-from collections import defaultdict
-
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.extensions import db
-from src.forms.AllocationTargetForm import AllocationTargetForm
 from src.forms.PortfolioPlanForm import PortfolioPlanForm
 from src.models import (
     ASSET_CATEGORY_LABELS,
     Account,
-    AllocationTarget,
     Asset,
     DividendReceived,
     PortfolioPlan,
@@ -29,33 +25,6 @@ ACCOUNT_BADGE_COLORS = {
     'CASH': ('#f0eee8', '#6f6b60'),
 }
 DEFAULT_BADGE_COLOR = ('#f0eee8', '#6f6b60')
-
-# Bar colours for the plan-vs-real rows, in order.
-ALLOCATION_BAR_COLORS = ('#b3372b', '#b98a2e', '#1a7f4e', '#4a6b8a', '#7d5ba6', '#d9d5cb')
-
-# Holdings whose asset carries no sector still have to land somewhere, and
-# they're plannable like any other bucket.
-UNCLASSIFIED_SECTOR = 'Sin clasificar'
-
-
-def _sector_choices(user_id):
-    """Sectors a target can be set on: the ones held, plus the ones already
-    planned — so an existing target stays editable after its last holding in
-    that sector is sold."""
-    service = PortfolioService(user_id)
-    asset_ids = [p['asset_id'] for p in service.get_positions_by_asset()]
-    sectors = {
-        asset.sector or UNCLASSIFIED_SECTOR
-        for asset in (Asset.query.filter(Asset.id.in_(asset_ids)).all() if asset_ids else [])
-    }
-    sectors.update(
-        row[0]
-        for row in AllocationTarget.query.with_entities(AllocationTarget.sector)
-        .filter_by(user_id=user_id)
-        .all()
-    )
-    return sorted(sectors)
-
 
 def _account_badges(accounts_by_asset, asset_id, accounts_by_id):
     """The account chips shown on a position row.
@@ -143,47 +112,6 @@ def portfolio():
         / invested_total * 100
     ) if invested_total else None
 
-    # Allocation target section — planned by sector, not by individual name.
-    targets = {
-        t.sector: t.target_percent
-        for t in AllocationTarget.query.filter_by(user_id=current_user.id).all()
-    }
-    market_value_by_sector = defaultdict(float)
-    for p in positions:
-        asset = assets_by_id.get(p["asset_id"])
-        if asset is None:
-            continue
-        market_value_by_sector[asset.sector or UNCLASSIFIED_SECTOR] += p["market_value_cad"] or 0.0
-
-    allocation_rows = []
-    if targets:
-        # A held sector with no target is shown too, at meta 0% — an
-        # unplanned position is exactly the deviation worth seeing.
-        for sector in set(targets) | set(market_value_by_sector):
-            market_value_cad = market_value_by_sector.get(sector, 0.0)
-            current_percent = (market_value_cad / patrimony_cad * 100) if patrimony_cad else 0.0
-            target_percent = targets.get(sector, 0.0)
-            target_value_cad = target_percent / 100 * patrimony_cad
-            amount_to_trade_cad = target_value_cad - market_value_cad
-            allocation_rows.append(
-                {
-                    "sector": sector,
-                    "current_percent": current_percent,
-                    "target_percent": target_percent,
-                    "has_target": sector in targets,
-                    "deviation": current_percent - target_percent,
-                    "amount_to_trade_cad": amount_to_trade_cad,
-                    "amount_to_trade_abs_cad": abs(amount_to_trade_cad),
-                }
-            )
-        allocation_rows.sort(key=lambda row: row["current_percent"], reverse=True)
-        for index, row in enumerate(allocation_rows):
-            row["color"] = ALLOCATION_BAR_COLORS[index % len(ALLOCATION_BAR_COLORS)]
-    biggest_deviation = max(allocation_rows, key=lambda row: abs(row["deviation"]), default=None)
-
-    allocation_target_form = AllocationTargetForm()
-    allocation_target_form.sector.choices = [(s, s) for s in _sector_choices(current_user.id)]
-
     analytics = PortfolioAnalyticsService(current_user.id)
     plan = PortfolioPlan.query.filter_by(user_id=current_user.id).first()
     plan_form = PortfolioPlanForm(obj=plan)
@@ -206,9 +134,6 @@ def portfolio():
         "total_return_percent": total_return_percent,
         "total_yield_on_cost": (dividends_total / invested_total * 100) if invested_total else None,
         "usd_cad_rate": fx_rate_to_cad_today("USD"),
-        "allocation_rows": allocation_rows,
-        "biggest_deviation": biggest_deviation,
-        "allocation_target_form": allocation_target_form,
         "asset_types": asset_labels,
         "asset_allocation": asset_values,
         "plan_form": plan_form,
@@ -220,32 +145,6 @@ def portfolio():
     }
 
     return render_template('portfolio.html', **context)
-
-
-@portfolio_bp.route('/portfolio/allocation-targets', methods=['POST'])
-@login_required
-def set_allocation_target():
-    form = AllocationTargetForm()
-    form.sector.choices = [(s, s) for s in _sector_choices(current_user.id)]
-    if form.validate_on_submit():
-        try:
-            target_percent = float(form.target_percent.data)
-        except ValueError:
-            flash('% objetivo inválido', 'error')
-            return redirect(url_for('portfolio.portfolio'))
-
-        sector = form.sector.data
-        target = AllocationTarget.query.filter_by(user_id=current_user.id, sector=sector).first()
-        if target is None:
-            target = AllocationTarget(user_id=current_user.id, sector=sector, target_percent=target_percent)
-            db.session.add(target)
-        else:
-            target.target_percent = target_percent
-        db.session.commit()
-        flash(f'Objetivo de alocación guardado para {sector}', 'success')
-    else:
-        flash('No se pudo guardar el objetivo de alocación', 'error')
-    return redirect(url_for('portfolio.portfolio'))
 
 
 @portfolio_bp.route('/portfolio/plan', methods=['POST'])
