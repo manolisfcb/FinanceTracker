@@ -10,10 +10,11 @@ class PortfolioPlan(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True, index=True
     )
-    equity_etf_percent = db.Column(db.Float, nullable=False, default=40.0)
-    reit_percent = db.Column(db.Float, nullable=False, default=30.0)
-    crypto_percent = db.Column(db.Float, nullable=False, default=20.0)
-    cash_percent = db.Column(db.Float, nullable=False, default=10.0)
+    equity_etf_percent = db.Column(db.Float, nullable=False, default=0.0)
+    reit_percent = db.Column(db.Float, nullable=False, default=0.0)
+    fixed_income_percent = db.Column(db.Float, nullable=False, default=0.0)
+    crypto_percent = db.Column(db.Float, nullable=False, default=0.0)
+    cash_percent = db.Column(db.Float, nullable=False, default=0.0)
     # Cash is not represented by an order in the current portfolio model, so
     # the user can include the liquid balance that should participate in the
     # current-vs-target comparison.
@@ -28,6 +29,7 @@ class PortfolioPlan(db.Model):
         return {
             'equity_etf_percent': self.equity_etf_percent,
             'reit_percent': self.reit_percent,
+            'fixed_income_percent': self.fixed_income_percent,
             'crypto_percent': self.crypto_percent,
             'cash_percent': self.cash_percent,
             'cash_balance_cad': self.cash_balance_cad,

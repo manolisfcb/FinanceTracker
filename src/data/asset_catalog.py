@@ -12,6 +12,7 @@ def _crypto(symbol: str, name: str, yahoo_symbol: str | None = None) -> dict:
     return {
         "symbol": symbol,
         "name": name,
+        "category": "CRYPTO",
         "sector": "Cryptoassets",
         "industry": "Cryptocurrency",
         "exchange": "CRYPTO",
@@ -83,6 +84,7 @@ def _reit(
     return {
         "symbol": symbol,
         "name": name,
+        "category": "REIT",
         "sector": "Real Estate",
         "industry": industry,
         "exchange": exchange,
@@ -160,6 +162,9 @@ def _etf(symbol: str, name: str, exchange: str, industry: str) -> dict:
     return {
         "symbol": symbol,
         "name": name,
+        # Product rule: every ETF belongs to equities, independently of the
+        # exposure it tracks (including bond and real-estate ETFs).
+        "category": "EQUITY",
         "sector": "ETFs",
         "industry": industry,
         "exchange": exchange,

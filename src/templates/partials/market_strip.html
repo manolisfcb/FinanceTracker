@@ -1,0 +1,29 @@
+{# Site-wide market strip. Values come from the inject_market_strip context
+   processor, refreshed by the refresh_market_strip job every 15 minutes. #}
+{% if market_indices or market_usdcad or market_boc_rate %}
+<div class="tn-market-strip num">
+    {% for indicator in market_indices %}
+    <span>{{ indicator.label }}
+        {% if indicator.change_percent is not none %}
+        <span class="{{ 'tn-market-pos' if indicator.change_percent >= 0 else 'tn-market-neg' }}">
+            {{ '+' if indicator.change_percent >= 0 }}{{ indicator.change_percent|ratio }}%
+        </span>
+        {% else %}
+        <span class="text-[#8a857a]">—</span>
+        {% endif %}
+    </span>
+    {% endfor %}
+
+    {% if market_usdcad %}
+    <span>USD/CAD {{ market_usdcad.value|fx }}</span>
+    {% endif %}
+    {% if market_boc_rate %}
+    <span>Tasa BoC {{ market_boc_rate.value|ratio }}%</span>
+    {% endif %}
+
+    <span class="ml-auto flex items-center gap-2">
+        <span class="tn-market-dot {{ '' if market_session.is_open else 'tn-market-dot-closed' }}"></span>
+        {{ market_session.text }}
+    </span>
+</div>
+{% endif %}

@@ -6,48 +6,48 @@ import time
 
 import requests
 
-from src.models import Asset, DividendReceived, PortfolioSnapshotModel
+from src.models import Asset, AssetCategory, DividendReceived, PortfolioSnapshotModel
 from src.services.market_data import get_provider
 from src.services.portfolio import fx_rate_to_cad_today
 
 
 ASSET_CLASSES = (
     {
-        'key': 'EQUITY_ETF',
-        'label': 'Acciones / ETF',
+        'key': AssetCategory.EQUITY,
+        'label': 'Acciones',
         'short_label': 'Acciones',
         'color': '#b3372b',
         'target_field': 'equity_etf_percent',
     },
     {
-        'key': 'REIT',
+        'key': AssetCategory.REIT,
         'label': 'REITs',
         'short_label': 'REITs',
         'color': '#b98a2e',
         'target_field': 'reit_percent',
     },
     {
-        'key': 'CRYPTO',
+        'key': AssetCategory.FIXED_INCOME,
+        'label': 'Renta fija',
+        'short_label': 'Renta fija',
+        'color': '#1a7f4e',
+        'target_field': 'fixed_income_percent',
+    },
+    {
+        'key': AssetCategory.CRYPTO,
         'label': 'Cripto',
         'short_label': 'Cripto',
         'color': '#4a6b8a',
         'target_field': 'crypto_percent',
     },
     {
-        'key': 'CASH',
+        'key': AssetCategory.CASH,
         'label': 'Cash',
         'short_label': 'Cash',
         'color': '#8a857a',
         'target_field': 'cash_percent',
     },
 )
-
-DEFAULT_TARGETS = {
-    'equity_etf_percent': 40.0,
-    'reit_percent': 30.0,
-    'crypto_percent': 20.0,
-    'cash_percent': 10.0,
-}
 
 # CAD-listed investable proxies keep every equity comparison in the user's
 # reporting currency. The interest-rate comparison is built separately from
@@ -110,20 +110,8 @@ def _canadian_policy_rate_return(start_date: str) -> dict[str, float]:
 
 
 def classify_asset(asset: Asset) -> str:
-    """Map the existing catalog metadata to the four strategic buckets."""
-    sector = (asset.sector or '').lower()
-    industry = (asset.industry or '').lower()
-    name = (asset.name or '').lower()
-
-    if asset.exchange == 'CRYPTO' or sector == 'cryptoassets' or industry == 'cryptocurrency':
-        return 'CRYPTO'
-    if (
-        industry.startswith('reit')
-        or ' reit' in f' {name}'
-        or (sector == 'etfs' and 'real estate' in industry)
-    ):
-        return 'REIT'
-    return 'EQUITY_ETF'
+    """Read the canonical class stored on the asset row."""
+    return asset.category
 
 
 def asset_segment(asset: Asset, asset_class: str) -> str:
@@ -155,16 +143,12 @@ class PortfolioAnalyticsService:
             asset_class = classify_asset(asset)
             values[asset_class] += value
             segments[(asset_class, asset_segment(asset, asset_class))] += value
-        values['CASH'] += cash_balance
+        values[AssetCategory.CASH] += cash_balance
 
         total = sum(values.values())
         rows = []
         for meta in ASSET_CLASSES:
-            target = (
-                float(getattr(plan, meta['target_field']))
-                if plan is not None
-                else DEFAULT_TARGETS[meta['target_field']]
-            )
+            target = float(getattr(plan, meta['target_field'])) if plan is not None else 0.0
             current_value = values[meta['key']]
             current_percent = (current_value / total * 100) if total else 0.0
             target_value = total * target / 100
@@ -174,9 +158,9 @@ class PortfolioAnalyticsService:
                 'current_percent': current_percent,
                 'current_value_cad': current_value,
                 'target_value_cad': target_value,
-                'amount_to_trade_cad': target_value - current_value,
-                'amount_to_trade_abs_cad': abs(target_value - current_value),
-                'deviation': current_percent - target,
+                'amount_to_trade_cad': target_value - current_value if plan is not None else 0.0,
+                'amount_to_trade_abs_cad': abs(target_value - current_value) if plan is not None else 0.0,
+                'deviation': current_percent - target if plan is not None else 0.0,
             })
 
         flows = []
@@ -206,7 +190,7 @@ class PortfolioAnalyticsService:
                 'from': 'Cash',
                 'to': 'Efectivo CAD',
                 'flow': round(cash_balance, 2),
-                'classKey': 'CASH',
+                'classKey': AssetCategory.CASH,
             })
 
         return {
@@ -218,6 +202,7 @@ class PortfolioAnalyticsService:
             'total_cad': total,
             'flows': flows,
             'has_holdings': total > 0,
+            'has_plan': plan is not None,
         }
 
     def dividends_by_asset(self, assets_by_id: dict[int, Asset]) -> list[dict]:

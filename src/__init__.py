@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import flask
 from flask_login import current_user
@@ -16,6 +17,9 @@ WEEKDAYS_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", 
 # Screener figures are in each asset's own reporting currency, so the column
 # mixes markets and the symbol is what tells them apart.
 CURRENCY_SYMBOLS = {"CAD": "C$", "USD": "US$", "BRL": "R$"}
+
+# Avatar backgrounds for community authors, keyed off the username.
+AVATAR_COLORS = ["#4a6b8a", "#b98a2e", "#7d5ba6", "#3f7f88", "#b3372b", "#5f7a4a"]
 
 CONFIG_MAP = {
     "development": "config.DevelopmentConfig",
@@ -86,6 +90,7 @@ def create_app(config_name=None):
     from src.routes.dividends import dividends_bp
     from src.routes.inbox import inbox_bp, unread_inbox_count
     from src.routes.tools import tools_bp
+    from src.routes.community import community_bp
 
     # Importing these registers their view functions onto the blueprints
     # above (decorator side effects) — the imports themselves are unused.
@@ -103,12 +108,24 @@ def create_app(config_name=None):
     app.register_blueprint(dividends_bp)
     app.register_blueprint(inbox_bp)
     app.register_blueprint(tools_bp)
+    app.register_blueprint(community_bp)
 
     @app.context_processor
     def inject_unread_inbox_count():
         if not current_user.is_authenticated:
             return {}
         return {"unread_inbox_count": unread_inbox_count(current_user.id)}
+
+    @app.context_processor
+    def inject_market_strip():
+        """The strip sits above the nav on every page, so it has to be a
+        context processor rather than a per-view context. It reads only the
+        cached MarketIndicator rows the 15-minute job writes."""
+        if not current_user.is_authenticated:
+            return {}
+        from src.services.market_strip import market_strip_context
+
+        return market_strip_context()
 
     api = Api(app)
     from src.routes import stockResources
@@ -196,6 +213,42 @@ def create_app(config_name=None):
             return ""
         return CURRENCY_SYMBOLS.get(value, f"{value} ")
 
+    @app.template_filter("avatar_color")
+    def avatar_color_filter(value):
+        """Stable background for a username's initial.
+
+        Derived from the name rather than stored, so a member keeps the same
+        colour everywhere without an avatars table; the palette is the
+        muted set the rest of the design already uses.
+        """
+        if not value:
+            return AVATAR_COLORS[0]
+        return AVATAR_COLORS[sum(ord(c) for c in value) % len(AVATAR_COLORS)]
+
+    @app.template_filter("relative_time_es")
+    def format_relative_time_es_filter(value):
+        """"hace 2 h" for community timestamps.
+
+        A feed reads as a conversation, and an absolute timestamp on every
+        post makes it read as a log instead. Past a week the absolute date is
+        the more useful answer, so it takes over.
+        """
+        if value is None:
+            return "—"
+        seconds = (datetime.utcnow() - value).total_seconds()
+        if seconds < 60:
+            return "hace instantes"
+        minutes = int(seconds // 60)
+        if minutes < 60:
+            return f"hace {minutes} min"
+        hours = minutes // 60
+        if hours < 24:
+            return f"hace {hours} h"
+        days = hours // 24
+        if days < 7:
+            return f"hace {days} d"
+        return f"{value.day} de {MONTHS_ES[value.month - 1]}"
+
     @app.template_filter("compact_number")
     def format_compact_number_filter(value):
         if value is None:
@@ -218,6 +271,7 @@ def create_app(config_name=None):
         from src.resources.jobs import refresh_dividends  # noqa: F401
         from src.resources.jobs import refresh_filings  # noqa: F401
         from src.resources.jobs import refresh_news  # noqa: F401
+        from src.resources.jobs import refresh_market_strip  # noqa: F401
 
         if not scheduler.running:
             scheduler.start()

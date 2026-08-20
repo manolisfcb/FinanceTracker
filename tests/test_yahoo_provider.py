@@ -73,8 +73,25 @@ def test_get_asset_metadata_accepts_a_tsx_etf(mock_ticker_cls):
     assert metadata == {
         'symbol': 'VFV', 'yahoo_symbol': 'VFV.TO', 'exchange': 'TSX',
         'currency': 'CAD', 'name': 'Vanguard S&P 500 Index ETF',
+        'category': 'EQUITY',
         'sector': 'ETFs', 'industry': 'US Equity', 'country': 'Canada',
     }
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_asset_metadata_persists_direct_reit_category(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.get_info.return_value = {
+        'symbol': 'O', 'quoteType': 'EQUITY', 'exchange': 'NYQ',
+        'currency': 'USD', 'longName': 'Realty Income REIT',
+        'regularMarketPrice': 60.0, 'sector': 'Real Estate',
+        'industry': 'REIT - Retail',
+    }
+    mock_ticker_cls.return_value = mock_ticker
+
+    metadata = _provider().get_asset_metadata('O')
+
+    assert metadata['category'] == 'REIT'
 
 
 @patch('src.services.market_data.yahoo.yf.Ticker')

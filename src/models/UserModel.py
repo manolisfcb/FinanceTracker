@@ -10,6 +10,9 @@ class UserModel(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     added_on = db.Column(db.DateTime, server_default=db.func.now())
+    # Community moderation: an admin may soft-delete anyone's post or
+    # comment. Granted out-of-band (there is no self-service path to it).
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

@@ -24,7 +24,7 @@
         <div class="text-[11.5px] text-muted mt-0.5">{{ selected_ids|length }}/4 seleccionadas · buscá y agregá en el orden que quieras</div>
     </div>
     {% if selected_ids|length < 4 %}
-    <div class="tn-combobox w-full sm:w-[390px]" data-asset-autocomplete data-search-url="{{ url_for('portfolio.search_order_assets') }}" data-comparator-picker>
+    <div class="tn-combobox w-full sm:w-[390px]" data-asset-autocomplete data-search-url="{{ url_for('portfolio.search_order_assets') }}" data-excluded-asset-ids="{{ selected_ids|join(',') }}" data-comparator-picker>
         <input type="hidden" id="comparisonAssetId">
         <div class="relative">
             <span class="material-symbols-outlined tn-input-icon" aria-hidden="true">search</span>
@@ -97,7 +97,7 @@
         {% endfor %}
 
         {% if selected_ids|length < 4 %}
-        <button type="button" class="tn-compare-add-column" data-focus-asset-picker>
+        <button type="button" class="tn-compare-add-column" data-open-asset-picker aria-haspopup="dialog" aria-controls="comparatorAssetDialog">
             <span class="material-symbols-outlined" aria-hidden="true">add</span>
             <span>Agregar activo<br>al comparador</span>
         </button>
@@ -134,7 +134,7 @@
 {% else %}
 <section class="card p-6 mb-5 flex flex-wrap items-center justify-between gap-4">
     <div><div class="text-[15px] font-semibold">Elegí una empresa más</div><p class="text-[12px] text-muted mt-1">Con dos activos se habilitan el gráfico de rentabilidad y la calculadora.</p></div>
-    <button type="button" class="btn btn-primary" data-focus-asset-picker>Agregar empresa</button>
+    <button type="button" class="btn btn-primary" data-open-asset-picker aria-haspopup="dialog" aria-controls="comparatorAssetDialog">Agregar empresa</button>
 </section>
 {% endif %}
 {% endif %}
@@ -144,8 +144,53 @@
     <span class="material-symbols-outlined" aria-hidden="true">compare_arrows</span>
     <h2 class="font-serif-display text-2xl mt-3">Empezá por la primera empresa</h2>
     <p class="text-[13px] text-muted mt-2 max-w-md">No elegimos acciones por vos. Usá el buscador para armar una comparación de hasta cuatro empresas.</p>
-    <button type="button" class="btn btn-primary mt-5" data-focus-asset-picker>Seleccionar empresa</button>
+    <button type="button" class="btn btn-primary mt-5" data-open-asset-picker aria-haspopup="dialog" aria-controls="comparatorAssetDialog">Seleccionar empresa</button>
 </section>
+{% endif %}
+
+{% if selected_ids|length < 4 %}
+<dialog id="comparatorAssetDialog" class="tn-asset-picker-dialog" aria-labelledby="comparatorAssetDialogTitle">
+    <div class="tn-asset-picker-panel">
+        <div class="tn-asset-picker-heading">
+            <div>
+                <div class="tn-asset-picker-kicker">Comparador de acciones</div>
+                <h2 id="comparatorAssetDialogTitle">Agregar empresa</h2>
+            </div>
+            <form method="dialog">
+                <button type="submit" class="tn-asset-picker-close" aria-label="Cerrar selector">
+                    <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                </button>
+            </form>
+        </div>
+        <p class="tn-asset-picker-copy">Escribí el ticker o el nombre de la empresa que querés sumar.</p>
+
+        <div class="tn-combobox tn-asset-picker-search" data-asset-autocomplete data-search-url="{{ url_for('portfolio.search_order_assets') }}" data-excluded-asset-ids="{{ selected_ids|join(',') }}" data-comparator-picker data-modal-asset-picker>
+            <input type="hidden" id="modalComparisonAssetId">
+            <label for="modalComparisonAssetSearch" class="lbl">Ticker o empresa</label>
+            <div class="relative mt-1.5">
+                <span class="material-symbols-outlined tn-input-icon" aria-hidden="true">search</span>
+                <input id="modalComparisonAssetSearch" class="tn-input pl-10" placeholder="Ej. RY, Shopify, Enbridge…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="modalComparisonAssetSuggestions">
+            </div>
+            <div id="modalComparisonAssetSuggestions" class="tn-combobox-menu" role="listbox" aria-label="Empresas sugeridas" hidden></div>
+        </div>
+
+        {% if comparison.columns %}
+        <div class="tn-asset-picker-current">
+            <span>Ya seleccionadas</span>
+            <div>
+                {% for column in comparison.columns %}
+                <span class="tn-asset-picker-chip"><strong class="num">{{ column.asset.symbol }}</strong> {{ column.asset.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="tn-asset-picker-footer">
+            <span>Podés comparar hasta cuatro empresas.</span>
+            <form method="dialog"><button type="submit" class="btn">Cancelar</button></form>
+        </div>
+    </div>
+</dialog>
 {% endif %}
 
 <script>
@@ -251,21 +296,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     investment?.addEventListener('input', renderInvestment);
 
-    const selectedInput = document.getElementById('comparisonAssetId');
-    selectedInput?.addEventListener('change', () => {
+    const selectCompany = selectedInput => {
         const chosen = Number(selectedInput.value);
         if (!chosen || selectedIds.includes(chosen)) return;
         const params = new URLSearchParams();
         [...selectedIds, chosen].slice(0, 4).forEach(id => params.append('asset', id));
         window.location.assign(`${window.location.pathname}?${params}`);
+    };
+    document.querySelectorAll('[data-comparator-picker] input[type="hidden"]').forEach(selectedInput => {
+        selectedInput.addEventListener('change', () => selectCompany(selectedInput));
     });
-    document.querySelectorAll('[data-focus-asset-picker]').forEach(button => {
+
+    const assetDialog = document.getElementById('comparatorAssetDialog');
+    const modalPicker = assetDialog?.querySelector('[data-modal-asset-picker]');
+    let dialogTrigger;
+    document.querySelectorAll('[data-open-asset-picker]').forEach(button => {
         button.addEventListener('click', () => {
-            const search = document.getElementById('comparisonAssetSearch');
-            search?.focus();
-            search?.scrollIntoView({behavior: 'smooth', block: 'center'});
+            if (!assetDialog) return;
+            dialogTrigger = button;
+            modalPicker?.dispatchEvent(new CustomEvent('asset-picker:reset'));
+            assetDialog.showModal();
+            window.setTimeout(() => document.getElementById('modalComparisonAssetSearch')?.focus(), 0);
         });
     });
+    assetDialog?.addEventListener('click', event => {
+        if (event.target === assetDialog) assetDialog.close();
+    });
+    assetDialog?.addEventListener('close', () => dialogTrigger?.focus());
     if (selectedIds.length >= 2) loadRange('5Y');
 });
 </script>

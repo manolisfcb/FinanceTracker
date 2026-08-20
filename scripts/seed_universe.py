@@ -32,7 +32,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src import create_app
 from src.data.asset_catalog import CRYPTO_ASSETS, ETF_ASSETS, REIT_ASSETS, SUPPLEMENTAL_ASSETS
 from src.extensions import db
-from src.models import Asset, Fundamentals
+from src.models import Asset, Fundamentals, infer_asset_category
 from src.resources.jobs._common import get_or_create_snapshot
 from src.services.market_data import get_provider
 
@@ -42,6 +42,16 @@ _HEADERS = {
 }
 TSX_COMPOSITE_URL = "https://en.wikipedia.org/wiki/S%26P/TSX_Composite_Index"
 SP500_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+
+
+def _persisted_category(row):
+    return infer_asset_category(
+        symbol=row.get('symbol'),
+        exchange=row.get('exchange'),
+        name=row.get('name'),
+        sector=row.get('sector'),
+        industry=row.get('industry'),
+    )
 
 
 def _fetch_tables(url):
@@ -55,7 +65,7 @@ def fetch_tsx_composite():
     table = _fetch_tables(TSX_COMPOSITE_URL)[3]
     table.columns = ['ticker', 'company', 'sector', 'industry']
     table = table.dropna(subset=['ticker']).drop_duplicates(subset=['ticker'])
-    return [
+    rows = [
         {
             'symbol': row.ticker.strip(),
             'name': row.company.strip() if isinstance(row.company, str) else row.ticker.strip(),
@@ -70,13 +80,16 @@ def fetch_tsx_composite():
         }
         for row in table.itertuples()
     ]
+    for row in rows:
+        row['category'] = _persisted_category(row)
+    return rows
 
 
 def fetch_sp500():
     table = _fetch_tables(SP500_URL)[0][['Symbol', 'Security', 'GICS Sector', 'GICS Sub-Industry']]
     table.columns = ['symbol', 'name', 'sector', 'industry']
     table = table.dropna(subset=['symbol']).drop_duplicates(subset=['symbol'])
-    return [
+    rows = [
         {
             'symbol': row.symbol.strip(),
             'name': row.name.strip(),
@@ -92,6 +105,9 @@ def fetch_sp500():
         }
         for row in table.itertuples()
     ]
+    for row in rows:
+        row['category'] = _persisted_category(row)
+    return rows
 
 
 def upsert_asset(row):
@@ -103,6 +119,7 @@ def upsert_asset(row):
         asset.name = row['name']
         asset.yahoo_symbol = row['yahoo_symbol']
         asset.currency = row['currency']
+        asset.category = row['category']
         asset.sector = asset.sector or row['sector']
         asset.industry = asset.industry or row['industry']
         asset.country = asset.country or row.get('country')

@@ -5,10 +5,13 @@ from wtforms.validators import InputRequired, NumberRange, Optional
 
 class PortfolioPlanForm(FlaskForm):
     equity_etf_percent = DecimalField(
-        'Acciones / ETF', validators=[InputRequired(), NumberRange(min=0, max=100)]
+        'Acciones', validators=[InputRequired(), NumberRange(min=0, max=100)]
     )
     reit_percent = DecimalField(
         'REITs', validators=[InputRequired(), NumberRange(min=0, max=100)]
+    )
+    fixed_income_percent = DecimalField(
+        'Renta fija', validators=[InputRequired(), NumberRange(min=0, max=100)]
     )
     crypto_percent = DecimalField(
         'Cripto', validators=[InputRequired(), NumberRange(min=0, max=100)]

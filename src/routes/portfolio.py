@@ -6,9 +6,16 @@ from flask_login import current_user, login_required
 from src.extensions import db
 from src.forms.AllocationTargetForm import AllocationTargetForm
 from src.forms.PortfolioPlanForm import PortfolioPlanForm
-from src.models import Account, AllocationTarget, Asset, DividendReceived, PortfolioPlan
+from src.models import (
+    ASSET_CATEGORY_LABELS,
+    Account,
+    AllocationTarget,
+    Asset,
+    DividendReceived,
+    PortfolioPlan,
+)
 from src.services.portfolio import PortfolioService, fx_rate_to_cad_today
-from src.services.portfolio_analytics import DEFAULT_TARGETS, PortfolioAnalyticsService
+from src.services.portfolio_analytics import PortfolioAnalyticsService
 
 portfolio_bp = Blueprint('portfolio', __name__)
 
@@ -105,6 +112,8 @@ def portfolio():
                 "symbol": asset.symbol,
                 "name": asset.name,
                 "exchange": asset.exchange,
+                "category": asset.category,
+                "category_label": ASSET_CATEGORY_LABELS[asset.category],
                 "detail_url": url_for('stocks.get_stock_detail', exchange=asset.exchange, symbol=asset.symbol),
                 "accounts": _account_badges(accounts_by_asset, p["asset_id"], accounts_by_id),
                 "actual_price": p["current_price"],
@@ -177,10 +186,7 @@ def portfolio():
 
     analytics = PortfolioAnalyticsService(current_user.id)
     plan = PortfolioPlan.query.filter_by(user_id=current_user.id).first()
-    plan_form = PortfolioPlanForm(
-        obj=plan,
-        data={**DEFAULT_TARGETS, 'cash_balance_cad': 0.0} if plan is None else None,
-    )
+    plan_form = PortfolioPlanForm(obj=plan)
     strategic_allocation = analytics.allocation(positions, assets_by_id, plan)
     dividend_chart = analytics.dividends_by_asset(assets_by_id)
     performance_chart = analytics.performance()
@@ -253,6 +259,7 @@ def set_portfolio_plan():
     percentages = (
         form.equity_etf_percent.data,
         form.reit_percent.data,
+        form.fixed_income_percent.data,
         form.crypto_percent.data,
         form.cash_percent.data,
     )
@@ -267,6 +274,7 @@ def set_portfolio_plan():
 
     plan.equity_etf_percent = float(form.equity_etf_percent.data)
     plan.reit_percent = float(form.reit_percent.data)
+    plan.fixed_income_percent = float(form.fixed_income_percent.data)
     plan.crypto_percent = float(form.crypto_percent.data)
     plan.cash_percent = float(form.cash_percent.data)
     plan.cash_balance_cad = float(form.cash_balance_cad.data or 0)

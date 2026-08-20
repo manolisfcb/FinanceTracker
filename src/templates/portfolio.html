@@ -76,7 +76,7 @@
             <div class="tn-plan-popover">
                 <form method="POST" action="{{ url_for('portfolio.set_portfolio_plan') }}">
                     {{ plan_form.hidden_tag() }}
-                    <div class="grid grid-cols-2 lg:grid-cols-5 gap-2.5">
+                    <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2.5">
                         <div class="space-y-1.5">
                             <label class="lbl">{{ plan_form.equity_etf_percent.label.text }}</label>
                             {{ plan_form.equity_etf_percent(class="tn-input plan-percent", step="0.1", min="0", max="100") }}
@@ -84,6 +84,10 @@
                         <div class="space-y-1.5">
                             <label class="lbl">{{ plan_form.reit_percent.label.text }}</label>
                             {{ plan_form.reit_percent(class="tn-input plan-percent", step="0.1", min="0", max="100") }}
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="lbl">{{ plan_form.fixed_income_percent.label.text }}</label>
+                            {{ plan_form.fixed_income_percent(class="tn-input plan-percent", step="0.1", min="0", max="100") }}
                         </div>
                         <div class="space-y-1.5">
                             <label class="lbl">{{ plan_form.crypto_percent.label.text }}</label>
@@ -99,7 +103,7 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap items-center justify-between gap-3 mt-3">
-                        <span class="text-[12px] text-muted2">Total objetivo: <span id="planPercentTotal" class="num font-semibold text-ink">100.0%</span></span>
+                        <span class="text-[12px] text-muted2">Total objetivo: <span id="planPercentTotal" class="num font-semibold text-ink">{{ '100.0%' if plan_is_saved else '0.0%' }}</span></span>
                         <button type="submit" id="savePortfolioPlan" class="btn btn-primary">Guardar portafolio ideal</button>
                     </div>
                 </form>
@@ -107,6 +111,7 @@
         </details>
     </div>
 
+    {% if strategic_allocation.has_plan %}
     <div class="tn-allocation-view-switch mb-4" role="tablist" aria-label="Vista de comparación del portafolio">
         <button type="button" class="tn-allocation-view-tab is-active" role="tab"
                 id="allocationViewGroupedTab" aria-selected="true" aria-controls="allocationViewGrouped"
@@ -193,6 +198,12 @@
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="tn-chart-panel py-12 text-center">
+        <div class="text-[13px] font-semibold text-muted2">Todavía no configuraste un portafolio ideal.</div>
+        <p class="text-[12px] text-faint mt-1">Definí tus porcentajes para comparar el objetivo con tus posiciones reales.</p>
+    </div>
+    {% endif %}
 </section>
 
 <div class="grid grid-cols-1 xl:grid-cols-[2.2fr_1fr] gap-3.5 items-start">
@@ -221,7 +232,7 @@
                     <tr>
                         <td class="l tn-edge-l font-sans font-semibold">
                             <a href="{{ row.detail_url }}" class="text-ink hover:text-maple">{{ row.symbol }}</a>
-                            <span class="text-faint font-normal text-[11px]">{{ row.exchange }}</span>
+                            <span class="text-faint font-normal text-[11px]">{{ row.exchange }} · {{ row.category_label }}</span>
                         </td>
                         <td class="l">
                             {% for badge in row.accounts %}
@@ -410,6 +421,7 @@
     Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
     Chart.defaults.color = '#6f6b60';
 
+    {% if strategic_allocation.has_plan %}
     const allocationLabels = {{ strategic_allocation.labels|tojson }};
     const allocationColors = {{ strategic_allocation.colors|tojson }};
     const targetAllocationValues = {{ strategic_allocation.target_values|tojson }};
@@ -626,6 +638,7 @@
         });
     });
     createGroupedAllocationChart();
+    {% endif %}
 
     const planInputs = Array.from(document.querySelectorAll('.plan-percent'));
     const planTotal = document.getElementById('planPercentTotal');
@@ -789,8 +802,9 @@
     {% if strategic_allocation.flows %}
     const compositionFlows = {{ strategic_allocation.flows|tojson }};
     const compositionColors = {
-        EQUITY_ETF: '#b3372b',
+        EQUITY: '#b3372b',
         REIT: '#b98a2e',
+        FIXED_INCOME: '#1a7f4e',
         CRYPTO: '#4a6b8a',
         CASH: '#8a857a',
     };

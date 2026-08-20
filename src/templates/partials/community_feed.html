@@ -1,0 +1,25 @@
+{# Feed body: sort tabs + posts. HTMX swaps this whole block when the sort or
+   category changes, so the composer and sidebars stay put. #}
+<div id="community-feed" class="flex flex-col gap-3">
+    <div class="flex gap-2">
+        {% for key, label in sorts %}
+        <a href="{{ url_for('community.community_page', sort=key, category=selected_category.value if selected_category) }}"
+           hx-get="{{ url_for('community.community_page', sort=key, category=selected_category.value if selected_category) }}"
+           hx-target="#community-feed"
+           hx-swap="outerHTML"
+           hx-push-url="true"
+           class="chip {{ 'chip-on' if selected_sort == key }}">{{ label }}</a>
+        {% endfor %}
+    </div>
+
+    {% for entry in entries %}
+        {% include 'partials/community_post_card.html' %}
+    {% else %}
+    <div class="card p-8 text-center">
+        <div class="text-sm font-semibold text-ink mb-1">
+            {% if selected_category %}Todavía no hay publicaciones en {{ categories[selected_category] }}{% else %}Todavía no hay publicaciones{% endif %}
+        </div>
+        <div class="text-[13px] text-muted">Sé el primero en compartir un análisis, una noticia o una duda.</div>
+    </div>
+    {% endfor %}
+</div>

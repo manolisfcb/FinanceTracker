@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% from 'partials/avatar.html' import avatar %}
+
+{% block head_title %}
+    Comunidad | TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<div class="mb-5">
+    <h1 class="font-serif-display text-3xl text-ink mb-1">Comunidad de inversores</h1>
+    <div class="text-[13px] text-muted">Análisis, dudas y lecturas de mercado entre inversores canadienses</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-[1fr_2.1fr_1fr] gap-3.5 items-start">
+
+    <!-- Left rail: dividend news across the universe -->
+    <aside class="card p-5 order-2 lg:order-1">
+        <div class="flex items-center gap-2 mb-3.5">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6f6b60" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+            <span class="text-sm font-semibold">Recientes</span>
+        </div>
+        {% if recent_news %}
+        <div class="flex flex-col gap-3.5">
+            {% for event in recent_news %}
+            <div class="{{ 'pb-3.5 border-b border-[#f0eee8]' if not loop.last }}">
+                <a href="{{ url_for('stocks.get_stock_detail', exchange=event.asset.exchange, symbol=event.asset.symbol) }}"
+                   class="block text-[12.5px] font-semibold leading-normal text-ink hover:text-maple mb-1">{{ event.title }}</a>
+                <div class="num text-[11px] text-faint">{{ event.published_at.date()|date_es }} de {{ event.published_at.year }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-[12.5px] text-muted">Sin noticias de dividendos por ahora.</div>
+        {% endif %}
+    </aside>
+
+    <!-- Center: composer + feed -->
+    <div class="flex flex-col gap-3 order-1 lg:order-2">
+        <div class="card p-4">
+            <div class="flex items-center gap-3">
+                {{ avatar(current_user.username, 36) }}
+                <button type="button" class="tn-composer" aria-expanded="false"
+                        aria-controls="composer-panel"
+                        onclick="document.getElementById('composer-panel').hidden = false; this.hidden = true; document.getElementById('post-title').focus();">
+                    Comparte un análisis, noticia o duda…
+                </button>
+            </div>
+
+            <form id="composer-panel" hidden method="POST"
+                  action="{{ url_for('community.create_post') }}" class="mt-3 flex flex-col gap-3">
+                {{ form.hidden_tag() }}
+                <input id="post-title" name="{{ form.title.name }}" class="tn-input" maxlength="160"
+                       placeholder="Título — ¿de qué se trata?" required />
+                <textarea name="{{ form.body.name }}" class="tn-input" rows="5" required
+                          placeholder="Escribí acá. Usá $RY o $ENB para enlazar una empresa."></textarea>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <label class="flex items-center gap-2 text-[13px] text-muted2">
+                        Categoría
+                        <select name="{{ form.category.name }}" class="tn-input w-auto">
+                            {% for value, label in form.category.choices %}
+                            <option value="{{ value }}" {{ 'selected' if form.category.data == value }}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="btn"
+                                onclick="this.closest('form').hidden = true; this.closest('.card').querySelector('.tn-composer').hidden = false;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Publicar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {% include 'partials/community_feed.html' %}
+    </div>
+
+    <!-- Right rail: categories + trending tickers -->
+    <aside class="flex flex-col gap-3.5 order-3">
+        <div class="card p-5">
+            <div class="text-sm font-semibold mb-3">Categorías</div>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ url_for('community.community_page', sort=selected_sort) }}"
+                   class="chip {{ 'chip-on' if not selected_category }}">Feed</a>
+                {% for category, label in categories.items() %}
+                <a href="{{ url_for('community.community_page', sort=selected_sort, category=category.value) }}"
+                   class="chip {{ 'chip-on' if selected_category == category }}">{{ label }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card p-5">
+            <div class="flex items-center gap-2 mb-3.5">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6f6b60" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>
+                <span class="text-sm font-semibold">Activos en destaque</span>
+            </div>
+            {% if trending %}
+            <div class="flex flex-col gap-3">
+                {% for row in trending %}
+                <a href="{{ url_for('stocks.get_stock_detail', exchange=row.asset.exchange, symbol=row.asset.symbol) }}"
+                   class="flex items-center gap-3 group">
+                    <span class="num w-4 font-semibold {{ 'text-[#b98a2e]' if loop.first else 'text-faint' }}">{{ loop.index }}</span>
+                    <span class="flex-1">
+                        <span class="tick">${{ row.asset.symbol }}</span>
+                        <span class="block text-[11.5px] text-muted mt-0.5">
+                            {{ row.mentions }} {{ 'mención' if row.mentions == 1 else 'menciones' }} esta semana
+                        </span>
+                    </span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a8a396" stroke-width="2.5" class="group-hover:stroke-[#1c1b18]"><path d="M9 6l6 6-6 6"></path></svg>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-[12.5px] text-muted">
+                Todavía nadie mencionó un ticker. Escribí <span class="tick">$RY</span> en una publicación para empezar.
+            </div>
+            {% endif %}
+        </div>
+    </aside>
+</div>
+{% endblock %}

@@ -13,6 +13,7 @@
                 <a href="{{ url_for('portfolio.list_orders') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['portfolio.list_orders', 'portfolio.import_orders', 'portfolio.add_order', 'portfolio.edit_order', 'portfolio.list_accounts', 'portfolio.add_account', 'portfolio.edit_account'] }}">Órdenes</a>
                 <a href="{{ url_for('stocks.get_stocks') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'stocks.get_stocks' }}">Acciones</a>
                 <a href="{{ url_for('dividends.dividends_page') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'dividends.dividends_page' }}">Dividendos</a>
+                <a href="{{ url_for('community.community_page') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['community.community_page', 'community.post_page', 'community.edit_post'] }}">Comunidad</a>
             </div>
             {% endif %}
         </div>

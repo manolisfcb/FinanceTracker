@@ -343,21 +343,165 @@ puede descartar alguna nota legítima que no nombre a la empresa en el titular n
 > Referencias: pestaña "Comunidade" de meusdividendos — feed continuo de análisis, dudas y
 > lecturas de mercado entre inversores. esta tambien es otra referencia: https://investidor10.com.br/comunidade/
 
-- [ ] `[M]` Modelos: `Post` (user, title, body, category, created_at), `Comment`,
-      `Vote` (up/down por user+post), `PostTickerMention` (N-N post↔asset).
-- [ ] `[M]` Parser de menciones `$RY`, `$ENB` en el cuerpo → chips clickeables que llevan a la
-      página de la empresa; alimenta "Activos en destaque".
-- [ ] `[L]` `/community`: feed con tabs **Recientes / Más votados / En alta**, categorías
+- [x] `[M]` Modelos: `Post` (user, title, body, category, created_at), `Comment`,
+      `Vote` (up/down por user+post), `PostTickerMention` (N-N post↔asset). Se sumaron
+      `PostReport` (moderación) y `users.is_admin`. Post y Comment usan soft-delete
+      (`is_deleted`/`deleted_by_id`) para que votos, comentarios y menciones queden íntegros.
+- [x] `[M]` Parser de menciones `$RY`, `$ENB` → chips clickeables que llevan a la
+      página de la empresa; alimenta "Activos en destaque". Lee **título y cuerpo** (un ticker
+      en el titular también es una mención), pero solo enlaza dentro del cuerpo: el título ya
+      es un enlace al post y los `<a>` no anidan. Un símbolo ambiguo resuelve al listado
+      canadiense primero (TSX → TSXV → US); uno inexistente queda como texto plano.
+- [x] `[L]` `/community`: feed con tabs **Recientes / Más votados / En alta**, categorías
       (Feed, Análisis, Dudas, Dividendos, Noticias, Operaciones, Sugerencias), composer
       ("Comparte un análisis, noticia o duda…"), votos ↑↓ y contador de comentarios (HTMX).
-- [ ] `[M]` Sidebar: "Recientes" (últimas noticias de dividendos del universo) y
-      "Activos en destaque" (ranking de menciones últimos 7 días).
-- [ ] `[M]` Página de post con hilo de comentarios; editar/borrar propio contenido.
-- [ ] `[S]` Feed por empresa: pestaña "Comunidad" dentro de la página de empresa filtrando
-      posts que mencionan su ticker.
-- [ ] `[S]` Moderación mínima: reporte de post, soft-delete por admin, rate-limit de publicación.
-- [ ] `[S]` Barra superior de mercado (market strip) en toda la app: TSX Composite, S&P 500,
-      USD/CAD, tasa BoC, estado del mercado (abierto/cerrado) — job cada 15 min.
+      "En alta" ordena por votos + comentarios dentro de una ventana de 7 días. Votar dos
+      veces igual retira el voto; votar al revés lo invierte.
+- [x] `[M]` Sidebar: "Recientes" (últimas noticias de dividendos del universo, sin filtrar por
+      portafolio) y "Activos en destaque" (ranking de menciones últimos 7 días).
+- [x] `[M]` Página de post con hilo de comentarios; editar/borrar propio contenido. Un admin
+      puede eliminar contenido ajeno pero nunca reescribirlo.
+- [x] `[S]` Feed por empresa: sección "Comunidad" dentro de la página de empresa filtrando
+      posts que mencionan su ticker, cargada por HTMX después del pintado.
+- [x] `[S]` Moderación mínima: reporte de post, soft-delete por admin, rate-limit de publicación
+      (5 posts y 20 comentarios por hora, ventana móvil).
+- [x] `[S]` Barra superior de mercado (market strip) en toda la app: TSX Composite, S&P 500,
+      NASDAQ, USD/CAD, tasa BoC (Valet V39079), estado del mercado con feriados del TSX
+      — job cada 15 min. Cada fuente está aislada: una caída de Yahoo no borra la tasa BoC.
+
+---
+
+## Fase 7 — Estadísticas agregadas de portafolios (3–4 semanas, cuando haya masa crítica)
+
+> Objetivo: transformar las posiciones derivadas de las órdenes en estadísticas anónimas de mercado
+> interno: activos más presentes, combinaciones frecuentes y arquetipos de portafolio. Las órdenes
+> siguen siendo la única fuente de verdad; toda tabla de esta fase es una proyección analítica
+> regenerable y nunca se edita manualmente.
+>
+> **Condición para iniciar**: Postgres en producción, aislamiento multiusuario de órdenes/cuentas
+> cubierto por tests, precios y FX diarios confiables, y suficientes portafolios no vacíos para formar
+> cohortes de al menos 10 usuarios. Como referencia operativa, evaluar la fase a partir de ~100 usuarios
+> con portafolio activo; el umbral final debe configurarse según la distribución real y no quedar fijo
+> en el código.
+
+### 7.1 Definición de población y métricas
+- [ ] `[M]` Definir **usuario elegible** para cada fecha: usuario con al menos una posición neta positiva,
+      excluyendo cuentas de prueba, administradores técnicos y datos importados incompletos. Documentar
+      zona horaria, fecha de corte y tratamiento de órdenes corregidas o cargadas retroactivamente.
+- [ ] `[S]` Definir **tenedor de un activo** como un usuario distinto cuya cantidad consolidada del activo
+      sea mayor que cero al cierre de la fecha. Varias cuentas del mismo usuario cuentan una sola vez.
+- [ ] `[S]` Definir **penetración** como `usuarios que poseen el activo / usuarios elegibles`, mostrando
+      ambos valores y la fecha del snapshot. Nunca usar número de compras como sustituto de usuarios.
+- [ ] `[M]` Para cada activo calcular: usuarios tenedores, penetración, valor agregado en CAD, peso medio,
+      **peso mediano**, percentiles 25/75, posición mediana dentro de la cartera y variación de tenedores
+      frente a 7, 30 y 90 días. La mediana será la medida principal para evitar que carteras grandes
+      distorsionen el resultado.
+- [ ] `[S]` Mantener separada la métrica de **actividad de trading**: compradores, vendedores y órdenes
+      netas por período. No mezclar “más operado” con “más poseído”.
+- [ ] `[M]` Calcular estadísticas de composición: número mediano de posiciones, peso mediano del top 1 y
+      top 5, concentración, distribución por sector/país/moneda/clase de activo y porcentaje de carteras
+      con exposición internacional.
+
+### 7.2 Proyección analítica y jobs
+- [ ] `[L]` Crear `UserPositionSnapshot`, una proyección diaria reconstruible con:
+      `date`, `user_id`, `asset_id`, `quantity`, `market_value_cad`, `portfolio_value_cad`,
+      `portfolio_weight_percent` y versión del algoritmo. Restricción única
+      `(date, user_id, asset_id)` e índices por `(date, asset_id)` y `(user_id, date)`.
+- [ ] `[M]` Job diario idempotente, posterior a precios y FX, que recalcule posiciones desde `Order`,
+      consolide todas las cuentas del usuario por activo y escriba el snapshot de la fecha. Debe poder
+      reprocesar un rango completo cuando cambie una orden histórica o el algoritmo de costo/FX.
+- [ ] `[M]` Crear agregados diarios regenerables —vista materializada o tablas de caché— para popularidad
+      de activos, pares/tríos frecuentes y patrones de cartera. La UI nunca consultará todas las órdenes
+      de todos los usuarios durante una request.
+- [ ] `[S]` Registrar cada corrida en `PortfolioAnalyticsRun`: inicio/fin, fecha calculada, versión,
+      usuarios elegibles, filas producidas, cohortes suprimidas y error. Alertar si cae bruscamente la
+      población o el valor agregado respecto del día anterior.
+- [ ] `[M]` Reconciliación automática: para una muestra de usuarios, la suma de posiciones del snapshot
+      debe coincidir con `PortfolioService`; los conteos agregados deben coincidir con los snapshots
+      subyacentes antes de publicar una fecha.
+
+### 7.3 Activos y combinaciones más frecuentes
+- [ ] `[M]` Ranking **Activos más presentes** con símbolo, empresa, usuarios tenedores, penetración,
+      peso mediano, rango intercuartil y cambio 30 días. Filtros por fecha, exchange, sector, país y
+      clase de activo; orden por tenedores, penetración o peso mediano.
+- [ ] `[M]` Ranking de **pares y tríos más frecuentes** entre posiciones actuales. Mostrar soporte
+      absoluto, porcentaje de portafolios y pesos medianos de los componentes; no generar combinaciones
+      que no alcancen el umbral de privacidad.
+- [ ] `[M]` Métrica “Quienes tienen X también suelen tener…” basada en probabilidad condicional y
+      acompañada por soporte y *lift*. El soporte evita recomendaciones engañosas producidas por muestras
+      pequeñas y el *lift* distingue afinidad real de activos que simplemente son populares en general.
+- [ ] `[S]` Enlazar cada símbolo a su página de empresa y permitir descargar únicamente resultados
+      agregados en CSV, respetando exactamente los mismos filtros y reglas de supresión de la pantalla.
+
+### 7.4 Portafolios repetidos y similares
+- [ ] `[M]` Implementar una **firma exacta por conjunto**: lista ordenada de `asset_id` con posición
+      positiva, sin cantidades. Permite contar cuántos usuarios poseen exactamente la misma combinación;
+      separar por número de posiciones para que carteras pequeñas no dominen todo el ranking.
+- [ ] `[M]` Implementar una **firma aproximada por composición** usando los principales activos y pesos
+      redondeados a bandas configurables (inicialmente 5 puntos porcentuales). Mostrar siempre que los
+      pesos son rangos, no composiciones individuales exactas.
+- [ ] `[L]` Agrupar portafolios similares mediante vectores de pesos: similitud Jaccard para activos
+      compartidos y similitud coseno para composición. Versionar parámetros, elegir el número de grupos
+      con métricas reproducibles y asignar nombres descriptivos después de revisar sus componentes
+      dominantes, por ejemplo “ETF global pasivo” o “Dividendos canadienses”.
+- [ ] `[M]` Para cada arquetipo mostrar: cantidad y porcentaje de usuarios, activos/sectores dominantes,
+      número mediano de posiciones, concentración top 5, exposición geográfica y rango de pesos. No
+      mostrar una cartera individual representativa ni permitir reconstruir la de un usuario.
+- [ ] `[M]` Medir estabilidad de los grupos entre corridas. Si un cambio de parámetros altera
+      sustancialmente los arquetipos, mantener la versión anterior visible hasta validar la nueva y
+      explicar la ruptura de serie histórica.
+
+### 7.5 Pantalla `/statistics`
+- [ ] `[L]` Crear página server-rendered + HTMX con cuatro vistas:
+      **Resumen**, **Activos populares**, **Combinaciones** y **Portafolios similares**.
+- [ ] `[M]` Resumen con KPIs: usuarios elegibles, posiciones por cartera, concentración top 5,
+      activo con mayor penetración, sector dominante y fecha/estado del último cálculo. Incluir evolución
+      de 30/90 días sin presentar el cambio como dato en tiempo real.
+- [ ] `[M]` Activos populares: tabla ordenable y buscable, evolución de tenedores, distribución de peso
+      y filtros compartibles en la URL. Diferenciar visualmente “más poseído”, “mayor peso” y “más operado”.
+- [ ] `[M]` Combinaciones: pares/tríos, co-tenencia condicionada y carteras exactas frecuentes, con una
+      explicación legible de soporte, penetración y *lift* para evitar interpretaciones incorrectas.
+- [ ] `[L]` Portafolios similares: tarjetas de arquetipos con composición agregada por activos y sectores,
+      rangos de concentración y evolución del tamaño del grupo. Presentarlos como descripción estadística,
+      nunca como recomendación de inversión ni señal automática para copiar operaciones.
+- [ ] `[S]` Estados de carga, fecha del último snapshot, metodología enlazada, empty state cuando no haya
+      masa crítica y banner de datos parciales si fallaron precios/FX o la corrida no pasó reconciliación.
+- [ ] `[S]` Responsive y accesible: tablas utilizables con teclado, gráficos con alternativa textual,
+      colores no usados como único indicador y números con formato CAD/porcentaje coherente con el resto.
+
+### 7.6 Privacidad, consentimiento y seguridad
+- [ ] `[M]` Aplicar **k-anonimato mínimo configurable**, inicialmente `k=10`: ocultar cualquier activo,
+      combinación, filtro o arquetipo con menos de 10 usuarios. La supresión se aplica en backend y en
+      exports, no solo ocultando elementos en HTML.
+- [ ] `[M]` Revisar filtros combinables para evitar ataques de diferenciación: bloquear cortes demasiado
+      estrechos, no exponer conteos casi idénticos entre fechas y redondear conteos/rangos cuando sea
+      necesario. No exponer `user_id`, cantidades, costos, brokers ni valores de carteras individuales.
+- [ ] `[M]` Añadir preferencia de participación/opt-out para analítica comunitaria y excluir al usuario
+      de snapshots futuros según la política de producto. Documentar retención y cómo regenerar agregados
+      si alguien retira el consentimiento.
+- [ ] `[S]` Página de metodología: definiciones, universo incluido, fecha de corte, tamaño mínimo de
+      muestra, tratamiento de cuentas múltiples y disclaimer de que popularidad no equivale a calidad
+      ni constituye asesoramiento financiero.
+- [ ] `[M]` Test específico de aislamiento: ningún endpoint o export debe devolver posiciones de un
+      usuario, aceptar un `user_id` arbitrario ni permitir inferir una cartera mediante filtros sucesivos.
+
+### 7.7 Calidad, rendimiento y lanzamiento
+- [ ] `[M]` Tests unitarios de cantidades netas, consolidación multi-cuenta, penetración, percentiles,
+      firmas, soporte/*lift*, similitud y supresión `k`; fixtures con órdenes corregidas, ventas totales,
+      activos sin precio y FX faltante.
+- [ ] `[M]` Tests de integración del pipeline completo `Order → UserPositionSnapshot → agregados → UI`,
+      incluyendo rerun idempotente, backfill y cambio de versión del algoritmo.
+- [ ] `[S]` Presupuesto de rendimiento: la página debe leer solo agregados indexados; fijar objetivo de
+      respuesta p95 y medir duración/memoria del job con el volumen real antes del lanzamiento.
+- [ ] `[S]` Activación mediante feature flag: primero solo administración, después beta opt-in y finalmente
+      disponibilidad general cuando privacidad, reconciliación y estabilidad de datos estén validadas.
+- [ ] `[M]` Instrumentación de uso sin registrar portafolios individuales: vistas por sección, filtros
+      usados, exports y errores del pipeline. Revisión periódica para retirar métricas confusas o sin uso.
+
+**Criterio de salida**: con una cohorte que supere el mínimo de privacidad, `/statistics` muestra activos,
+combinaciones y arquetipos reproducibles desde snapshots diarios; todos los conteos pasan reconciliación,
+ningún resultado contiene menos de `k` usuarios ni revela datos individuales, el pipeline puede reconstruirse
+desde órdenes y la pantalla explica fecha, muestra y metodología de cada métrica.
 
 ---
 
@@ -368,11 +512,14 @@ puede descartar alguna nota legítima que no nombre a la empresa en el titular n
 
 ## Orden recomendado de ejecución
 ```
-Fase 0 ──► Fase 1 ──► Fase 2 ──► Fase 3 ──► Fase 4a ──► Fase 4b ──► Fase 5 ──► Fase 6
-(salud)   (datos)    (empresa)  (portafolio) (proventos+  (noticias) (insights) (comunidad)
+Fase 0 ──► Fase 1 ──► Fase 2 ──► Fase 3 ──► Fase 4a ──► Fase 4b ──► Fase 5 ──► Fase 6 ──► Fase 7
+(salud)   (datos)    (empresa)  (portafolio) (proventos+  (noticias) (insights) (comunidad) (estadísticas)
                                               regulatorio)
 ```
 La comunidad va al final: necesita usuarios activos y páginas de empresa a las cuales enlazar
 las menciones; puede adelantarse si el objetivo es validar interés temprano.
 La Fase 1 va antes que el portafolio v2 porque el catálogo de assets con símbolos normalizados
 es prerequisito de las órdenes multi-exchange.
+La Fase 7 se planifica después de la comunidad, pero su verdadero disparador es la masa crítica:
+Postgres, snapshots diarios confiables y cohortes suficientemente grandes para publicar estadísticas
+sin comprometer privacidad. Puede desarrollarse técnicamente antes y mantenerse detrás de un feature flag.

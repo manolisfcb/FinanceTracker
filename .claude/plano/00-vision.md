@@ -13,6 +13,8 @@ Plataforma unificada de inversiones para el inversor **canadiense**:
 4. **Hechos relevantes** — noticias y filings por empresa (SEDAR+ para Canadá, EDGAR 8-K para US),
    calendario de dividendos y resultados.
 5. **Insights** — a futuro: alertas, rankings de dividendos, score de calidad, comparador.
+6. **Estadísticas agregadas** — cuando exista masa crítica: activos más presentes, combinaciones
+   frecuentes y arquetipos de portafolio, siempre anónimos y con umbral mínimo de privacidad.
 
 ## Principios
 - **Órdenes como fuente de verdad**: las posiciones del portafolio se derivan siempre de las
@@ -32,3 +34,4 @@ Plataforma unificada de inversiones para el inversor **canadiense**:
 | 4 | Proventos + calendario + hechos relevantes (SEDAR+/EDGAR) | meusdividendos |
 | 5 | Insights: scores, semáforos, rankings, alertas | meusdividendos/suno |
 | 6 | Comunidad de inversores (feed, votos, menciones $TICKER) | meusdividendos Comunidade |
+| 7 | Estadísticas agregadas de activos y portafolios | Analítica interna anonimizada |

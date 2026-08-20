@@ -1,0 +1,5 @@
+{% macro avatar(username, size=32) %}
+<div class="tn-avatar" style="width:{{ size }}px; height:{{ size }}px; font-size:{{ (size * 0.4)|round|int }}px; background:{{ username|avatar_color }}">
+    {{ (username or '?')[0]|upper }}
+</div>
+{% endmacro %}

@@ -188,32 +188,25 @@ def test_fractional_share_counts_render_with_four_decimals(auth_client, db, user
     assert '>0.2254</td>' in body
 
 
-def test_portfolio_ideal_defaults_and_new_analytics_sections_render(auth_client, db, user):
+def test_portfolio_ideal_has_no_mock_targets_before_user_configures_it(auth_client, db, user):
     body = auth_client.get('/portfolio').get_data(as_text=True)
 
     assert 'Tu portafolio ideal' in body
-    assert 'Barras agrupadas' in body
-    assert 'Anillos comparativos' in body
-    assert 'Barras 100%' in body
-    assert 'id="allocationViewGroupedTab" aria-selected="true"' in body
-    assert 'id="allocationViewRingsTab" aria-selected="false"' in body
-    assert 'id="allocationViewStackedTab" aria-selected="false"' in body
-    assert 'groupedAllocationChart' in body
-    assert 'targetAllocationChart' in body
-    assert 'stackedAllocationChart' in body
+    assert 'Todavía no configuraste un portafolio ideal.' in body
+    assert 'groupedAllocationChart' not in body
     assert 'Rentabilidad comparada' in body
     assert 'Composición por tipo y segmento' in body
     assert 'Dividendos por activo' in body
-    assert 'value="40.00"' in body
-    assert 'value="30.00"' in body
-    assert 'value="20.00"' in body
-    assert 'value="10.00"' in body
+    assert 'Renta fija' in body
+    assert 'value="40.00"' not in body
+    assert 'value="30.00"' not in body
 
 
 def test_user_can_save_a_complete_portfolio_plan(auth_client, db, user):
     response = auth_client.post('/portfolio/plan', data={
-        'equity_etf_percent': '40',
-        'reit_percent': '30',
+        'equity_etf_percent': '35',
+        'reit_percent': '25',
+        'fixed_income_percent': '10',
         'crypto_percent': '20',
         'cash_percent': '10',
         'cash_balance_cad': '2500',
@@ -221,7 +214,8 @@ def test_user_can_save_a_complete_portfolio_plan(auth_client, db, user):
 
     assert response.status_code == 302
     plan = PortfolioPlan.query.filter_by(user_id=user.id).one()
-    assert plan.equity_etf_percent == 40.0
+    assert plan.equity_etf_percent == 35.0
+    assert plan.fixed_income_percent == 10.0
     assert plan.cash_balance_cad == 2500.0
 
 
@@ -229,6 +223,7 @@ def test_portfolio_plan_must_sum_to_one_hundred(auth_client, db, user):
     response = auth_client.post('/portfolio/plan', data={
         'equity_etf_percent': '40',
         'reit_percent': '30',
+        'fixed_income_percent': '0',
         'crypto_percent': '20',
         'cash_percent': '20',
         'cash_balance_cad': '0',
@@ -238,7 +233,9 @@ def test_portfolio_plan_must_sum_to_one_hundred(auth_client, db, user):
     assert PortfolioPlan.query.filter_by(user_id=user.id).first() is None
 
 
-def test_current_allocation_classifies_reits_crypto_and_cash(auth_client, db, user):
+def test_current_allocation_uses_persisted_reit_crypto_fixed_income_and_cash_categories(
+    auth_client, db, user
+):
     tfsa = _account(db, user)
     crypto_account = _account(db, user, AccountType.CRYPTO, 'Crypto')
     reit = _position(
@@ -246,13 +243,19 @@ def test_current_allocation_classifies_reits_crypto_and_cash(auth_client, db, us
         dividends=0, sector='Real Estate',
     )
     reit.industry = 'REIT - Retail'
+    reit.category = 'REIT'
     _position(
         db, user, crypto_account, symbol='BTC', exchange='CRYPTO', quantity=1,
         cost=100, price=200, dividends=0, sector='Cryptoassets',
     )
+    _position(
+        db, user, tfsa, symbol='GOC30', exchange='OTC', quantity=1,
+        cost=100, price=100, dividends=0, sector='Fixed Income',
+    )
     db.session.add(PortfolioPlan(
-        user_id=user.id, equity_etf_percent=40, reit_percent=30,
-        crypto_percent=20, cash_percent=10, cash_balance_cad=50,
+        user_id=user.id, equity_etf_percent=30, reit_percent=30,
+        fixed_income_percent=10, crypto_percent=20, cash_percent=10,
+        cash_balance_cad=50,
     ))
     db.session.commit()
 
@@ -263,6 +266,7 @@ def test_current_allocation_classifies_reits_crypto_and_cash(auth_client, db, us
     assert 'Retail \\u00b7 REITs' in body
     assert 'Efectivo CAD' in body
     assert '"classKey": "CRYPTO"' in body
+    assert '"classKey": "FIXED_INCOME"' in body
 
 
 def test_dividend_chart_includes_total_and_per_share(auth_client, db, user):

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% from 'partials/avatar.html' import avatar %}
+
+{% block head_title %}
+    {{ post.title }} | Comunidad · TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<div class="flex items-center gap-1.5 text-[13px] text-muted2 mb-4">
+    <a href="{{ url_for('community.community_page') }}" class="hover:text-ink">Comunidad</a>
+    <span>/</span>
+    <a href="{{ url_for('community.community_page', category=post.category.value) }}" class="hover:text-ink">{{ categories[post.category] }}</a>
+</div>
+
+<div class="max-w-3xl">
+    <article class="card p-6 mb-4">
+        <div class="flex items-start justify-between gap-4 mb-3">
+            <div class="flex items-center gap-2.5">
+                {{ avatar(post.author.username, 36) }}
+                <div>
+                    <div class="text-[13px] font-semibold">{{ post.author.username }}</div>
+                    <div class="text-[11.5px] text-faint">
+                        {{ post.created_at|relative_time_es }}{% if post.updated_at %} · editado{% endif %}
+                    </div>
+                </div>
+                <span class="cat {{ category_styles[post.category] }} ml-1">{{ categories[post.category] }}</span>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+                {% if post.user_id == current_user.id %}
+                <a href="{{ url_for('community.edit_post', post_id=post.id) }}" class="btn">Editar</a>
+                {% endif %}
+                {% if can_moderate %}
+                <form method="POST" action="{{ url_for('community.delete_post', post_id=post.id) }}"
+                      onsubmit="return confirm('¿Eliminar esta publicación? Sus comentarios dejarán de ser visibles.');">
+                    <button type="submit" class="btn">Eliminar</button>
+                </form>
+                {% else %}
+                <form method="POST" action="{{ url_for('community.report_post', post_id=post.id) }}">
+                    <button type="submit" class="btn" {{ 'disabled' if already_reported }}>
+                        {{ 'Reportado' if already_reported else 'Reportar' }}
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <h1 class="text-lg font-semibold text-ink mb-2">{{ post.title }}</h1>
+        <p class="text-sm leading-relaxed text-[#4a463d] mb-4 whitespace-pre-line [text-wrap:pretty]">{{ rendered_body }}</p>
+
+        {% if post.mentions %}
+        <div class="flex flex-wrap gap-1.5 mb-4">
+            {% for mention in post.mentions %}
+            <a href="{{ url_for('stocks.get_stock_detail', exchange=mention.asset.exchange, symbol=mention.asset.symbol) }}"
+               class="tick">${{ mention.asset.symbol }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% with comment_count = comments|length %}
+            {% include 'partials/community_vote.html' %}
+        {% endwith %}
+    </article>
+
+    <div class="card p-6">
+        <div class="text-sm font-semibold mb-4">
+            {{ comments|length }} {{ 'comentario' if comments|length == 1 else 'comentarios' }}
+        </div>
+
+        <form method="POST" action="{{ url_for('community.create_comment', post_id=post.id) }}"
+              class="flex flex-col gap-3 mb-6">
+            {{ comment_form.hidden_tag() }}
+            <textarea name="{{ comment_form.body.name }}" class="tn-input" rows="3" required
+                      placeholder="Sumá tu punto de vista. Podés mencionar $BCE o $SU."></textarea>
+            <div class="flex justify-end">
+                <button type="submit" class="btn btn-primary">Comentar</button>
+            </div>
+        </form>
+
+        <div class="flex flex-col gap-5">
+            {% for item in comments %}
+            <div class="{{ 'pb-5 border-b border-[#f0eee8]' if not loop.last }}">
+                <div class="flex items-start justify-between gap-4 mb-2">
+                    <div class="flex items-center gap-2.5">
+                        {{ avatar(item.comment.author.username, 28) }}
+                        <span class="text-[13px] font-semibold">{{ item.comment.author.username }}</span>
+                        <span class="text-[11.5px] text-faint">
+                            · {{ item.comment.created_at|relative_time_es }}{% if item.comment.updated_at %} · editado{% endif %}
+                        </span>
+                    </div>
+                    {% if item.can_moderate %}
+                    <div id="comment-actions-{{ item.comment.id }}" class="flex items-center gap-3 text-[12px] shrink-0">
+                        {% if item.comment.user_id == current_user.id %}
+                        <button type="button" class="text-muted2 hover:text-ink"
+                                onclick="document.getElementById('comment-edit-{{ item.comment.id }}').hidden = false; document.getElementById('comment-actions-{{ item.comment.id }}').hidden = true;">Editar</button>
+                        {% endif %}
+                        <form method="POST" action="{{ url_for('community.delete_comment', comment_id=item.comment.id) }}"
+                              onsubmit="return confirm('¿Eliminar este comentario?');">
+                            <button type="submit" class="text-muted2 hover:text-neg">Eliminar</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <p class="text-[13px] leading-relaxed text-[#4a463d] pl-[38px] whitespace-pre-line [text-wrap:pretty]">{{ item.rendered_body }}</p>
+
+                {% if item.comment.user_id == current_user.id %}
+                <form id="comment-edit-{{ item.comment.id }}" hidden method="POST"
+                      action="{{ url_for('community.edit_comment', comment_id=item.comment.id) }}"
+                      class="pl-[38px] mt-2 flex flex-col gap-2">
+                    <textarea name="body" class="tn-input" rows="3" required>{{ item.comment.body }}</textarea>
+                    <div class="flex justify-end gap-2">
+                        <button type="button" class="btn"
+                                onclick="document.getElementById('comment-edit-{{ item.comment.id }}').hidden = true; document.getElementById('comment-actions-{{ item.comment.id }}').hidden = false;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-[13px] text-muted">Todavía no hay comentarios. Empezá la conversación.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

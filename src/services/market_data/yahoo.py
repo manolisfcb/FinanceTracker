@@ -189,18 +189,36 @@ class YahooProvider(MarketDataProvider):
         if len(symbol) > 10:
             return None
         quote_type = info["quoteType"]
+        name = info.get("longName") or info.get("shortName") or symbol
+        sector = "ETFs" if quote_type == "ETF" else info.get("sector")
+        industry = (
+            info.get("category") or "Exchange-Traded Fund"
+            if quote_type == "ETF"
+            else info.get("industry")
+        )
+        if quote_type == "ETF":
+            category = "EQUITY"
+        else:
+            from src.models.Asset import infer_asset_category
+
+            category = infer_asset_category(
+                symbol=symbol,
+                exchange=exchange,
+                name=name,
+                sector=sector,
+                industry=industry,
+            )
         return {
             "symbol": symbol,
             "yahoo_symbol": canonical,
             "exchange": exchange,
             "currency": currency,
-            "name": info.get("longName") or info.get("shortName") or symbol,
-            "sector": "ETFs" if quote_type == "ETF" else info.get("sector"),
-            "industry": (
-                info.get("category") or "Exchange-Traded Fund"
-                if quote_type == "ETF"
-                else info.get("industry")
-            ),
+            "name": name,
+            # ETFs count as equities even when their underlying exposure is
+            # bonds/REITs; direct REIT equities keep their own category.
+            "category": category,
+            "sector": sector,
+            "industry": industry,
             "country": "Canada" if currency == "CAD" else "United States",
         }
 

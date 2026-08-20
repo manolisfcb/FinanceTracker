@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from src.models import Asset
+from src.models import Asset, AssetCategory
 from src.services.portfolio_analytics import (
     _boc_rate_cache,
     _canadian_policy_rate_return,
@@ -10,7 +10,7 @@ from src.services.portfolio_analytics import (
 )
 
 
-def test_asset_classification_uses_catalog_metadata():
+def test_asset_category_is_persisted_when_asset_is_created():
     crypto = Asset(
         symbol='BTC', yahoo_symbol='BTC-CAD', exchange='CRYPTO', currency='CAD',
         name='Bitcoin', sector='Cryptoassets', industry='Cryptocurrency',
@@ -23,10 +23,25 @@ def test_asset_classification_uses_catalog_metadata():
         symbol='GOOGL', yahoo_symbol='GOOGL', exchange='US', currency='USD',
         name='Alphabet', sector='Communication Services', industry='Internet Content',
     )
+    bond = Asset(
+        symbol='GOC2030', yahoo_symbol='GOC2030', exchange='OTC', currency='CAD',
+        name='Government of Canada Bond 2030', sector='Fixed Income',
+    )
+    bond_etf = Asset(
+        symbol='ZAG', yahoo_symbol='ZAG.TO', exchange='TSX', currency='CAD',
+        name='BMO Aggregate Bond Index ETF', sector='ETFs', industry='Fixed Income',
+    )
+    fii = Asset(
+        symbol='HGLG11', yahoo_symbol='HGLG11.SA', exchange='B3', currency='BRL',
+        name='CSHG Logística FII', sector='Real Estate',
+    )
 
-    assert classify_asset(crypto) == 'CRYPTO'
-    assert classify_asset(reit) == 'REIT'
-    assert classify_asset(stock) == 'EQUITY_ETF'
+    assert classify_asset(crypto) == AssetCategory.CRYPTO
+    assert classify_asset(reit) == AssetCategory.REIT
+    assert classify_asset(stock) == AssetCategory.EQUITY
+    assert classify_asset(bond) == AssetCategory.FIXED_INCOME
+    assert classify_asset(bond_etf) == AssetCategory.EQUITY
+    assert classify_asset(fii) == AssetCategory.REIT
 
 
 @patch('src.services.portfolio_analytics.requests.get')

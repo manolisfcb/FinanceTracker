@@ -133,6 +133,24 @@ def test_comparator_opens_empty_until_user_selects_companies(auth_client, db):
     assert "BIG Corp" not in body
 
 
+def test_comparator_uses_modal_picker_and_keeps_top_search(auth_client, db):
+    first = _company(db, "RY")[0]
+
+    empty_body = auth_client.get("/tools/comparator").get_data(as_text=True)
+    selected_body = auth_client.get(
+        f"/tools/comparator?asset={first.id}"
+    ).get_data(as_text=True)
+
+    assert 'id="comparisonAssetSearch"' in empty_body
+    assert 'id="comparatorAssetDialog"' in empty_body
+    assert 'id="modalComparisonAssetSearch"' in empty_body
+    assert empty_body.count('data-asset-autocomplete') == 2
+    assert 'data-open-asset-picker' in empty_body
+    assert 'aria-haspopup="dialog"' in empty_body
+    assert 'Ya seleccionadas' in selected_body
+    assert 'RY Corp' in selected_body
+
+
 def test_comparator_keeps_selected_asset_without_fundamentals(auth_client, db):
     complete = _company(db, "DATA", market_cap=100, price=10)[0]
     pending = Asset(
