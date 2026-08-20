@@ -143,7 +143,7 @@ def create_app(config_name=None):
         from src.resources.jobs import refresh_fx  # noqa: F401
         from src.resources.jobs import refresh_snapshots  # noqa: F401
         from src.resources.jobs import refresh_dividends  # noqa: F401
-        from src.resources.jobs import refresh_company_events  # noqa: F401
+        from src.resources.jobs import refresh_filings  # noqa: F401
         from src.resources.jobs import refresh_news  # noqa: F401
 
         if not scheduler.running:

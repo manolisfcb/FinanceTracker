@@ -290,6 +290,19 @@ números reales hace falta o una fuente de FX BRL→CAD o una cartera CA/US.
 este entorno y las noticias reales aparecen en la página de empresa y en el inbox (138 noticias de
 los 37 assets en cartera, 71 de Yahoo + 67 de Google).
 
+**Ajuste posterior (mismo día): backfill on-demand para todo el universo.** Los 3 jobs solo barren
+assets en cartera (37 de 1159), así que las demás empresas del screener mostraban dividendos,
+noticias y hechos relevantes vacíos. Se agregó `src/services/company_data.py` — toda la ingesta
+(dividendos, calendario, filings, noticias) vive ahí y la usan **tanto los jobs como la página de
+empresa**, que rellena un asset la primera vez que alguien lo abre (caché de intentos de 6h, retries
+acotados como la cotización en vivo, y nunca rompe la página si una fuente falla). Los jobs quedaron
+finos y se dividieron por fuente: `refresh_dividends` (todo lo de Yahoo: histórico + ex-date + fecha
+de resultados), `refresh_filings` (solo EDGAR, renombrado desde `refresh_company_events`) y
+`refresh_news`. Verificado en vivo: AAPL/BCE/VALE3 se llenan en 1,7–2,5s la primera vez y 0,2s
+después. **El guard inicial (`has_any_data`) tenía un bug**: un asset a medias — AAPL tenía filings
+pero no dividendos ni noticias — contaba como "ya tiene datos" y no se completaba nunca; se
+reemplazó por `needs_backfill()`, que mira dividendos y noticias por separado.
+
 **Hallazgo durante la ejecución — el feed por ticker de Yahoo trae ruido**: pedirle noticias de `RY`
 devuelve notas de *Rayonier (RYN)*, *Citizens & Northern (CZNC)* y ETFs genéricos; Google mete
 páginas de referencia de bonos. yfinance no expone tickers relacionados por nota (ni `.news` ni

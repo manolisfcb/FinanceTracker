@@ -11,7 +11,7 @@ from src.models import (
     OrderModel,
     OrderType,
 )
-from src.resources.jobs.refresh_company_events import _refresh_company_events
+from src.resources.jobs.refresh_filings import _refresh_filings
 from src.resources.jobs.refresh_dividends import _refresh_held_dividends
 
 
@@ -131,25 +131,27 @@ def test_past_ex_date_creates_no_upcoming_event(mock_get_provider, app, db, user
     assert CompanyEvent.query.count() == 0
 
 
-@patch('src.resources.jobs.refresh_company_events.edgar')
-@patch('src.resources.jobs.refresh_company_events.get_provider')
-def test_filings_are_only_fetched_for_us_assets(mock_get_provider, mock_edgar, app, db, user):
-    _held_asset(db, user, symbol='RY', exchange='TSX')
-    us_asset = _held_asset(db, user, symbol='AAPL', exchange='US')
-    mock_get_provider.return_value = _provider()
-    mock_edgar.resolve_cik.return_value = '0000320193'
-    mock_edgar.get_recent_filings.return_value = [{
+def _filing(accession='0000320193-26-000101'):
+    return {
         'form': '8-K',
         'filing_date': date.today().isoformat(),
-        'accession_number': '0000320193-26-000101',
+        'accession_number': accession,
         'url': 'https://sec.gov/filing',
-    }]
+    }
+
+
+@patch('src.services.company_data.edgar')
+def test_filings_are_only_fetched_for_us_assets(mock_edgar, app, db, user):
+    _held_asset(db, user, symbol='RY', exchange='TSX')
+    us_asset = _held_asset(db, user, symbol='AAPL', exchange='US')
+    mock_edgar.resolve_cik.return_value = '0000320193'
+    mock_edgar.get_recent_filings.return_value = [_filing()]
 
     with app.app_context():
-        items = _refresh_company_events()
+        items = _refresh_filings()
         db.session.commit()
 
-    assert items == 2
+    assert items == 1
     mock_edgar.resolve_cik.assert_called_once_with('AAPL')
     event = CompanyEvent.query.filter_by(kind=CompanyEventKind.FILING).one()
     assert event.asset_id == us_asset.id
@@ -157,43 +159,35 @@ def test_filings_are_only_fetched_for_us_assets(mock_get_provider, mock_edgar, a
     assert Asset.query.get(us_asset.id).cik == '0000320193'
 
 
-@patch('src.resources.jobs.refresh_company_events.edgar')
-@patch('src.resources.jobs.refresh_company_events.get_provider')
-def test_filings_are_not_duplicated_on_rerun(mock_get_provider, mock_edgar, app, db, user):
+@patch('src.services.company_data.edgar')
+def test_filings_are_not_duplicated_on_rerun(mock_edgar, app, db, user):
     _held_asset(db, user, symbol='AAPL', exchange='US')
-    mock_get_provider.return_value = _provider()
     mock_edgar.resolve_cik.return_value = '0000320193'
-    mock_edgar.get_recent_filings.return_value = [{
-        'form': '8-K',
-        'filing_date': date.today().isoformat(),
-        'accession_number': '0000320193-26-000101',
-        'url': 'https://sec.gov/filing',
-    }]
+    mock_edgar.get_recent_filings.return_value = [_filing()]
 
     with app.app_context():
-        _refresh_company_events()
+        _refresh_filings()
         db.session.commit()
-        _refresh_company_events()
+        assert _refresh_filings() == 0
         db.session.commit()
 
     assert CompanyEvent.query.filter_by(kind=CompanyEventKind.FILING).count() == 1
 
 
-@patch('src.resources.jobs.refresh_company_events.edgar')
-@patch('src.resources.jobs.refresh_company_events.get_provider')
-def test_next_earnings_row_updates_in_place(mock_get_provider, mock_edgar, app, db, user):
+@patch('src.resources.jobs.refresh_dividends.get_provider')
+def test_next_earnings_row_updates_in_place(mock_get_provider, app, db, user):
     asset = _held_asset(db, user)
     first = date.today() + timedelta(days=20)
     mock_get_provider.return_value = _provider(calendar={'next_earnings_date': first})
 
     with app.app_context():
-        _refresh_company_events()
+        _refresh_held_dividends()
         db.session.commit()
 
     moved = first + timedelta(days=2)
     mock_get_provider.return_value = _provider(calendar={'next_earnings_date': moved})
     with app.app_context():
-        _refresh_company_events()
+        _refresh_held_dividends()
         db.session.commit()
 
     event = CompanyEvent.query.filter_by(kind=CompanyEventKind.EARNINGS).one()

@@ -9,6 +9,7 @@ from sqlalchemy import and_, func, or_
 from src.extensions import db
 from src.forms.StockForm import Stock
 from src.models import Asset, CompanyEvent, CompanyEventKind, DividendHistory, Fundamentals
+from src.services.company_data import backfill_asset, needs_backfill
 from src.services.market_data import get_provider
 
 stocks_bp = Blueprint('stocks', __name__)
@@ -284,6 +285,12 @@ def get_stock_detail(exchange, symbol):
     asset = Asset.query.filter_by(exchange=exchange, symbol=symbol).first()
     if asset is None:
         abort(404)
+
+    # The nightly jobs only sweep assets someone holds, so the rest of the
+    # universe would show empty dividends/filings/news forever. Fill this one
+    # in on first view instead of fetching all ~1100 every night.
+    if needs_backfill(asset):
+        backfill_asset(asset)
 
     fundamentals = _latest_fundamentals_for(asset.id)
 
