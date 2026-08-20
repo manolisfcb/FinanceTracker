@@ -18,6 +18,24 @@ CONFIG_MAP = {
 }
 
 
+def _is_reloader_parent(app) -> bool:
+    """Whether this process is the watcher half of Werkzeug's auto-reloader.
+
+    With `debug=True`, `app.run()` re-executes the entrypoint in a child
+    process, so `create_app()` runs twice — once in the watcher, once in the
+    process actually serving. Without this guard both start a scheduler and
+    every job runs twice: duplicate provider calls, duplicate JobRun rows,
+    and SQLite lock contention between the two.
+
+    The watcher sets WERKZEUG_RUN_MAIN=true in the child, so an unset value
+    while in debug means "this is the watcher". A debug run with the reloader
+    off (`flask run --no-reload`, the project's VS Code config) also lands
+    here and gets no scheduler — jobs firing mid-debug-session are rarely
+    what you want anyway.
+    """
+    return app.debug and os.environ.get("WERKZEUG_RUN_MAIN") != "true"
+
+
 def create_app(config_name=None):
     app = flask.Flask(__name__)
 
@@ -136,7 +154,7 @@ def create_app(config_name=None):
     # of tests so test runs stay hermetic and fast, and so repeated
     # create_app("testing") calls don't fail trying to start an
     # already-running APScheduler.
-    if not app.testing:
+    if not app.testing and not _is_reloader_parent(app):
         scheduler.init_app(app)
         from src.resources.jobs import refresh_fundamentals  # noqa: F401
         from src.resources.jobs import refresh_quotes  # noqa: F401
