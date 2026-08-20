@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block head_title %}
-    Nueva cuenta | TrueNorth Analytics
+    {{ 'Editar cuenta' if editing else 'Nueva cuenta' }} | TrueNorth Analytics
 {% endblock %}
 
 {% block content %}
 {% include 'partials/flash_messages.html' %}
 
-<h1 class="font-serif-display text-3xl text-ink mb-6">Nueva cuenta</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-6">{{ 'Editar cuenta' if editing else 'Nueva cuenta' }}</h1>
 
 <div class="card p-6 max-w-lg">
     <form method="POST" class="space-y-4">
@@ -28,7 +28,14 @@
             {{ form.broker(class="tn-input", placeholder="ej. Questrade") }}
         </div>
 
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <div class="flex gap-2.5">
+            <button type="submit" class="btn btn-primary">
+                {{ 'Guardar cambios' if editing else 'Guardar' }}
+            </button>
+            {% if editing %}
+            <a href="{{ url_for('portfolio.list_accounts') }}" class="btn">Cancelar</a>
+            {% endif %}
+        </div>
     </form>
 </div>
 {% endblock %}

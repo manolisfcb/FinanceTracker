@@ -1,10 +1,19 @@
-from datetime import date
+from datetime import date, datetime
 from unittest.mock import MagicMock, patch
 
 import requests
 
 from src.forms.AccountForm import AccountForm
-from src.models import Account, AccountType, Asset, Fundamentals, FxRate, OrderModel
+from src.models import (
+    Account,
+    AccountType,
+    Asset,
+    Fundamentals,
+    FxRate,
+    OrderModel,
+    OrderType,
+    UserModel,
+)
 
 
 def test_account_form_offers_canadian_and_crypto_account_types(app):
@@ -24,6 +33,50 @@ def test_user_can_create_crypto_account(auth_client, db, user):
     assert response.status_code == 302
     account = Account.query.filter_by(user_id=user.id, name='Wealthsimple Crypto').one()
     assert account.type == AccountType.CRYPTO
+
+
+def test_user_can_edit_account_without_losing_its_orders(auth_client, db, user):
+    account = Account(
+        user_id=user.id, type=AccountType.TFSA, name='TFSA', broker='Wealthsimpe',
+    )
+    asset = Asset(
+        symbol='AAPL', yahoo_symbol='AAPL', exchange='US', currency='USD', name='Apple Inc.',
+    )
+    db.session.add_all([account, asset])
+    db.session.commit()
+    order = OrderModel(
+        user_id=user.id, account_id=account.id, asset_id=asset.id,
+        type=OrderType.BUY, quantity=0.23, price=440.15, fees=0,
+        currency='CAD', fx_rate_to_cad=1.0, executed_at=datetime(2026, 8, 19),
+    )
+    db.session.add(order)
+    db.session.commit()
+
+    edit_body = auth_client.get(f'/accounts/edit/{account.id}').get_data(as_text=True)
+    assert 'Editar cuenta' in edit_body
+    assert 'value="Wealthsimpe"' in edit_body
+
+    response = auth_client.post(
+        f'/accounts/edit/{account.id}',
+        data={'type': 'TFSA', 'name': 'TFSA', 'broker': 'Wealthsimple'},
+    )
+
+    assert response.status_code == 302
+    db.session.refresh(account)
+    assert account.broker == 'Wealthsimple'
+    assert OrderModel.query.filter_by(id=order.id, account_id=account.id).one()
+    assert f'/accounts/edit/{account.id}' in auth_client.get('/accounts').get_data(as_text=True)
+
+
+def test_user_cannot_edit_another_users_account(auth_client, db):
+    other = UserModel(username='other', email='other@example.com', password='password')
+    db.session.add(other)
+    db.session.commit()
+    account = Account(user_id=other.id, type=AccountType.CASH, name='Other Cash')
+    db.session.add(account)
+    db.session.commit()
+
+    assert auth_client.get(f'/accounts/edit/{account.id}').status_code == 404
 
 
 def test_user_can_add_fractional_bitcoin_order(auth_client, db, user):
@@ -84,6 +137,111 @@ def test_user_can_add_four_decimal_fractional_share_order(auth_client, db, user)
 
     orders_body = auth_client.get('/orders').get_data(as_text=True)
     assert '>0.2254</td>' in orders_body
+
+
+def test_user_can_edit_order_quantity_without_recreating_it(auth_client, db, user):
+    account = Account(user_id=user.id, type=AccountType.TFSA, name='TFSA')
+    asset = Asset(
+        symbol='AAPL', yahoo_symbol='AAPL', exchange='US', currency='USD', name='Apple Inc.',
+    )
+    db.session.add_all([account, asset])
+    db.session.commit()
+    order = OrderModel(
+        user_id=user.id, account_id=account.id, asset_id=asset.id,
+        type=OrderType.BUY, quantity=0.23, price=440.15, fees=0,
+        currency='CAD', fx_rate_to_cad=1.0, executed_at=datetime(2026, 8, 19),
+    )
+    db.session.add(order)
+    db.session.commit()
+    original_id = order.id
+
+    edit_body = auth_client.get(f'/orders/edit/{order.id}').get_data(as_text=True)
+    assert 'Editar orden' in edit_body
+    assert 'value="0.23"' in edit_body
+
+    response = auth_client.post(
+        f'/orders/edit/{order.id}',
+        data={
+            'account': str(account.id),
+            'broker': 'Wealthsimple',
+            'asset_symbol': 'AAPL',
+            'asset_id': str(asset.id),
+            'type': 'BUY',
+            'quantity': '0.2254',
+            'price': '440.15',
+            'fees': '0',
+            'currency': 'CAD',
+            'executed_at': '2026-08-19',
+        },
+    )
+
+    assert response.status_code == 302
+    assert OrderModel.query.filter_by(user_id=user.id).count() == 1
+    edited = db.session.get(OrderModel, original_id)
+    assert edited.quantity == 0.2254
+    assert edited.broker == 'Wealthsimple'
+
+    orders_body = auth_client.get('/orders').get_data(as_text=True)
+    assert '>0.2254</td>' in orders_body
+    assert f'/orders/edit/{original_id}' in orders_body
+
+
+def test_user_cannot_edit_another_users_order(auth_client, db):
+    other = UserModel(username='other', email='other@example.com', password='password')
+    db.session.add(other)
+    db.session.commit()
+    account = Account(user_id=other.id, type=AccountType.CASH, name='Other Cash')
+    asset = Asset(symbol='TD', yahoo_symbol='TD.TO', exchange='TSX', currency='CAD', name='TD')
+    db.session.add_all([account, asset])
+    db.session.commit()
+    order = OrderModel(
+        user_id=other.id, account_id=account.id, asset_id=asset.id,
+        type=OrderType.BUY, quantity=1, price=100, fees=0,
+        currency='CAD', fx_rate_to_cad=1.0, executed_at=datetime(2026, 8, 19),
+    )
+    db.session.add(order)
+    db.session.commit()
+
+    assert auth_client.get(f'/orders/edit/{order.id}').status_code == 404
+
+
+def test_editing_order_currency_recalculates_trade_fx(auth_client, db, user):
+    account = Account(user_id=user.id, type=AccountType.TFSA, name='TFSA')
+    asset = Asset(
+        symbol='AAPL', yahoo_symbol='AAPL', exchange='US', currency='USD', name='Apple Inc.',
+    )
+    db.session.add_all([account, asset])
+    db.session.commit()
+    order = OrderModel(
+        user_id=user.id, account_id=account.id, asset_id=asset.id,
+        type=OrderType.BUY, quantity=1, price=100, fees=0,
+        currency='CAD', fx_rate_to_cad=1.0, executed_at=datetime(2026, 8, 19),
+    )
+    db.session.add_all([
+        order,
+        FxRate(date=date(2026, 8, 19), pair='USDCAD', rate=1.3824),
+    ])
+    db.session.commit()
+
+    response = auth_client.post(
+        f'/orders/edit/{order.id}',
+        data={
+            'account': str(account.id),
+            'asset_symbol': 'AAPL',
+            'asset_id': str(asset.id),
+            'type': 'BUY',
+            'quantity': '1',
+            'price': '100',
+            'fees': '0',
+            'currency': 'USD',
+            'executed_at': '2026-08-19',
+        },
+    )
+
+    assert response.status_code == 302
+    db.session.refresh(order)
+    assert order.currency == 'USD'
+    assert order.fx_rate_to_cad == 1.3824
 
 
 def test_manual_order_currency_is_a_cad_usd_selector(auth_client, db, user):
@@ -174,7 +332,7 @@ def test_usd_manual_order_is_not_saved_without_an_fx_rate(mock_get, auth_client,
 
     assert response.status_code == 200
     assert OrderModel.query.filter_by(user_id=user.id).count() == 0
-    assert 'La orden no se guardó' in response.get_data(as_text=True)
+    assert 'Los cambios no se guardaron' in response.get_data(as_text=True)
 
 
 def test_asset_autocomplete_searches_symbol_and_company_name(auth_client, db):

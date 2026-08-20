@@ -53,7 +53,9 @@
                         <td class="num">{{ order.fees }}</td>
                         <td>{{ order.currency }}</td>
                         <td>{{ order.broker or '—' }}</td>
-                        <td>
+                        <td class="whitespace-nowrap">
+                            <a href="{{ url_for('portfolio.edit_order', id=order.id) }}"
+                               class="text-muted2 hover:text-ink mr-3" title="Editar">Editar</a>
                             <a hx-delete="{{ url_for('portfolio.delete_order', id=order.id) }}"
                                hx-confirm="¿Seguro que quieres eliminar esta orden?"
                                hx-on="afterRequest: window.location.reload()"

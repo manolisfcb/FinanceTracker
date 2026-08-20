@@ -327,15 +327,12 @@ a:hover { color: var(--tn-maple-dark); }
 
 .tn-help-bubble {
   display: none;
-  position: absolute;
-  bottom: calc(100% + 7px);
-  /* Keep the absolutely positioned bubble as one composited box. Chromium
-     otherwise fragments it across the balanced `.tn-ind-groups` columns,
-     painting the first lines at the bottom of the previous column. */
-  transform: translateZ(0);
-  /* Above the tiles and cards that come later in the flow, which would
-     otherwise paint over a bubble escaping its own tile. */
-  z-index: 60;
+  /* JS moves visible bubbles to <body>. Keeping them outside the multicolumn
+     indicator layout prevents Chromium from fragmenting a single tooltip
+     between two columns. */
+  position: fixed;
+  z-index: 100;
+  width: min(280px, calc(100vw - 24px));
   padding: 9px 11px;
   border-radius: 8px;
   background: var(--tn-ink);
@@ -350,22 +347,13 @@ a:hover { color: var(--tn-maple-dark); }
   text-transform: none;
   white-space: normal;
   cursor: auto;
+  pointer-events: none;
 }
-.tn-help:hover .tn-help-bubble,
-.tn-help:focus-visible .tn-help-bubble,
-.tn-help.is-open .tn-help-bubble { display: block; }
+.tn-help-bubble.is-visible { display: block; }
 
-/* A tile is far too narrow for a paragraph, so the bubble spans the group
-   column: two tiles wide plus the 8px gap between them, opening rightwards
-   from the left tile and leftwards from the right one. That keeps it inside
-   the card at every breakpoint without needing to measure anything. */
-.ind:nth-child(odd) .tn-help-bubble { left: 0; width: calc(200% + 8px); }
-.ind:nth-child(even) .tn-help-bubble { right: 0; width: calc(200% + 8px); }
-
-/* Outside the tile grid (the "Datos clave" rows), the row itself is the
-   anchor and the bubble spans it. */
+/* Used by the "Datos clave" rows for their own layout. Tooltip positioning
+   is viewport-relative and handled in help_tips.js. */
 .tn-help-row { position: relative; }
-.tn-help-row > * > .tn-help > .tn-help-bubble { left: 0; right: 0; width: auto; }
 
 /* Portfolio account filter chips */
 .chip {
@@ -488,7 +476,7 @@ a:hover { color: var(--tn-maple-dark); }
   color: var(--tn-muted-2);
 }
 
-/* Company mark shared by the screener's compact row and card header. The
+/* Company mark shared by the screener and company-detail headers. The
    surrounding tile keeps favicons with transparent or white canvases legible
    without changing the rhythm of either layout. */
 .company-icon {
@@ -503,7 +491,19 @@ a:hover { color: var(--tn-maple-dark); }
 }
 .company-icon-sm { width: 30px; height: 30px; }
 .company-icon-md { width: 36px; height: 36px; }
+.company-icon-lg { width: 48px; height: 48px; border-radius: 10px; }
 .company-icon img { width: 72%; height: 72%; object-fit: contain; }
+.company-icon-fallback {
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--tn-input-bg);
+  color: var(--tn-muted-2);
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 18px;
+}
+.company-icon-lg .company-icon-fallback { font-size: 22px; }
 
 /* One indicator inside a screener card. */
 .stat {

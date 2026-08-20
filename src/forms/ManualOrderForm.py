@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired, Optional
 
 class ManualOrderForm(FlaskForm):
     account = SelectField('Cuenta', choices=[], validators=[DataRequired()])
+    broker = StringField('Broker', validators=[Optional()])
     asset_symbol = StringField('Activo', validators=[DataRequired()])
     asset_id = HiddenField(validators=[Optional()])
     type = SelectField('Tipo', choices=[('BUY', 'Comprar'), ('SELL', 'Vender')], validators=[DataRequired()])

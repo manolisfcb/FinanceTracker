@@ -40,6 +40,19 @@ def test_stock_detail_renders_asset_info(mock_get_provider, auth_client, db):
 
 
 @patch('src.routes.stockViews.get_provider')
+def test_stock_detail_uses_company_icon_with_initial_fallback(mock_get_provider, auth_client, db):
+    mock_get_provider.return_value.get_quote.return_value = None
+    _seed_asset(db, logo_url='https://logo.clearbit.com/rbc.com')
+
+    body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
+
+    assert 'company-icon company-icon-lg' in body
+    assert 'https://www.google.com/s2/favicons?domain=rbc.com&amp;sz=128' in body
+    assert 'logo.clearbit.com' not in body
+    assert 'company-icon-fallback' in body
+
+
+@patch('src.routes.stockViews.get_provider')
 def test_stock_detail_shows_day_change_from_live_quote(mock_get_provider, auth_client, db):
     mock_get_provider.return_value.get_quote.return_value = {
         'price': 150.0, 'previous_close': 145.0, 'currency': 'CAD',

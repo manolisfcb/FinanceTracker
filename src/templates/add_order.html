@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block head_title %}
-    Nueva orden | TrueNorth Analytics
+    {{ 'Editar orden' if editing else 'Nueva orden' }} | TrueNorth Analytics
 {% endblock %}
 
 {% block content %}
 {% include 'partials/flash_messages.html' %}
 
-<h1 class="font-serif-display text-3xl text-ink mb-6">Nueva orden</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-6">{{ 'Editar orden' if editing else 'Nueva orden' }}</h1>
 
 <div class="card p-6 max-w-lg">
     <form method="POST" class="space-y-4">
@@ -16,6 +16,11 @@
         <div class="space-y-1.5">
             <label class="text-[13px] text-muted2">{{ form.account.label.text }}</label>
             {{ form.account(class="tn-input") }}
+        </div>
+
+        <div class="space-y-1.5">
+            <label class="text-[13px] text-muted2">{{ form.broker.label.text }}</label>
+            {{ form.broker(class="tn-input", placeholder="ej. Wealthsimple") }}
         </div>
 
         <div class="space-y-1.5">
@@ -89,7 +94,14 @@
             {{ form.executed_at(class="tn-input", type="date") }}
         </div>
 
-        <button type="submit" class="btn btn-primary">Guardar orden</button>
+        <div class="flex gap-2.5">
+            <button type="submit" class="btn btn-primary">
+                {{ 'Guardar cambios' if editing else 'Guardar orden' }}
+            </button>
+            {% if editing %}
+            <a href="{{ url_for('portfolio.list_orders') }}" class="btn">Cancelar</a>
+            {% endif %}
+        </div>
     </form>
 </div>
 {% endblock %}

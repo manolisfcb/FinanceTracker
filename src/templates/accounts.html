@@ -30,7 +30,9 @@
                         <td class="font-semibold">{{ account.name }}</td>
                         <td>{{ account.type.value }}</td>
                         <td>{{ account.broker or '—' }}</td>
-                        <td>
+                        <td class="whitespace-nowrap">
+                            <a href="{{ url_for('portfolio.edit_account', id=account.id) }}"
+                               class="text-muted2 hover:text-ink mr-3" title="Editar">Editar</a>
                             <a hx-delete="{{ url_for('portfolio.delete_account', id=account.id) }}"
                                hx-confirm="¿Seguro que quieres eliminar esta cuenta?"
                                hx-on="afterRequest: window.location.reload()"
