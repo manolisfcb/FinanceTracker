@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+    Inbox | TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<div class="flex items-end justify-between mb-5">
+    <div>
+        <h1 class="font-serif-display text-3xl text-ink mb-1">Inbox</h1>
+        <div class="text-[13px] text-muted">Hechos relevantes de las empresas de tu portafolio</div>
+    </div>
+    <button class="btn"
+            hx-post="{{ url_for('inbox.mark_all_read') }}"
+            hx-on="afterRequest: window.location.reload()">Marcar todo como leído</button>
+</div>
+
+<div id="inbox-panel">
+    {% include 'partials/inbox_timeline.html' %}
+</div>
+{% endblock %}

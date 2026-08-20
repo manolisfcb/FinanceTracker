@@ -1,9 +1,15 @@
 import os
 
 import flask
+from flask_login import current_user
 from flask_restful import Api
 
 from src.extensions import db, migration, jwt, login_manager, htmx, scheduler
+
+MONTHS_ES = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+]
 
 CONFIG_MAP = {
     "development": "config.DevelopmentConfig",
@@ -53,6 +59,8 @@ def create_app(config_name=None):
     from src.routes.portfolio import portfolio_bp
     from src.routes.stockViews import stocks_bp
     from src.routes.personal_finance import personal_finance_bp
+    from src.routes.dividends import dividends_bp
+    from src.routes.inbox import inbox_bp, unread_inbox_count
 
     # Importing these registers their view functions onto the blueprints
     # above (decorator side effects) — the imports themselves are unused.
@@ -67,6 +75,14 @@ def create_app(config_name=None):
     app.register_blueprint(portfolio_bp)
     app.register_blueprint(stocks_bp)
     app.register_blueprint(personal_finance_bp)
+    app.register_blueprint(dividends_bp)
+    app.register_blueprint(inbox_bp)
+
+    @app.context_processor
+    def inject_unread_inbox_count():
+        if not current_user.is_authenticated:
+            return {}
+        return {"unread_inbox_count": unread_inbox_count(current_user.id)}
 
     api = Api(app)
     from src.routes import stockResources
@@ -95,6 +111,18 @@ def create_app(config_name=None):
             return "—"
         return f"{value * 100:.2f}%"
 
+    @app.template_filter("date_es")
+    def format_date_es_filter(value):
+        if value is None:
+            return "—"
+        return f"{value.day} de {MONTHS_ES[value.month - 1]}"
+
+    @app.template_filter("month_abbr_es")
+    def format_month_abbr_es_filter(value):
+        if value is None:
+            return "—"
+        return MONTHS_ES[value.month - 1][:3]
+
     @app.template_filter("compact_number")
     def format_compact_number_filter(value):
         if value is None:
@@ -114,6 +142,8 @@ def create_app(config_name=None):
         from src.resources.jobs import refresh_quotes  # noqa: F401
         from src.resources.jobs import refresh_fx  # noqa: F401
         from src.resources.jobs import refresh_snapshots  # noqa: F401
+        from src.resources.jobs import refresh_dividends  # noqa: F401
+        from src.resources.jobs import refresh_company_events  # noqa: F401
 
         if not scheduler.running:
             scheduler.start()

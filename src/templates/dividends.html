@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+    Dividendos | TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<div class="mb-5">
+    <h1 class="font-serif-display text-3xl text-ink mb-1">Dividendos</h1>
+    <div class="text-[13px] text-muted">Ingresos pasivos de tu portafolio, en CAD</div>
+</div>
+
+{% if warnings %}
+<div class="tn-alert tn-alert-info mb-5">
+    <span>{{ warnings|length }} advertencia(s) en el cálculo de dividendos — {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
+</div>
+{% endif %}
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-4">
+    <div class="card p-4">
+        <div class="lbl mb-2">Recibidos 12m</div>
+        <div class="num text-xl font-semibold">C$ {{ kpis.received_12m_cad|currency }}</div>
+        {% if kpis.change_vs_previous_percent is not none %}
+        <div class="num text-[12px] mt-1.5 {{ 'pos' if kpis.change_vs_previous_percent >= 0 else 'neg' }}">
+            {{ '+' if kpis.change_vs_previous_percent >= 0 }}{{ kpis.change_vs_previous_percent|ratio }}% vs. año anterior
+        </div>
+        {% else %}
+        <div class="text-[12px] text-muted mt-1.5">sin histórico previo</div>
+        {% endif %}
+    </div>
+    <div class="card p-4">
+        <div class="lbl mb-2">Promedio mensual</div>
+        <div class="num text-xl font-semibold">C$ {{ kpis.monthly_average_cad|currency }}</div>
+        <div class="text-[12px] text-muted mt-1.5">últimos 12 meses</div>
+    </div>
+    <div class="card p-4">
+        <div class="lbl mb-2">Próximo pago</div>
+        {% if kpis.next_payment %}
+        <div class="num text-xl font-semibold">
+            {% if kpis.next_payment.estimated_cad is not none %}C$ {{ kpis.next_payment.estimated_cad|currency }}{% else %}—{% endif %}
+        </div>
+        <div class="text-[12px] text-muted mt-1.5">{{ kpis.next_payment.symbol }} · {{ kpis.next_payment.event_date|date_es }}</div>
+        {% else %}
+        <div class="num text-xl font-semibold">—</div>
+        <div class="text-[12px] text-muted mt-1.5">sin ex-dates anunciadas</div>
+        {% endif %}
+    </div>
+    <div class="card p-4">
+        <div class="lbl mb-2">Proyección 12m</div>
+        <div class="num text-xl font-semibold">C$ {{ kpis.projection_12m_cad|currency }}</div>
+        <div class="text-[12px] text-muted mt-1.5">al ritmo actual de pagos</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-4">
+    <div class="card p-5 md:col-span-2">
+        <div class="text-sm font-semibold mb-3">Recibidos por mes</div>
+        <canvas id="monthlyDividendsChart" height="80"></canvas>
+    </div>
+
+    <div class="card p-5">
+        <div class="text-sm font-semibold mb-3">Calendario próximo</div>
+        {% if calendar %}
+        <div class="flex flex-col gap-3">
+            {% for entry in calendar %}
+            <div class="flex items-center gap-3">
+                <div class="w-11 text-center border border-border rounded-lg py-1 bg-[#fbfaf8]">
+                    <div class="text-[9.5px] font-bold tracking-wider uppercase text-maple">{{ entry.event_date|month_abbr_es }}</div>
+                    <div class="num text-base font-semibold">{{ '%02d'|format(entry.event_date.day) }}</div>
+                </div>
+                <div class="flex-1 text-[12.5px]">
+                    <span class="font-semibold">{{ entry.symbol }}</span> ex-dividend
+                    <div class="text-muted text-[11.5px]">
+                        {% if entry.amount_per_share %}{{ entry.currency }} {{ entry.amount_per_share|currency }}/acción · {% endif %}{{ entry.quantity|round(2) }} acciones
+                    </div>
+                </div>
+                <span class="num text-[13px] font-semibold">
+                    {% if entry.estimated_cad is not none %}C$ {{ entry.estimated_cad|currency }}{% else %}—{% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-[13px] text-faint py-4">Todavía no hay ex-dates anunciadas para tus posiciones.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% if suggestions %}
+<div class="card p-5 mb-4">
+    <div class="text-sm font-semibold mb-1">Dividendos sugeridos</div>
+    <div class="text-[12px] text-muted mb-3">
+        Calculados desde el histórico de pagos y tus posiciones a la ex-date. Confirmá los que
+        recibiste de verdad para que dejen de ser estimados.
+    </div>
+    <div class="overflow-x-auto">
+        <table class="tn-card-table">
+            <thead>
+                <tr>
+                    <th>Fecha de pago</th>
+                    <th>Activo</th>
+                    <th>Acciones</th>
+                    <th>Monto</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in suggestions %}
+                {% include 'partials/dividend_suggestion_row.html' %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="card overflow-hidden">
+    <div class="px-5 pt-4 pb-1 text-sm font-semibold">Por posición</div>
+    <div class="overflow-x-auto">
+        <table class="tn-card-table">
+            <thead>
+                <tr>
+                    <th>Activo</th>
+                    <th>Yield actual</th>
+                    <th>Yield on cost</th>
+                    <th>Recibido 12m</th>
+                    <th>Recibido total</th>
+                    <th>Frecuencia</th>
+                    <th>% del ingreso</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if positions %}
+                    {% for row in positions %}
+                    <tr>
+                        <td class="font-semibold">
+                            <a href="{{ url_for('stocks.get_stock_detail', exchange=row.exchange, symbol=row.symbol) }}">{{ row.symbol }}</a>
+                            <div class="text-[11.5px] text-muted font-normal">{{ row.name }}</div>
+                        </td>
+                        <td class="num">{{ row.current_yield|percent }}</td>
+                        <td class="num">{{ row.yoc|percent }}</td>
+                        <td class="num">{{ row.received_12m_cad|currency }}</td>
+                        <td class="num">{{ row.received_total_cad|currency }}</td>
+                        <td>{{ row.frequency or '—' }}</td>
+                        <td class="num font-semibold">
+                            {% if row.income_share_percent is not none %}{{ row.income_share_percent|ratio }}%{% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-faint py-6">
+                            Todavía no hay posiciones con dividendos. Registrá órdenes y esperá al próximo refresh.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+    Chart.defaults.color = '#6f6b60';
+
+    new Chart(document.getElementById('monthlyDividendsChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: {{ monthly|map(attribute='month')|map('month_abbr_es')|list|tojson }},
+            datasets: [{
+                label: 'Dividendos (CAD)',
+                data: {{ monthly|map(attribute='total_cad')|list|tojson }},
+                backgroundColor: '#d9d5cb',
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, grid: { color: '#efede7' } }
+            }
+        }
+    });
+</script>
+{% endblock %}

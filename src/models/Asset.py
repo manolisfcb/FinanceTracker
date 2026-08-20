@@ -20,6 +20,9 @@ class Asset(db.Model):
     ir_website = db.Column(db.String(255), nullable=True)
     logo_url = db.Column(db.String(255), nullable=True)
     description = db.Column(db.Text, nullable=True)
+    # SEC EDGAR filings are addressed by CIK, not ticker. Filled lazily by the
+    # company-events job for held US assets only, not for the whole universe.
+    cik = db.Column(db.String(10), nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __repr__(self):
@@ -40,5 +43,6 @@ class Asset(db.Model):
             "ir_website": self.ir_website,
             "logo_url": self.logo_url,
             "description": self.description,
+            "cik": self.cik,
             "is_active": self.is_active,
         }

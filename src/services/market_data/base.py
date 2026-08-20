@@ -27,6 +27,12 @@ class MarketDataProvider(ABC):
         """Dividend history: list of {ex_date, pay_date, amount, currency}."""
 
     @abstractmethod
+    def get_calendar(self, yahoo_symbol: str) -> dict | None:
+        """Announced upcoming dates:
+        {ex_dividend_date, dividend_pay_date, next_earnings_date}.
+        Any key may be None when the company hasn't announced that date yet."""
+
+    @abstractmethod
     def get_price_history(self, yahoo_symbol: str, range_key: str) -> list[dict]:
         """EOD close price series for a chart range ('1M', '6M', '1Y', '5Y'):
         list of {date, close}, oldest first."""

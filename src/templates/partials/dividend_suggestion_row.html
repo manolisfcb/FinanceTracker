@@ -1,0 +1,21 @@
+<tr id="suggestion-{{ row.id }}">
+    <td class="num">{{ row.pay_date.strftime('%Y-%m-%d') }}</td>
+    <td class="font-semibold">
+        {{ row.symbol }}
+        <div class="text-[11.5px] text-muted font-normal">{{ row.name }}</div>
+    </td>
+    <td class="num">{{ row.quantity_held|round(2) }}</td>
+    <td class="num">{{ row.currency }} {{ row.total_amount|currency }}</td>
+    <td>
+        <div class="flex gap-2 justify-end">
+            <button class="btn btn-primary"
+                    hx-post="{{ url_for('dividends.confirm_dividend', dividend_id=row.id) }}"
+                    hx-target="#suggestion-{{ row.id }}"
+                    hx-swap="outerHTML">Confirmar</button>
+            <button class="btn"
+                    hx-post="{{ url_for('dividends.dismiss_dividend', dividend_id=row.id) }}"
+                    hx-target="#suggestion-{{ row.id }}"
+                    hx-swap="outerHTML">Descartar</button>
+        </div>
+    </td>
+</tr>

@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
@@ -172,6 +173,34 @@ def test_get_dividends_returns_empty_list_when_no_history(mock_ticker_cls):
     mock_ticker_cls.return_value = mock_ticker
 
     assert _provider().get_dividends('RY.TO') == []
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_calendar_normalizes_dates(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.calendar = {
+        'Earnings Date': [date(2026, 8, 27), date(2026, 8, 28)],
+        'Ex-Dividend Date': datetime(2026, 8, 20, 9, 30),
+        'Dividend Date': pd.Timestamp('2026-09-01'),
+    }
+    mock_ticker_cls.return_value = mock_ticker
+
+    calendar = _provider().get_calendar('RY.TO')
+
+    assert calendar == {
+        'ex_dividend_date': date(2026, 8, 20),
+        'dividend_pay_date': date(2026, 9, 1),
+        'next_earnings_date': date(2026, 8, 27),
+    }
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_calendar_is_none_when_yahoo_has_nothing(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.calendar = {}
+    mock_ticker_cls.return_value = mock_ticker
+
+    assert _provider().get_calendar('RY.TO') is None
 
 
 def _history_frame():

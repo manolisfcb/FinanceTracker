@@ -15,6 +15,9 @@ class DividendReceived(db.Model):
     total_amount = db.Column(db.Float, nullable=False)
     currency = db.Column(db.String(3), nullable=False)
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    # Suggested rows the user rejected. Without this flag, deleting one would
+    # just be recreated by the next sync_suggested_dividends() run.
+    dismissed = db.Column(db.Boolean, nullable=False, default=False)
 
     user = db.relationship('UserModel', backref='dividends_received', lazy=True)
     asset = db.relationship('Asset', backref='dividends_received', lazy=True)
@@ -32,4 +35,5 @@ class DividendReceived(db.Model):
             "total_amount": self.total_amount,
             "currency": self.currency,
             "confirmed": self.confirmed,
+            "dismissed": self.dismissed,
         }

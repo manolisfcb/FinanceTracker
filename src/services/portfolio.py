@@ -318,7 +318,7 @@ class PortfolioService:
             existing = DividendReceived.query.filter_by(
                 user_id=self.user_id, asset_id=dh.asset_id, pay_date=pay_date
             ).first()
-            if existing is not None and existing.confirmed:
+            if existing is not None and (existing.confirmed or existing.dismissed):
                 continue
 
             total_amount = quantity_held * dh.amount

@@ -11,6 +11,8 @@ PROTECTED_ROUTES = [
     "/orders/add",
     "/accounts",
     "/accounts/add",
+    "/dividends",
+    "/inbox",
 ]
 
 

@@ -149,6 +149,39 @@
     </div>
 </div>
 
+<!-- Hechos relevantes -->
+<div class="card p-5 mb-5">
+    <div class="flex items-center justify-between mb-3">
+        <div class="text-sm font-semibold">Hechos relevantes</div>
+        {% if next_earnings %}
+        <div class="text-[12px] text-muted2">
+            Próximos resultados: <span class="num font-semibold text-ink">{{ next_earnings.event_date|date_es }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if filings %}
+    <div class="flex flex-col gap-2.5">
+        {% for filing in filings %}
+        <div class="flex items-center gap-3 text-[13px]">
+            <span class="num text-[11.5px] text-faint w-20 shrink-0">{{ filing.event_date }}</span>
+            <span class="flex-1">{{ filing.summary or filing.title }}</span>
+            <a href="{{ filing.url }}" target="_blank" rel="noopener" class="font-semibold text-[12.5px] shrink-0">Ver en EDGAR ↗</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-[13px] text-faint">
+        {% if asset.currency == 'CAD' %}
+        SEDAR+ no tiene API pública, así que los filings canadienses no se ingestan.
+        <a href="{{ sedar_search_url }}" target="_blank" rel="noopener" class="font-semibold">Buscar {{ asset.name }} en SEDAR+ ↗</a>
+        {% else %}
+        Sin filings registrados todavía.
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
 <!-- Description -->
 <div class="card p-5 mb-5">
     <div class="text-sm font-semibold mb-3">Sobre {{ asset.name }}</div>

@@ -1,6 +1,6 @@
 import csv
 import io
-from urllib.parse import urlencode
+from urllib.parse import quote_plus, urlencode
 
 from flask import Blueprint, Response, abort, jsonify, render_template, request
 from flask_login import login_required
@@ -8,10 +8,13 @@ from sqlalchemy import and_, func, or_
 
 from src.extensions import db
 from src.forms.StockForm import Stock
-from src.models import Asset, DividendHistory, Fundamentals
+from src.models import Asset, CompanyEvent, CompanyEventKind, DividendHistory, Fundamentals
 from src.services.market_data import get_provider
 
 stocks_bp = Blueprint('stocks', __name__)
+
+# SEDAR+ has no public API, so Canadian filings are a search link, not data.
+SEDAR_SEARCH_URL = "https://www.sedarplus.ca/csa-party/records/searchIssuer.html?keyword={query}"
 
 # (query key, column header) — drives both the table and the CSV export, in
 # display order. 'symbol' renders as "Activo" (symbol + name stacked).
@@ -317,6 +320,19 @@ def get_stock_detail(exchange, symbol):
     if price is not None:
         form.price.data = price
 
+    next_earnings = (
+        CompanyEvent.query
+        .filter_by(asset_id=asset.id, kind=CompanyEventKind.EARNINGS)
+        .first()
+    )
+    filings = (
+        CompanyEvent.query
+        .filter_by(asset_id=asset.id, kind=CompanyEventKind.FILING)
+        .order_by(CompanyEvent.published_at.desc())
+        .limit(10)
+        .all()
+    )
+
     context = {
         'asset': asset,
         'fundamentals': fundamentals,
@@ -328,6 +344,9 @@ def get_stock_detail(exchange, symbol):
         'dividends': dividends,
         'dividend_years': list(dividend_years),
         'dividend_totals': list(dividend_totals),
+        'next_earnings': next_earnings,
+        'filings': filings,
+        'sedar_search_url': SEDAR_SEARCH_URL.format(query=quote_plus(asset.name)),
         'form': form,
     }
     return render_template('stocks/company.html', **context)

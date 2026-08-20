@@ -19,6 +19,11 @@ class Config(object):
     # yahoo (yfinance, free/MVP) today; swappable to eodhd|fmp later without
     # touching the domain — see src/services/market_data.
     MARKET_DATA_PROVIDER = os.getenv("MARKET_DATA_PROVIDER", "yahoo")
+    # SEC's fair access policy requires a User-Agent naming the app and a
+    # contact email, or EDGAR returns 403.
+    SEC_EDGAR_USER_AGENT = os.getenv(
+        "SEC_EDGAR_USER_AGENT", "TrueNorth Analytics mmedinac26@gmail.com"
+    )
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

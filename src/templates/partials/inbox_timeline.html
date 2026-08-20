@@ -1,0 +1,61 @@
+{% set kind_styles = {
+    'DIVIDEND': ('bg-[#f3ece3]', 'text-[#b98a2e]', 'Dividendo'),
+    'EARNINGS': ('bg-[#e9efe9]', 'text-[#1a7f4e]', 'Resultados'),
+    'FILING':   ('bg-[#eceef2]', 'text-[#4a6b8a]', 'Filing'),
+    'NEWS':     ('bg-[#f6e9e8]', 'text-[#c23934]', 'Noticia'),
+} %}
+
+<div class="flex gap-2 mb-4">
+    {% for kind, label in kind_filters %}
+    <button class="btn {{ 'btn-primary' if selected_kind == kind }}"
+            hx-get="{{ url_for('inbox.inbox_page', kind=kind.value if kind else None) }}"
+            hx-target="#inbox-panel"
+            hx-swap="innerHTML"
+            hx-push-url="true">{{ label }}</button>
+    {% endfor %}
+</div>
+
+{% if groups %}
+    {% for group in groups %}
+    <div class="lbl mt-5 mb-2">
+        {% if group.relative %}{{ group.relative }} · {% endif %}{{ group.day|date_es }}
+    </div>
+    <div class="card overflow-hidden">
+        {% for event in group.events %}
+        {% set style = kind_styles.get(event.kind.value, ('bg-[#eceef2]', 'text-[#4a6b8a]', event.kind.value)) %}
+        <div class="flex gap-3.5 px-5 py-3.5 border-b border-[#f0eee8] last:border-b-0 {{ '' if event.read else 'bg-[#fdfcfa]' }}">
+            <div class="w-2 h-2 rounded-full mt-3.5 shrink-0 {{ 'bg-maple' if not event.read }}"></div>
+            <div class="flex-1">
+                <div class="flex items-center gap-2.5 mb-1">
+                    <span class="font-semibold text-[13.5px] {{ 'text-muted2' if event.read }}">
+                        {% if event.asset %}
+                        <a href="{{ url_for('stocks.get_stock_detail', exchange=event.asset.exchange, symbol=event.asset.symbol) }}">{{ event.asset.symbol }} · {{ event.asset.name }}</a>
+                        {% else %}{{ event.title }}{% endif %}
+                    </span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 {{ style[0] }} {{ style[1] }}">{{ style[2] }}</span>
+                </div>
+                <div class="text-[13px] leading-relaxed {{ 'text-muted' if event.read else 'text-[#4a463d]' }}">
+                    {{ event.summary or event.title }}
+                    {% if event.url %}
+                    <a href="{{ event.url }}" target="_blank" rel="noopener" class="font-semibold">Ver en EDGAR ↗</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex flex-col items-end gap-1.5">
+                <span class="num text-[11.5px] text-faint whitespace-nowrap">{{ event.published_at.strftime('%H:%M') }}</span>
+                {% if not event.read %}
+                <button class="text-[11.5px] text-muted2 hover:text-ink"
+                        hx-post="{{ url_for('inbox.mark_read', event_id=event.id) }}"
+                        hx-on="afterRequest: window.location.reload()">Marcar leído</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+{% else %}
+<div class="card p-8 text-center text-faint text-[13px]">
+    No hay hechos relevantes todavía. Aparecen acá cuando las empresas de tu portafolio publican
+    filings, resultados o anuncios de dividendo.
+</div>
+{% endif %}

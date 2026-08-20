@@ -1,5 +1,6 @@
 import random
 import time
+from datetime import date, datetime
 
 import yfinance as yf
 
@@ -21,6 +22,17 @@ _price_history_cache: dict[tuple[str, str], tuple[float, list[dict]]] = {}
 
 def _as_fraction(percent_value):
     return percent_value / 100 if percent_value is not None else None
+
+
+def _as_date(value):
+    """yfinance's calendar mixes date, datetime and pandas Timestamp."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    return value.date() if hasattr(value, "date") else None
 
 
 class YahooProvider(MarketDataProvider):
@@ -152,6 +164,21 @@ class YahooProvider(MarketDataProvider):
                 })
             return events
         return self._with_retries(_fetch) or []
+
+    def get_calendar(self, yahoo_symbol: str) -> dict | None:
+        def _fetch():
+            calendar = self._ticker(yahoo_symbol).calendar
+            if not calendar:
+                return None
+            earnings = calendar.get("Earnings Date")
+            if isinstance(earnings, (list, tuple)):
+                earnings = earnings[0] if earnings else None
+            return {
+                "ex_dividend_date": _as_date(calendar.get("Ex-Dividend Date")),
+                "dividend_pay_date": _as_date(calendar.get("Dividend Date")),
+                "next_earnings_date": _as_date(earnings),
+            }
+        return self._with_retries(_fetch)
 
     def get_price_history(self, yahoo_symbol: str, range_key: str) -> list[dict]:
         period = _PRICE_HISTORY_PERIODS.get(range_key, _PRICE_HISTORY_PERIODS["1Y"])

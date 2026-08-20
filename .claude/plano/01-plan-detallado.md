@@ -230,18 +230,37 @@ automatizados para los casos sin datos).
 > (dividendos propios, filings regulatorios, earnings) de la parte de noticias de terceros (Fase 4b),
 > porque tienen fuentes, formato de dato y criterio de salida distintos.
 
-- [ ] `[M]` `/dividends` (Proventos): recibidos por mes (gráfico barras), YoC por posición,
+- [x] `[M]` `/dividends` (Proventos): recibidos por mes (gráfico barras), YoC por posición,
       proyección próximos 12 meses, calendario de ex-dates y pay-dates de las posiciones.
-- [ ] `[L]` Hechos relevantes regulatorios:
-      - US: job que consulta **SEC EDGAR** (API pública JSON) para 8-K/10-Q/10-K de assets en portafolio → tabla `CompanyEvent` (`source=EDGAR`).
-      - Canadá: **SEDAR+ no tiene API pública** → por ahora solo link directo a la búsqueda SEDAR+
-        de la empresa (sin ingestión estructurada); evaluar proveedor pago (QuoteMedia) si se vuelve crítico.
-- [ ] `[S]` Calendario de earnings (yfinance calendar) en página de empresa y en inbox.
-- [ ] `[M]` `/inbox`: timeline de eventos de las empresas del portafolio (dividendo anunciado, filing EDGAR,
-      earnings) con marcado leído/no leído. Se extiende en Fase 4b para incluir noticias.
+      **Agregado durante la ejecución**: nada poblaba `DividendHistory` (el provider tenía
+      `get_dividends()` pero ningún job lo llamaba), así que se sumó el job `refresh_dividends`
+      (solo assets con órdenes, no las 722 del universo). También se agregó UI de confirmar/descartar
+      las `DividendReceived` sugeridas (columna nueva `dismissed`) — sin eso, `confirmed` no tenía
+      forma de volverse `True` y la pantalla quedaba llena de estimados permanentes.
+- [x] `[L]` Hechos relevantes regulatorios:
+      - US: job `refresh_company_events` consulta **SEC EDGAR** (API pública JSON) para 8-K/10-Q/10-K
+        de assets en portafolio → tabla `CompanyEvent` (`source=EDGAR`). CIK resuelto desde el mapa
+        público ticker→CIK de SEC y persistido en `Asset.cik` (solo para US en cartera).
+      - Canadá: **SEDAR+ no tiene API pública** → link directo a la búsqueda SEDAR+ en la página de
+        empresa (sin ingestión estructurada); evaluar proveedor pago (QuoteMedia) si se vuelve crítico.
+- [x] `[S]` Calendario de earnings (yfinance `.calendar`, nuevo método `get_calendar` en el provider)
+      en página de empresa y en inbox — persistido como `CompanyEvent(kind=EARNINGS)`, una fila por
+      asset actualizada in situ (la fecha estimada se mueve; una fila por corrida acumularía basura).
+- [x] `[M]` `/inbox`: timeline de eventos de las empresas del portafolio (dividendo anunciado, filing
+      EDGAR, earnings) con marcado leído/no leído (`CompanyEventRead`, presencia = leído) y badge de
+      no leídos en el nav. Se extiende en Fase 4b para incluir noticias.
 
-**Criterio de salida**: posiciones con dividendos reales muestran YoC/proyección/calendario correctos;
-un asset US en portafolio con filings recientes en EDGAR aparece en su página y en el inbox.
+**Criterio de salida**: ✅ verificado contra la DB de dev real (Yahoo ya no rate-limitea desde este
+entorno, a diferencia de Fases 1–3): `refresh_dividends` trajo **1498 dividendos históricos reales**
+de los 37 assets en cartera + 3 ex-dates futuras, `refresh_company_events` escribió 10 earnings, y
+EDGAR en vivo devolvió **15 filings reales de AAPL** (10-Q/8-K con links a sec.gov). `/dividends`
+genera 479 sugerencias, infiere frecuencia (Mensual/Trimestral) y `/inbox` lista 13 eventos con
+filtros y leído/no leído.
+
+**Hallazgo durante la ejecución**: la cartera de dev es casi toda BRL legacy y **no hay `FxRate`
+BRL→CAD**, así que todos los importes en CAD dan 0. Se agregó un banner de advertencia (mismo patrón
+que `PortfolioService.warnings` en `/portfolio`) en vez de mostrar `C$0,00` silenciosamente. Para ver
+números reales hace falta o una fuente de FX BRL→CAD o una cartera CA/US.
 
 ---
 
