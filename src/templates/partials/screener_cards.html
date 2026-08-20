@@ -1,0 +1,82 @@
+{% from 'partials/screener_pagination.html' import screener_pagination %}
+{% from 'partials/company_icon.html' import company_icon %}
+{% if rows %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+    {% for asset, fundamentals in rows %}
+    {% set change = price_changes.get(asset.id) %}
+    <div class="card px-5 py-[18px]"
+         data-row-href="{{ url_for('stocks.get_stock_detail', exchange=asset.exchange, symbol=asset.symbol) }}">
+        <div class="flex justify-between items-start gap-3 mb-3">
+            <div class="flex items-center gap-2.5 min-w-0">
+                {{ company_icon(asset, 'md') }}
+                <div class="min-w-0">
+                    <div class="flex items-baseline gap-2">
+                        <a href="{{ url_for('stocks.get_stock_detail', exchange=asset.exchange, symbol=asset.symbol) }}"
+                           class="font-bold text-base text-ink hover:text-maple" hx-boost="false">{{ asset.symbol }}</a>
+                        <span class="num text-[10.5px] text-faint font-semibold">{{ asset.exchange }}</span>
+                    </div>
+                    <div class="text-[12px] text-muted mt-0.5 truncate">{{ asset.name }}</div>
+                </div>
+            </div>
+            {% if asset.sector %}<span class="sector shrink-0">{{ asset.sector }}</span>{% endif %}
+        </div>
+
+        <div class="flex items-baseline gap-2.5 mb-3.5">
+            <span class="num text-[19px] font-semibold">
+                {%- if fundamentals and fundamentals.price is not none -%}
+                {{ asset.currency|currency_symbol }}{{ fundamentals.price|ratio }}
+                {%- else -%}—{%- endif -%}
+            </span>
+            {% if change is not none %}
+            <span class="num text-[12px] {{ 'pos' if change >= 0 else 'neg' }}">
+                {{ '▲' if change >= 0 else '▼' }} {{ '+' if change >= 0 }}{{ change|ratio }}%
+            </span>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+            <div class="stat">
+                <span class="lbl">P/E</span>
+                <span class="num text-sm font-semibold">{{ fundamentals.pe|ratio if fundamentals else '—' }}</span>
+            </div>
+            <div class="stat">
+                <span class="lbl">P/B</span>
+                <span class="num text-sm font-semibold">{{ fundamentals.pb|ratio if fundamentals else '—' }}</span>
+            </div>
+            <div class="stat">
+                <span class="lbl">ROE</span>
+                <span class="num text-sm font-semibold {{ 'pos' if fundamentals and fundamentals.roe is not none and fundamentals.roe >= roe_strong }}">
+                    {{ fundamentals.roe|percent if fundamentals else '—' }}
+                </span>
+            </div>
+            <div class="stat">
+                <span class="lbl">D/E</span>
+                <span class="num text-sm font-semibold">{{ fundamentals.debt_to_equity|ratio if fundamentals else '—' }}</span>
+            </div>
+            <div class="stat">
+                <span class="lbl">Yield</span>
+                <span class="num text-sm font-semibold">{{ fundamentals.dividend_yield|percent if fundamentals else '—' }}</span>
+            </div>
+            <div class="stat">
+                <span class="lbl">Payout</span>
+                <span class="num text-sm font-semibold {{ 'neg' if fundamentals and fundamentals.payout_ratio is not none and fundamentals.payout_ratio > payout_overpaying }}">
+                    {{ fundamentals.payout_ratio|percent if fundamentals else '—' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="flex justify-between border-t border-[#f0eee8] mt-3.5 pt-3 text-[11.5px]">
+            <span class="text-muted">Market cap</span>
+            <span class="num font-semibold">
+                {%- if fundamentals and fundamentals.market_cap is not none -%}
+                {{ asset.currency|currency_symbol }}{{ fundamentals.market_cap|compact_number }}
+                {%- else -%}—{%- endif -%}
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{{ screener_pagination(pagination, page_url_prefix, 'pt-4 px-1') }}
+{% else %}
+<div class="card text-center text-faint py-10">No hay empresas que coincidan con estos filtros.</div>
+{% endif %}

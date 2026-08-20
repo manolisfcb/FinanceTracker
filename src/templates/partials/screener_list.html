@@ -1,0 +1,65 @@
+{% from 'partials/screener_pagination.html' import screener_pagination %}
+{% from 'partials/company_icon.html' import company_icon %}
+<div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="tn-positions">
+            <thead>
+                <tr>
+                    {% for key, label in columns %}
+                    <th class="{{ 'l' if key in ('symbol', 'sector') }} {{ 'tn-edge-l' if loop.first }} {{ 'tn-edge-r' if loop.last }}">
+                        <a href="{{ sort_links[key] }}" class="{{ 'text-ink' if sort == key else 'text-muted' }} hover:text-ink whitespace-nowrap">
+                            {{ label }}{% if sort == key %} {{ '↑' if dir == 'asc' else '↓' }}{% endif %}
+                        </a>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody class="num">
+                {% for asset, fundamentals in rows %}
+                <tr data-row-href="{{ url_for('stocks.get_stock_detail', exchange=asset.exchange, symbol=asset.symbol) }}">
+                    <td class="l tn-edge-l font-sans">
+                        <div class="flex items-center gap-2.5">
+                            {{ company_icon(asset, 'sm') }}
+                            <div class="min-w-0">
+                                <a href="{{ url_for('stocks.get_stock_detail', exchange=asset.exchange, symbol=asset.symbol) }}"
+                                   class="font-semibold text-ink hover:text-maple" hx-boost="false">{{ asset.symbol }}</a>
+                                <span class="text-faint text-[11px]">{{ asset.exchange }}</span>
+                                <div class="text-[11.5px] text-muted">{{ asset.name }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="l font-sans text-muted2">{{ asset.sector or '—' }}</td>
+                    <td class="{{ 'font-semibold' if sort == 'price' }}">
+                        {%- if fundamentals and fundamentals.price is not none -%}
+                        {{ asset.currency|currency_symbol }}{{ fundamentals.price|ratio }}
+                        {%- else -%}—{%- endif -%}
+                    </td>
+                    <td class="{{ 'font-semibold' if sort == 'pe' }}">{{ fundamentals.pe|ratio if fundamentals else '—' }}</td>
+                    <td class="{{ 'font-semibold' if sort == 'pb' }}">{{ fundamentals.pb|ratio if fundamentals else '—' }}</td>
+                    <td class="{{ 'font-semibold' if sort == 'roe' }} {{ 'pos' if fundamentals and fundamentals.roe is not none and fundamentals.roe >= roe_strong }}">
+                        {{ fundamentals.roe|percent if fundamentals else '—' }}
+                    </td>
+                    <td class="{{ 'font-semibold' if sort == 'debt_to_equity' }}">{{ fundamentals.debt_to_equity|ratio if fundamentals else '—' }}</td>
+                    <td class="{{ 'font-semibold' if sort == 'net_margin' }}">{{ fundamentals.net_margin|percent if fundamentals else '—' }}</td>
+                    <td class="{{ 'font-semibold' if sort == 'dividend_yield' }}">{{ fundamentals.dividend_yield|percent if fundamentals else '—' }}</td>
+                    <td class="{{ 'font-semibold' if sort == 'payout_ratio' }} {{ 'neg' if fundamentals and fundamentals.payout_ratio is not none and fundamentals.payout_ratio > payout_overpaying }}">
+                        {{ fundamentals.payout_ratio|percent if fundamentals else '—' }}
+                    </td>
+                    <td class="tn-edge-r {{ 'font-semibold' if sort == 'market_cap' }}">
+                        {%- if fundamentals and fundamentals.market_cap is not none -%}
+                        {{ asset.currency|currency_symbol }}{{ fundamentals.market_cap|compact_number }}
+                        {%- else -%}—{%- endif -%}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="{{ columns|length }}" class="l text-center text-faint py-10">
+                        No hay empresas que coincidan con estos filtros.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ screener_pagination(pagination, page_url_prefix, 'px-5 py-3.5') }}
+</div>

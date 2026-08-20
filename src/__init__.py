@@ -13,6 +13,10 @@ MONTHS_ES = [
 
 WEEKDAYS_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
+# Screener figures are in each asset's own reporting currency, so the column
+# mixes markets and the symbol is what tells them apart.
+CURRENCY_SYMBOLS = {"CAD": "C$", "USD": "US$", "BRL": "R$"}
+
 CONFIG_MAP = {
     "development": "config.DevelopmentConfig",
     "production": "config.ProductionConfig",
@@ -177,6 +181,15 @@ def create_app(config_name=None):
             return "—"
         host = value.split("://")[-1].split("/")[0]
         return host[4:] if host.startswith("www.") else host
+
+    @app.template_filter("currency_symbol")
+    def format_currency_symbol_filter(value):
+        """C$, US$… for a currency code. An unknown code falls back to the
+        code itself rather than to nothing — an unlabelled number in a column
+        that mixes CAD and USD is worse than an ugly one."""
+        if not value:
+            return ""
+        return CURRENCY_SYMBOLS.get(value, f"{value} ")
 
     @app.template_filter("compact_number")
     def format_compact_number_filter(value):

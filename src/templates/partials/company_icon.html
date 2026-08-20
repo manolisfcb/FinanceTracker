@@ -1,0 +1,13 @@
+{% macro company_icon(asset, size='sm') -%}
+    {# Clearbit's public logo endpoint was retired in December 2025. Prefer a
+       future non-Clearbit URL if one is stored; otherwise reuse the company
+       website domain through Google's keyless favicon endpoint. #}
+    {% set stored_logo = asset.logo_url if asset.logo_url and 'logo.clearbit.com' not in asset.logo_url else none %}
+    {% set logo_src = stored_logo or ('https://www.google.com/s2/favicons?domain=' ~ (asset.website|domain) ~ '&sz=128' if asset.website else none) %}
+    {% if logo_src %}
+    <span class="company-icon company-icon-{{ size }}" aria-hidden="true">
+        <img src="{{ logo_src }}" alt="" loading="lazy" decoding="async"
+             onerror="this.closest('.company-icon').remove()">
+    </span>
+    {% endif %}
+{%- endmacro %}

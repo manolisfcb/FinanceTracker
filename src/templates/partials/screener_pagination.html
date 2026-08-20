@@ -1,0 +1,29 @@
+{# Numbered pagination, shared by both screener layouts. `wrapper` carries the
+   padding: the table view sits inside the results card, the cards view under
+   the grid, and the design spaces them differently. #}
+{% macro screener_pagination(pagination, page_url_prefix, wrapper) %}
+{% if pagination.total %}
+<div class="flex justify-between items-center gap-4 {{ wrapper }} text-[12.5px] text-muted">
+    <span>
+        Mostrando {{ (pagination.page - 1) * pagination.per_page + 1 }}–{{ [pagination.page * pagination.per_page, pagination.total]|min }}
+        de {{ pagination.total }}
+    </span>
+    <div class="num flex gap-1.5 items-center">
+        {% if pagination.has_prev %}
+        <a href="{{ page_url_prefix }}{{ pagination.prev_num }}" class="tn-page-arrow" aria-label="Anterior">←</a>
+        {% endif %}
+        {% for page_number in pagination.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+            {% if page_number %}
+            <a href="{{ page_url_prefix }}{{ page_number }}"
+               class="tn-page {{ 'tn-page-on' if page_number == pagination.page }}">{{ page_number }}</a>
+            {% else %}
+            <span class="tn-page-gap">…</span>
+            {% endif %}
+        {% endfor %}
+        {% if pagination.has_next %}
+        <a href="{{ page_url_prefix }}{{ pagination.next_num }}" class="tn-page-arrow" aria-label="Siguiente">→</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endmacro %}

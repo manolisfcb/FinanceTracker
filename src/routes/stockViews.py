@@ -2,7 +2,7 @@ import csv
 import io
 from urllib.parse import quote_plus, urlencode
 
-from flask import Blueprint, Response, abort, jsonify, render_template, request
+from flask import Blueprint, Response, abort, jsonify, make_response, render_template, request
 from flask_login import login_required
 from sqlalchemy import and_, func, or_
 
@@ -18,22 +18,43 @@ stocks_bp = Blueprint('stocks', __name__)
 # SEDAR+ has no public API, so Canadian filings are a search link, not data.
 SEDAR_SEARCH_URL = "https://www.sedarplus.ca/csa-party/records/searchIssuer.html?keyword={query}"
 
-# (query key, column header) — drives both the table and the CSV export, in
-# display order. 'symbol' renders as "Activo" (symbol + name stacked).
+# (query key, column header) — the screener table in display order. 'symbol'
+# renders as "Activo": symbol, exchange tag and company name stacked in one
+# cell, so exchange gets no column of its own here. The CSV still carries it.
 COLUMNS = [
     ('symbol', 'Activo'),
-    ('exchange', 'Exchange'),
     ('sector', 'Sector'),
     ('price', 'Precio'),
     ('pe', 'P/E'),
     ('pb', 'P/B'),
     ('roe', 'ROE'),
     ('debt_to_equity', 'D/E'),
+    ('net_margin', 'Margen neto'),
     ('dividend_yield', 'Div. yield'),
     ('payout_ratio', 'Payout'),
-    ('net_margin', 'Margen neto'),
     ('market_cap', 'Mkt cap'),
 ]
+
+# Every field the export writes, in order. Kept apart from COLUMNS because
+# the table folds exchange and name into a single "Activo" cell and a CSV
+# has no reason to.
+EXPORT_FIELDS = [
+    'symbol', 'name', 'exchange', 'sector', 'price', 'pe', 'pb', 'roe',
+    'debt_to_equity', 'net_margin', 'dividend_yield', 'payout_ratio', 'market_cap',
+]
+ASSET_FIELDS = frozenset({'symbol', 'name', 'exchange', 'sector'})
+
+# The two layouts of the same result set.
+VIEWS = ('list', 'cards')
+
+# 24 rather than 25: the cards layout is a three-column grid, and a page that
+# doesn't divide by three ends on a ragged row.
+PER_PAGE = 24
+
+# ROE at or above this reads as green in the table and the cards; below it
+# stays neutral. Payout turns red once the company pays out more than it earns.
+ROE_STRONG = 0.10
+PAYOUT_OVERPAYING = 1.0
 
 SORTABLE_COLUMNS = {
     'symbol': Asset.symbol,
@@ -50,18 +71,76 @@ SORTABLE_COLUMNS = {
     'market_cap': Fundamentals.market_cap,
 }
 
-# Indicator keys filterable by <key>_min/<key>_max — also drives the range
-# filter inputs rendered in the sidebar, so backend and UI can't drift apart.
-RANGE_FILTER_LABELS = {
-    'pe': 'P/E',
-    'pb': 'P/B',
-    'roe': 'ROE %',
-    'debt_to_equity': 'D/E',
-    'dividend_yield': 'Div. yield %',
-    'payout_ratio': 'Payout %',
-    'net_margin': 'Margen neto %',
-    'market_cap': 'Mkt cap',
+# Indicator keys filterable by <key>_min/<key>_max, and the presets each one
+# offers in its toolbar dropdown, as (label, min, max).
+#
+# The bounds are in the units the column is stored in — yields, margins and
+# payout are 0-1 fractions, D/E comes from Yahoo in percentage points — so
+# only the label is human-facing. Presets rather than free-text boxes because
+# that is what the design's toolbar is, and because a "Div. yield" box that
+# wants "0.03" for 3% gets filled in wrong every time.
+FILTER_PRESETS = {
+    'pe': ('P/E', [
+        ('cualquiera', None, None),
+        ('< 10', None, 10),
+        ('< 15', None, 15),
+        ('< 20', None, 20),
+        ('< 25', None, 25),
+        ('> 25', 25, None),
+    ]),
+    'dividend_yield': ('Div. yield', [
+        ('cualquiera', None, None),
+        ('> 1%', 0.01, None),
+        ('> 2%', 0.02, None),
+        ('> 3%', 0.03, None),
+        ('> 5%', 0.05, None),
+        ('> 7%', 0.07, None),
+    ]),
+    'roe': ('ROE', [
+        ('cualquiera', None, None),
+        ('> 5%', 0.05, None),
+        ('> 10%', 0.10, None),
+        ('> 15%', 0.15, None),
+        ('> 20%', 0.20, None),
+    ]),
+    'pb': ('P/B', [
+        ('cualquiera', None, None),
+        ('< 1', None, 1),
+        ('< 2', None, 2),
+        ('< 3', None, 3),
+        ('< 5', None, 5),
+    ]),
+    'debt_to_equity': ('D/E', [
+        ('cualquiera', None, None),
+        ('< 50', None, 50),
+        ('< 100', None, 100),
+        ('< 200', None, 200),
+    ]),
+    'net_margin': ('Margen neto', [
+        ('cualquiera', None, None),
+        ('> 5%', 0.05, None),
+        ('> 10%', 0.10, None),
+        ('> 20%', 0.20, None),
+    ]),
+    'payout_ratio': ('Payout', [
+        ('cualquiera', None, None),
+        ('< 40%', None, 0.40),
+        ('< 60%', None, 0.60),
+        ('< 80%', None, 0.80),
+        ('< 100%', None, 1.0),
+    ]),
+    'market_cap': ('Mkt cap', [
+        ('cualquiera', None, None),
+        ('> 1B', 1e9, None),
+        ('> 10B', 1e10, None),
+        ('> 100B', 1e11, None),
+    ]),
 }
+
+# Sector plus these three sit permanently in the toolbar, as in the design;
+# the rest are added one at a time from "+ Agregar filtro".
+PRIMARY_FILTERS = ('pe', 'dividend_yield', 'roe')
+EXTRA_FILTERS = ('pb', 'debt_to_equity', 'net_margin', 'payout_ratio', 'market_cap')
 
 # Company page indicator tiles: (Fundamentals column, label, format kind, help).
 #
@@ -281,7 +360,7 @@ def _apply_filters(query):
     if sectors:
         query = query.filter(Asset.sector.in_(sectors))
 
-    for key in RANGE_FILTER_LABELS:
+    for key in FILTER_PRESETS:
         column = SORTABLE_COLUMNS[key]
         min_value = _parse_float(request.args.get(f'{key}_min'))
         max_value = _parse_float(request.args.get(f'{key}_max'))
@@ -306,30 +385,221 @@ def _apply_sort(query, sort, direction):
     return query.order_by(column.asc() if direction == 'asc' else column.desc())
 
 
+def _url_with(**overrides):
+    """This request's URL with `overrides` applied: None drops a key, a list
+    sets it to those values (empty list drops it too), anything else replaces
+    it. Pagination always resets, since every override changes what page 1
+    even means."""
+    args = request.args.to_dict(flat=False)
+    args.pop('page', None)
+    for key, value in overrides.items():
+        if value is None or (isinstance(value, (list, tuple)) and not value):
+            args.pop(key, None)
+        elif isinstance(value, (list, tuple)):
+            args[key] = list(value)
+        else:
+            args[key] = [value]
+    query = urlencode(args, doseq=True)
+    return f"{request.path}?{query}" if query else request.path
+
+
 def _sort_links(sort, direction):
     """Per-column header links that toggle sort/dir while preserving every
     other active filter, and reset pagination back to page 1."""
-    args = request.args.to_dict(flat=False)
-    args.pop('page', None)
     links = {}
     for key in SORTABLE_COLUMNS:
         next_dir = 'asc' if (sort == key and direction == 'desc') else 'desc'
-        overridden = dict(args)
-        overridden['sort'] = [key]
-        overridden['dir'] = [next_dir]
-        links[key] = urlencode(overridden, doseq=True)
+        links[key] = _url_with(sort=key, dir=next_dir)
     return links
+
+
+def _bound(value):
+    """A preset bound as it appears in the query string. Plain decimal rather
+    than repr(), so 1e9 round-trips as '1000000000' and the link a preset
+    builds is the same string we later compare against to find it selected."""
+    if value is None:
+        return None
+    return f"{value:.10f}".rstrip('0').rstrip('.') or '0'
+
+
+def _range_dropdown(key, open_extras):
+    """One toolbar dropdown: its current label, its preset options, and — for
+    the filters added from "+ Agregar filtro" — the link that takes it back
+    out of the toolbar."""
+    title, presets = FILTER_PRESETS[key]
+    current_min = request.args.get(f'{key}_min') or None
+    current_max = request.args.get(f'{key}_max') or None
+
+    options = []
+    label = None
+    for preset_label, min_value, max_value in presets:
+        as_min, as_max = _bound(min_value), _bound(max_value)
+        active = (current_min == as_min and current_max == as_max)
+        if active:
+            label = preset_label
+        options.append({
+            'label': preset_label,
+            'active': active,
+            'url': _url_with(**{f'{key}_min': as_min, f'{key}_max': as_max}),
+        })
+
+    if label is None:
+        # A hand-edited URL: no preset matches, so describe the bounds.
+        if current_min and current_max:
+            label = f"{current_min}–{current_max}"
+        elif current_min:
+            label = f"> {current_min}"
+        else:
+            label = f"< {current_max}"
+
+    remove_url = None
+    if key in EXTRA_FILTERS:
+        remove_url = _url_with(**{
+            f'{key}_min': None,
+            f'{key}_max': None,
+            'add': [extra for extra in open_extras if extra != key],
+        })
+
+    return {
+        'key': key,
+        'title': title,
+        'label': label,
+        'options': options,
+        'remove_url': remove_url,
+        'is_set': bool(current_min or current_max),
+    }
+
+
+def _sector_dropdown(sectors):
+    """Sector filter. Multi-select, so each option toggles its own sector in
+    and out of the current selection and the label collapses to a count once
+    more than one is on."""
+    selected = request.args.getlist('sector')
+    options = [{
+        'label': 'Todos',
+        'active': not selected,
+        'url': _url_with(sector=None),
+    }]
+    for sector in sectors:
+        if sector in selected:
+            toggled = [chosen for chosen in selected if chosen != sector]
+        else:
+            toggled = selected + [sector]
+        options.append({
+            'label': sector,
+            'active': sector in selected,
+            'url': _url_with(sector=toggled),
+        })
+
+    if not selected:
+        label = 'Todos'
+    elif len(selected) == 1:
+        label = selected[0]
+    else:
+        label = f"{len(selected)} sectores"
+
+    return {
+        'key': 'sector',
+        'title': 'Sector',
+        'label': label,
+        'options': options,
+        'remove_url': None,
+        'is_set': bool(selected),
+    }
+
+
+def _exchange_chips(exchanges):
+    """Exchange chips. No `exchange` param means the whole universe, so every
+    chip starts lit and clicking one turns that market off; turning the last
+    one off lands back on the unfiltered set rather than on nothing."""
+    selected = request.args.getlist('exchange')
+    active = set(selected) if selected else set(exchanges)
+
+    chips = []
+    for exchange in exchanges:
+        toggled = active - {exchange} if exchange in active else active | {exchange}
+        if toggled == set(exchanges):
+            toggled = set()
+        chips.append({
+            'label': exchange,
+            'active': exchange in active,
+            'url': _url_with(exchange=sorted(toggled)),
+        })
+    return chips
+
+
+def _toolbar_filters(sectors):
+    """The dropdowns the toolbar shows, left to right, plus what is still
+    available behind "+ Agregar filtro"."""
+    open_extras = [key for key in request.args.getlist('add') if key in EXTRA_FILTERS]
+    shown_extras = [
+        key for key in EXTRA_FILTERS
+        if key in open_extras or request.args.get(f'{key}_min') or request.args.get(f'{key}_max')
+    ]
+
+    filters = [_sector_dropdown(sectors)]
+    filters += [_range_dropdown(key, open_extras) for key in PRIMARY_FILTERS]
+    filters += [_range_dropdown(key, open_extras) for key in shown_extras]
+
+    available = [
+        {'key': key, 'title': FILTER_PRESETS[key][0], 'url': _url_with(add=open_extras + [key])}
+        for key in EXTRA_FILTERS if key not in shown_extras
+    ]
+    return filters, available
+
+
+def _previous_prices(asset_ids):
+    """Price at each asset's second-most-recent snapshot, keyed by asset id.
+
+    The cards show the move since the last snapshot. There is no intraday
+    price stored for the whole universe — the company page fetches a live
+    quote for one symbol, which doesn't scale to a page of 24 — so this is
+    snapshot-to-snapshot, and it stays empty until a second sweep has run."""
+    if not asset_ids:
+        return {}
+    ranked = (
+        db.session.query(
+            Fundamentals.asset_id.label('asset_id'),
+            Fundamentals.price.label('price'),
+            func.row_number().over(
+                partition_by=Fundamentals.asset_id,
+                order_by=Fundamentals.as_of_date.desc(),
+            ).label('rank'),
+        )
+        .filter(Fundamentals.asset_id.in_(asset_ids))
+        .subquery()
+    )
+    rows = (
+        db.session.query(ranked.c.asset_id, ranked.c.price)
+        .filter(ranked.c.rank == 2, ranked.c.price.isnot(None))
+        .all()
+    )
+    return {asset_id: price for asset_id, price in rows}
+
+
+def _price_changes(rows):
+    """Percent change against the previous snapshot, per asset id."""
+    previous = _previous_prices([asset.id for asset, _ in rows])
+    changes = {}
+    for asset, fundamentals in rows:
+        before = previous.get(asset.id)
+        price = getattr(fundamentals, 'price', None)
+        if before and price is not None:
+            changes[asset.id] = (price - before) / before * 100
+    return changes
 
 
 @stocks_bp.route('/stocks', methods=['GET'])
 @login_required
 def get_stocks():
     page = request.args.get('page', 1, type=int)
-    per_page = 25
+    view = request.args.get('view', 'list')
+    if view not in VIEWS:
+        view = 'list'
 
     sort, direction = _current_sort()
     query = _apply_sort(_apply_filters(_latest_fundamentals_query()), sort, direction)
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = query.paginate(page=page, per_page=PER_PAGE, error_out=False)
 
     exchanges = [
         row[0] for row in
@@ -339,22 +609,42 @@ def get_stocks():
         row[0] for row in
         db.session.query(Asset.sector).filter(Asset.sector.isnot(None)).distinct().order_by(Asset.sector).all()
     ]
+    filters, available_filters = _toolbar_filters(sectors)
+
+    # Pagination links are the current URL with `page` appended, so they carry
+    # every filter, the sort and the layout along with them.
+    page_url_base = _url_with()
+    page_url_prefix = page_url_base + ('&' if '?' in page_url_base else '?') + 'page='
 
     context = {
         'rows': pagination.items,
         'pagination': pagination,
         'columns': COLUMNS,
-        'exchanges': exchanges,
-        'sectors': sectors,
-        'range_filters': RANGE_FILTER_LABELS,
+        'view': view,
+        'view_urls': {name: _url_with(view=name) for name in VIEWS},
+        'exchange_chips': _exchange_chips(exchanges),
+        'filters': filters,
+        'available_filters': available_filters,
+        'total_assets': db.session.query(func.count(Asset.id)).scalar(),
+        'last_update': db.session.query(func.max(Fundamentals.as_of_date)).scalar(),
+        'export_url': f"/stocks/export.csv?{request.query_string.decode()}",
+        'page_url_prefix': page_url_prefix,
+        'roe_strong': ROE_STRONG,
+        'payout_overpaying': PAYOUT_OVERPAYING,
         'sort': sort,
         'dir': direction,
         'sort_links': _sort_links(sort, direction),
     }
+    # Only the cards show a price move, and it costs an extra query.
+    context['price_changes'] = _price_changes(pagination.items) if view == 'cards' else {}
 
-    if request.headers.get('HX-Request'):
-        return render_template('partials/screener_table.html', **context)
-    return render_template('stocks/screener.html', **context)
+    template = 'partials/screener_table.html' if request.headers.get('HX-Request') else 'stocks/screener.html'
+    response = make_response(render_template(template, **context))
+    # /stocks has two representations for the same URL: a complete document
+    # and an HTMX fragment. Without Vary a browser/proxy cache may hand the
+    # fragment to a normal navigation (or a full page to an HTMX swap).
+    response.vary.add('HX-Request')
+    return response
 
 
 @stocks_bp.route('/stocks/export.csv', methods=['GET'])
@@ -365,22 +655,11 @@ def export_stocks_csv():
 
     buffer = io.StringIO()
     writer = csv.writer(buffer)
-    writer.writerow([key for key, _ in COLUMNS] + ['name'])
+    writer.writerow(EXPORT_FIELDS)
     for asset, fundamentals in query.all():
         writer.writerow([
-            asset.symbol,
-            asset.exchange,
-            asset.sector,
-            getattr(fundamentals, 'price', None),
-            getattr(fundamentals, 'pe', None),
-            getattr(fundamentals, 'pb', None),
-            getattr(fundamentals, 'roe', None),
-            getattr(fundamentals, 'debt_to_equity', None),
-            getattr(fundamentals, 'dividend_yield', None),
-            getattr(fundamentals, 'payout_ratio', None),
-            getattr(fundamentals, 'net_margin', None),
-            getattr(fundamentals, 'market_cap', None),
-            asset.name,
+            getattr(asset if field in ASSET_FIELDS else fundamentals, field, None)
+            for field in EXPORT_FIELDS
         ])
 
     return Response(

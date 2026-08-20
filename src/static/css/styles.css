@@ -383,3 +383,107 @@ a:hover { color: var(--tn-maple-dark); }
    triangle has to go — the "Editar plan" text is the affordance. */
 .tn-plan-edit > summary::-webkit-details-marker { display: none; }
 .tn-plan-edit > summary { list-style: none; }
+
+/* Screener toolbar dropdown: the trigger looks like the design's "select"
+   pill; the menu behind it is the shared .tn-dropdown-menu. */
+.sel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border: 1px solid #d9d5cb;
+  border-radius: 8px;
+  padding: 7px 12px;
+  background: #ffffff;
+  color: var(--tn-ink);
+  cursor: pointer;
+}
+.sel:hover { background: var(--tn-input-bg); }
+/* A filter that is actually narrowing the list reads as set, not as another
+   idle control — otherwise a toolbar of eight pills says nothing about which
+   ones are doing something. */
+.sel-on { border-color: var(--tn-ink); }
+.sel-on .sel-value { font-weight: 600; }
+
+/* Menus open leftwards from their trigger, unlike the right-anchored account
+   menu in the nav. */
+.tn-dropdown-menu-l { left: 0; right: auto; }
+.tn-dropdown-menu .tn-dropdown-item-on { font-weight: 600; background: var(--tn-input-bg); }
+
+/* Sector badge on a screener card. */
+.sector {
+  display: inline-flex;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  border-radius: 5px;
+  padding: 3px 9px;
+  background: var(--tn-border-soft);
+  color: var(--tn-muted-2);
+}
+
+/* Company mark shared by the screener's compact row and card header. The
+   surrounding tile keeps favicons with transparent or white canvases legible
+   without changing the rhythm of either layout. */
+.company-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--tn-border-soft);
+  border-radius: 8px;
+  background: #ffffff;
+}
+.company-icon-sm { width: 30px; height: 30px; }
+.company-icon-md { width: 36px; height: 36px; }
+.company-icon img { width: 72%; height: 72%; object-fit: contain; }
+
+/* One indicator inside a screener card. */
+.stat {
+  background: var(--tn-input-bg);
+  border: 1px solid var(--tn-border-soft);
+  border-radius: 7px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.stat .lbl { font-size: 10px; }
+
+/* Lista / Cards switch: two halves of one bordered pill. */
+.tn-seg { display: flex; border: 1px solid #d9d5cb; border-radius: 8px; overflow: hidden; background: #ffffff; }
+.tn-seg > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 8px 14px;
+  color: var(--tn-muted-2);
+}
+.tn-seg > a + a { border-left: 1px solid #d9d5cb; }
+.tn-seg > a:hover { color: var(--tn-ink); }
+.tn-seg > a.tn-seg-on, .tn-seg > a.tn-seg-on:hover { background: var(--tn-ink); color: #ffffff; }
+
+/* Numbered pagination. The arrows keep their border at both ends; the page
+   numbers only get a background once they're the current page. */
+.tn-page { padding: 5px 11px; border-radius: 6px; color: var(--tn-muted-2); }
+.tn-page:hover { background: var(--tn-border-soft); color: var(--tn-ink); }
+.tn-page-on, .tn-page-on:hover { background: var(--tn-ink); color: #ffffff; font-weight: 600; }
+.tn-page-arrow {
+  padding: 5px 10px;
+  border: 1px solid var(--tn-border);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--tn-muted-2);
+}
+.tn-page-arrow:hover { background: var(--tn-input-bg); color: var(--tn-ink); }
+.tn-page-gap { padding: 5px 4px; color: var(--tn-faint); }
+
+/* Rows and cards that navigate as a whole (see js/row_links.js). The inner
+   link stays the accessible target; these are the pointer affordances. */
+[data-row-href] { cursor: pointer; }
+.card[data-row-href] { transition: border-color .15s ease, box-shadow .15s ease; }
+.card[data-row-href]:hover { border-color: #d9d5cb; box-shadow: 0 4px 14px rgba(28, 27, 24, 0.06); }

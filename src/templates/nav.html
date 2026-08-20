@@ -27,10 +27,13 @@
 
         <div class="flex items-center gap-3.5">
             {% if current_user.is_authenticated %}
-                <div class="hidden lg:flex items-center gap-2 border border-border rounded-lg px-3 py-1.5 w-[220px] text-muted text-[13px] bg-[#fbfaf8]">
+                <form action="{{ url_for('stocks.get_stocks') }}" method="get"
+                      class="hidden lg:flex items-center gap-2 border border-border rounded-lg px-3 py-1.5 w-[220px] text-muted text-[13px] bg-[#fbfaf8] focus-within:border-maple">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-                    <span>Buscar ticker o empresa…</span>
-                </div>
+                    <input type="search" name="q" value="{{ request.args.get('q', '') if request.endpoint == 'stocks.get_stocks' }}"
+                           placeholder="Buscar ticker o empresa…" aria-label="Buscar ticker o empresa"
+                           class="bg-transparent border-0 outline-none w-full text-ink placeholder:text-muted" />
+                </form>
                 <span class="num text-xs font-semibold border border-border rounded-md px-2.5 py-1 bg-[#fbfaf8]">CAD</span>
 
                 <div class="relative group">
