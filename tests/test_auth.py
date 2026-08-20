@@ -1,3 +1,5 @@
+from bs4 import BeautifulSoup
+
 from src.models import UserModel
 
 
@@ -38,3 +40,21 @@ def test_logout_requires_login(client):
     resp = client.get("/logout")
     assert resp.status_code == 302
     assert "/login" in resp.headers["Location"]
+
+
+def test_expense_control_links_live_in_profile_menu(auth_client):
+    resp = auth_client.get("/dashboard")
+    soup = BeautifulSoup(resp.data, "html.parser")
+
+    primary_navigation = soup.select_one("div.hidden.md\\:flex")
+    assert primary_navigation is not None
+    assert "Transacciones" not in primary_navigation.get_text()
+    assert "Gráficos" not in primary_navigation.get_text()
+
+    profile_button = soup.find("button", attrs={"aria-label": "Abrir menú de perfil"})
+    assert profile_button is not None
+    profile_menu = profile_button.find_next("div", class_="card")
+    assert "Control de gastos" in profile_menu.get_text()
+    assert profile_menu.find("a", href="/transactions") is not None
+    assert profile_menu.find("a", href="/transactions_charts") is not None
+    assert profile_menu.find("a", href="/logout") is not None

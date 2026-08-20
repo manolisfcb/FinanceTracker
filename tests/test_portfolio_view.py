@@ -1,4 +1,5 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+from unittest.mock import patch
 
 from src.models import (
     Account,
@@ -10,6 +11,8 @@ from src.models import (
     FxRate,
     OrderModel,
     OrderType,
+    PortfolioPlan,
+    PortfolioSnapshotModel,
 )
 
 
@@ -183,3 +186,117 @@ def test_fractional_share_counts_render_with_four_decimals(auth_client, db, user
     body = auth_client.get('/portfolio').get_data(as_text=True)
 
     assert '>0.2254</td>' in body
+
+
+def test_portfolio_ideal_defaults_and_new_analytics_sections_render(auth_client, db, user):
+    body = auth_client.get('/portfolio').get_data(as_text=True)
+
+    assert 'Tu portafolio ideal' in body
+    assert 'targetAllocationChart' in body
+    assert 'Rentabilidad comparada' in body
+    assert 'Composición por tipo y segmento' in body
+    assert 'Dividendos por activo' in body
+    assert 'value="40.00"' in body
+    assert 'value="30.00"' in body
+    assert 'value="20.00"' in body
+    assert 'value="10.00"' in body
+
+
+def test_user_can_save_a_complete_portfolio_plan(auth_client, db, user):
+    response = auth_client.post('/portfolio/plan', data={
+        'equity_etf_percent': '40',
+        'reit_percent': '30',
+        'crypto_percent': '20',
+        'cash_percent': '10',
+        'cash_balance_cad': '2500',
+    })
+
+    assert response.status_code == 302
+    plan = PortfolioPlan.query.filter_by(user_id=user.id).one()
+    assert plan.equity_etf_percent == 40.0
+    assert plan.cash_balance_cad == 2500.0
+
+
+def test_portfolio_plan_must_sum_to_one_hundred(auth_client, db, user):
+    response = auth_client.post('/portfolio/plan', data={
+        'equity_etf_percent': '40',
+        'reit_percent': '30',
+        'crypto_percent': '20',
+        'cash_percent': '20',
+        'cash_balance_cad': '0',
+    }, follow_redirects=True)
+
+    assert 'debe sumar exactamente 100%' in response.get_data(as_text=True)
+    assert PortfolioPlan.query.filter_by(user_id=user.id).first() is None
+
+
+def test_current_allocation_classifies_reits_crypto_and_cash(auth_client, db, user):
+    tfsa = _account(db, user)
+    crypto_account = _account(db, user, AccountType.CRYPTO, 'Crypto')
+    reit = _position(
+        db, user, tfsa, symbol='REI.UN', quantity=10, cost=20, price=25,
+        dividends=0, sector='Real Estate',
+    )
+    reit.industry = 'REIT - Retail'
+    _position(
+        db, user, crypto_account, symbol='BTC', exchange='CRYPTO', quantity=1,
+        cost=100, price=200, dividends=0, sector='Cryptoassets',
+    )
+    db.session.add(PortfolioPlan(
+        user_id=user.id, equity_etf_percent=40, reit_percent=30,
+        crypto_percent=20, cash_percent=10, cash_balance_cad=50,
+    ))
+    db.session.commit()
+
+    body = auth_client.get('/portfolio').get_data(as_text=True)
+
+    assert 'currentAllocationChart' in body
+    assert 'REIT - Retail' not in body
+    assert 'Retail \\u00b7 REITs' in body
+    assert 'Efectivo CAD' in body
+    assert '"classKey": "CRYPTO"' in body
+
+
+def test_dividend_chart_includes_total_and_per_share(auth_client, db, user):
+    account = _account(db, user)
+    _position(db, user, account, quantity=10, dividends=50)
+
+    body = auth_client.get('/portfolio').get_data(as_text=True)
+
+    assert 'dividendsByAssetChart' in body
+    assert '"received_cad": 50.0' in body
+    assert '"per_share_cad": 5.0' in body
+
+
+@patch('src.services.portfolio_analytics._canadian_policy_rate_return')
+@patch('src.services.portfolio_analytics.get_provider')
+def test_performance_chart_compares_portfolio_with_canadian_benchmarks(
+    mock_get_provider, mock_policy_rate, auth_client, db, user
+):
+    first_day = date.today() - timedelta(days=10)
+    db.session.add_all([
+        PortfolioSnapshotModel(
+            user_id=user.id, account_id=None, date=first_day,
+            patrimony_cad=1000, total_invested_cad=1000, dividends_accum_cad=0,
+        ),
+        PortfolioSnapshotModel(
+            user_id=user.id, account_id=None, date=date.today(),
+            patrimony_cad=1100, total_invested_cad=1000, dividends_accum_cad=0,
+        ),
+    ])
+    db.session.commit()
+    mock_get_provider.return_value.get_price_history.return_value = [
+        {'date': first_day.isoformat(), 'close': 100.0},
+        {'date': date.today().isoformat(), 'close': 105.0},
+    ]
+    mock_policy_rate.return_value = {
+        first_day.isoformat(): 0.0,
+        date.today().isoformat(): 0.06,
+    }
+
+    body = auth_client.get('/portfolio').get_data(as_text=True)
+
+    assert 'performanceComparisonChart' in body
+    assert 'S\\u0026P/TSX (XIC)' in body
+    assert 'Tasa BoC acumulada' in body
+    assert mock_get_provider.return_value.get_price_history.call_count == 3

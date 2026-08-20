@@ -90,15 +90,15 @@
     <div class="card py-5 px-[22px] lg:col-span-2">
         <div class="flex justify-between items-center mb-3.5">
             <div class="text-sm font-semibold">Evolución del patrimonio</div>
-            {% if equity.dates %}
+            {% if has_equity_history %}
             <div class="flex gap-1.5" id="equityRangeButtons">
                 {% for key, label in [('1M', '1M'), ('6M', '6M'), ('1A', '1A'), ('ALL', 'Todo')] %}
-                <button type="button" class="tn-range equity-range-btn{{ ' tn-range-active' if key == '1A' }}" data-range="{{ key }}">{{ label }}</button>
+                <button type="button" class="tn-range equity-range-btn{{ ' tn-range-active' if key == '1M' }}" data-range="{{ key }}">{{ label }}</button>
                 {% endfor %}
             </div>
             {% endif %}
         </div>
-        {% if equity.dates %}
+        {% if has_equity_history %}
         <div class="h-[220px]">
             <canvas id="equityChart"></canvas>
         </div>
@@ -257,7 +257,7 @@
     </div>
 </div>
 
-{% if equity.dates %}
+{% if has_equity_history %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
@@ -269,8 +269,14 @@
         patrimony: {{ equity.patrimony|tojson }},
         contributed: {{ equity.contributed|tojson }},
     };
-    // Days of history each range keeps; ALL keeps everything.
-    const equityRanges = { '1M': 31, '6M': 183, '1A': 365, 'ALL': null };
+    // Longer ranges use the saved daily snapshots. The month view is loaded
+    // separately because it can reconstruct the days before snapshots began.
+    const equityRanges = { '6M': 183, '1A': 365, 'ALL': null };
+    const monthlyEquityUrl = {{ url_for('portfolio.dashboard_monthly_equity')|tojson }};
+    let equityShown = { dates: [], labels: [] };
+    let equityActiveRange = '1M';
+    let monthlyEquitySeries = null;
+    let renderSequence = 0;
 
     const equityChart = new Chart(document.getElementById('equityChart').getContext('2d'), {
         type: 'line',
@@ -283,7 +289,14 @@
                     borderColor: '#1a7f4e',
                     backgroundColor: 'rgba(26, 127, 78, 0.09)',
                     borderWidth: 2.5,
-                    pointRadius: 0,
+                    // The month view exposes every daily observation. Longer
+                    // ranges stay visually lighter and only show a marker if
+                    // the selected range contains a single snapshot.
+                    pointRadius: context => equityActiveRange === '1M'
+                        ? 2.5
+                        : (context.dataset.data.length === 1 ? 4 : 0),
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: '#1a7f4e',
                     tension: 0.25,
                     fill: true,
                 },
@@ -293,7 +306,11 @@
                     borderColor: '#b3a992',
                     borderWidth: 1.5,
                     borderDash: [5, 4],
-                    pointRadius: 0,
+                    pointRadius: context => equityActiveRange === '1M'
+                        ? 2.5
+                        : (context.dataset.data.length === 1 ? 4 : 0),
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: '#b3a992',
                     tension: 0.25,
                     fill: false,
                 },
@@ -313,18 +330,49 @@
                 },
             },
             scales: {
-                // The month label carries the x axis, like the design; the
-                // y scale is read off the tooltip, so it keeps the grid
-                // lines and drops the ticks.
+                // Daily labels are available through the tooltip; the axis
+                // skips some of them on narrow screens to remain legible.
                 x: { grid: { display: false }, ticks: { maxTicksLimit: 7, autoSkip: true, maxRotation: 0 } },
                 y: { grid: { color: '#efede7' }, ticks: { display: false }, border: { display: false } },
             },
         },
     });
 
-    let equityShown = equitySeries;
+    function paintEquitySeries(series, from = 0) {
+        equityShown = {
+            dates: series.dates.slice(from),
+            labels: series.labels.slice(from),
+        };
+        equityChart.data.labels = equityShown.labels;
+        equityChart.data.datasets[0].data = series.patrimony.slice(from);
+        equityChart.data.datasets[1].data = series.contributed.slice(from);
+        equityChart.update();
+    }
 
-    function renderEquityRange(range) {
+    async function renderEquityRange(range) {
+        const sequence = ++renderSequence;
+        equityActiveRange = range;
+        document.querySelectorAll('.equity-range-btn').forEach(btn => {
+            btn.classList.toggle('tn-range-active', btn.dataset.range === range);
+        });
+
+        if (range === '1M') {
+            if (monthlyEquitySeries === null) {
+                try {
+                    const response = await fetch(monthlyEquityUrl, {
+                        headers: { 'Accept': 'application/json' },
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    monthlyEquitySeries = await response.json();
+                } catch (error) {
+                    console.error('No se pudo cargar la evolución diaria', error);
+                    monthlyEquitySeries = equitySeries;
+                }
+            }
+            if (sequence === renderSequence) paintEquitySeries(monthlyEquitySeries);
+            return;
+        }
+
         const days = equityRanges[range];
         let from = 0;
         if (days !== null) {
@@ -333,24 +381,13 @@
             from = equitySeries.dates.findIndex(d => new Date(d) >= cutoff);
             if (from === -1) from = Math.max(equitySeries.dates.length - 1, 0);
         }
-        equityShown = {
-            dates: equitySeries.dates.slice(from),
-            labels: equitySeries.labels.slice(from),
-        };
-        equityChart.data.labels = equityShown.labels;
-        equityChart.data.datasets[0].data = equitySeries.patrimony.slice(from);
-        equityChart.data.datasets[1].data = equitySeries.contributed.slice(from);
-        equityChart.update();
-
-        document.querySelectorAll('.equity-range-btn').forEach(btn => {
-            btn.classList.toggle('tn-range-active', btn.dataset.range === range);
-        });
+        if (sequence === renderSequence) paintEquitySeries(equitySeries, from);
     }
 
     document.querySelectorAll('.equity-range-btn').forEach(btn => {
         btn.addEventListener('click', () => renderEquityRange(btn.dataset.range));
     });
-    renderEquityRange('1A');
+    renderEquityRange('1M');
 </script>
 {% endif %}
 {% endblock %}

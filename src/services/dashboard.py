@@ -9,12 +9,13 @@ Chart.js, so their geometry is computed here — in one testable place —
 instead of being assembled from arithmetic scattered through the template.
 """
 from collections import defaultdict
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from math import pi
 from zoneinfo import ZoneInfo
 
 from src import MONTHS_ES
 from src.models import (
+    Account,
     Asset,
     CompanyEvent,
     CompanyEventKind,
@@ -24,6 +25,7 @@ from src.models import (
     PortfolioSnapshotModel,
 )
 from src.services.dividends import DividendsService
+from src.services.market_data import get_provider
 from src.services.portfolio import PortfolioService, fx_rate_to_cad_today
 
 # Slice colours in order; everything past the fifth sector is pooled into
@@ -154,6 +156,14 @@ class DashboardService:
 
     # -- equity curve -------------------------------------------------------
 
+    def has_equity_history(self) -> bool:
+        return (
+            PortfolioSnapshotModel.query.filter_by(
+                user_id=self.user_id, account_id=None
+            ).first() is not None
+            or OrderModel.query.filter_by(user_id=self.user_id).first() is not None
+        )
+
     def equity_series(self) -> dict:
         """Patrimonio vs. aportado, one point per daily snapshot.
 
@@ -171,6 +181,169 @@ class DashboardService:
             'patrimony': [s.patrimony_cad for s in snapshots],
             'contributed': [s.total_invested_cad for s in snapshots],
         }
+
+    def monthly_equity_series(self, provider=None) -> dict:
+        """Daily portfolio value for every elapsed day of the current month.
+
+        Portfolio snapshots only start accumulating after the app is running,
+        while imported orders can predate them. For the 1M view we replay the
+        orders and value each day's holdings with Yahoo's historical closes.
+        Weekends and market holidays carry the preceding close forward. Past
+        saved snapshots remain authoritative; today always uses live totals
+        so the chart reconciles with the KPI cards after order changes.
+        """
+        first_day = self.today.replace(day=1)
+        orders = (
+            OrderModel.query.join(Account, OrderModel.account_id == Account.id)
+            .filter(
+                OrderModel.user_id == self.user_id,
+                OrderModel.executed_at < datetime.combine(self.today + timedelta(days=1), time.min),
+            )
+            .order_by(OrderModel.executed_at.asc(), OrderModel.id.asc())
+            .all()
+        )
+
+        lots: dict[str, dict] = {}
+        monthly_orders: dict[date, list] = defaultdict(list)
+        for order in orders:
+            if order.executed_at.date() < first_day:
+                self._apply_historical_order(lots, order)
+            else:
+                monthly_orders[order.executed_at.date()].append(order)
+
+        relevant_asset_ids = {
+            lot['asset_id'] for lot in lots.values() if lot['quantity'] > 0
+        }
+        relevant_asset_ids.update(
+            order.asset_id for rows in monthly_orders.values() for order in rows
+        )
+        if not relevant_asset_ids:
+            return self._empty_equity_series()
+
+        assets = {
+            asset.id: asset
+            for asset in Asset.query.filter(Asset.id.in_(relevant_asset_ids)).all()
+        }
+        provider = provider or get_provider(max_retries=1, min_interval_seconds=0)
+        price_history = {
+            asset_id: self._history_by_date(provider, asset.yahoo_symbol)
+            for asset_id, asset in assets.items()
+        }
+        currencies = {asset.currency for asset in assets.values() if asset.currency != 'CAD'}
+        fx_history = {
+            currency: self._history_by_date(provider, f'{currency}CAD=X')
+            for currency in currencies
+        }
+        fx_fallback = {currency: fx_rate_to_cad_today(currency) for currency in currencies}
+        snapshots = {
+            row.date: row
+            for row in PortfolioSnapshotModel.query.filter(
+                PortfolioSnapshotModel.user_id == self.user_id,
+                PortfolioSnapshotModel.account_id.is_(None),
+                PortfolioSnapshotModel.date >= first_day,
+                PortfolioSnapshotModel.date <= self.today,
+            ).all()
+        }
+        # Today's cards are computed live from the current orders, prices and
+        # FX. The last chart point must use that same source; a snapshot taken
+        # earlier today may have gone stale after an order was added or edited.
+        live_totals = self.portfolio.get_totals()
+
+        series = self._empty_equity_series()
+        last_prices = {
+            asset_id: history[max(day for day in history if day < first_day)]
+            for asset_id, history in price_history.items()
+            if any(day < first_day for day in history)
+        }
+        last_fx = {
+            currency: history[max(day for day in history if day < first_day)]
+            for currency, history in fx_history.items()
+            if any(day < first_day for day in history)
+        }
+        day = first_day
+        while day <= self.today:
+            for asset_id, history in price_history.items():
+                if day in history:
+                    last_prices[asset_id] = history[day]
+            for currency, history in fx_history.items():
+                if day in history:
+                    last_fx[currency] = history[day]
+            for order in monthly_orders.get(day, []):
+                self._apply_historical_order(lots, order)
+                # A trade price is a truthful same-day fallback when Yahoo
+                # has no close for a newly purchased asset yet.
+                last_prices.setdefault(order.asset_id, order.price)
+
+            patrimony = 0.0
+            for lot in lots.values():
+                if lot['quantity'] <= 0:
+                    continue
+                asset = assets.get(lot['asset_id'])
+                price = last_prices.get(lot['asset_id'])
+                if asset is None or price is None:
+                    continue
+                fx_rate = 1.0 if asset.currency == 'CAD' else (
+                    last_fx.get(asset.currency)
+                    or fx_fallback.get(asset.currency)
+                    or lot['last_trade_fx']
+                )
+                if fx_rate is not None:
+                    patrimony += lot['quantity'] * price * fx_rate
+
+            invested = sum(
+                lot['cost_cad'] for lot in lots.values() if lot['quantity'] > 0
+            )
+            snapshot = snapshots.get(day)
+            if day == self.today:
+                patrimony = live_totals['patrimony_cad']
+                invested = live_totals['total_invested_cad']
+            elif snapshot is not None:
+                patrimony = snapshot.patrimony_cad
+                invested = snapshot.total_invested_cad
+
+            series['dates'].append(day.isoformat())
+            series['labels'].append(f"{day.day} {MONTHS_ES[day.month - 1][:3]}")
+            series['patrimony'].append(patrimony)
+            series['contributed'].append(invested)
+            day += timedelta(days=1)
+
+        return series
+
+    @staticmethod
+    def _empty_equity_series() -> dict:
+        return {'dates': [], 'labels': [], 'patrimony': [], 'contributed': []}
+
+    @staticmethod
+    def _history_by_date(provider, yahoo_symbol: str) -> dict[date, float]:
+        return {
+            date.fromisoformat(point['date']): point['close']
+            for point in provider.get_price_history(yahoo_symbol, '1M')
+        }
+
+    @staticmethod
+    def _apply_historical_order(lots: dict[str, dict], order) -> None:
+        pool_key = (
+            f'account:{order.account_id}|asset:{order.asset_id}'
+            if order.account.is_registered
+            else f'nonreg:{order.user_id}|asset:{order.asset_id}'
+        )
+        lot = lots.setdefault(pool_key, {
+            'asset_id': order.asset_id,
+            'quantity': 0.0,
+            'cost_cad': 0.0,
+            'last_trade_fx': order.fx_rate_to_cad,
+        })
+        lot['last_trade_fx'] = order.fx_rate_to_cad
+        if order.type == OrderType.BUY:
+            lot['quantity'] += order.quantity
+            lot['cost_cad'] += (
+                order.quantity * order.price + order.fees
+            ) * order.fx_rate_to_cad
+            return
+
+        average_cost = lot['cost_cad'] / lot['quantity'] if lot['quantity'] else 0.0
+        lot['quantity'] -= order.quantity
+        lot['cost_cad'] -= order.quantity * average_cost
 
     # -- allocation ---------------------------------------------------------
 

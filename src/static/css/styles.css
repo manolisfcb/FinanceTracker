@@ -437,6 +437,47 @@ a:hover { color: var(--tn-maple-dark); }
 .tn-plan-edit > summary::-webkit-details-marker { display: none; }
 .tn-plan-edit > summary { list-style: none; }
 
+/* Strategic portfolio editor and comparison panels. The editor opens over
+   the card so changing a plan does not push every chart down the page. */
+.tn-plan-editor { position: relative; }
+.tn-plan-editor > summary::-webkit-details-marker { display: none; }
+.tn-plan-editor > summary { list-style: none; }
+.tn-plan-popover {
+  position: absolute;
+  z-index: 70;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(760px, calc(100vw - 40px));
+  padding: 16px;
+  border: 1px solid var(--tn-border);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgba(28, 27, 24, 0.14);
+}
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.tn-chart-panel {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--tn-border-soft);
+  border-radius: 9px;
+  background: var(--tn-input-bg);
+}
+.tn-rebalance-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--tn-border-soft);
+}
+.tn-rebalance-row:last-child { padding-bottom: 0; border-bottom: 0; }
+.tn-allocation-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+}
+
 /* Screener toolbar dropdown: the trigger looks like the design's "select"
    pill; the menu behind it is the shared .tn-dropdown-menu. */
 .sel {

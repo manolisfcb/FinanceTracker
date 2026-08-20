@@ -5,8 +5,10 @@ from flask_login import current_user, login_required
 
 from src.extensions import db
 from src.forms.AllocationTargetForm import AllocationTargetForm
-from src.models import Account, AllocationTarget, Asset, DividendReceived
+from src.forms.PortfolioPlanForm import PortfolioPlanForm
+from src.models import Account, AllocationTarget, Asset, DividendReceived, PortfolioPlan
 from src.services.portfolio import PortfolioService, fx_rate_to_cad_today
+from src.services.portfolio_analytics import DEFAULT_TARGETS, PortfolioAnalyticsService
 
 portfolio_bp = Blueprint('portfolio', __name__)
 
@@ -173,6 +175,16 @@ def portfolio():
     allocation_target_form = AllocationTargetForm()
     allocation_target_form.sector.choices = [(s, s) for s in _sector_choices(current_user.id)]
 
+    analytics = PortfolioAnalyticsService(current_user.id)
+    plan = PortfolioPlan.query.filter_by(user_id=current_user.id).first()
+    plan_form = PortfolioPlanForm(
+        obj=plan,
+        data={**DEFAULT_TARGETS, 'cash_balance_cad': 0.0} if plan is None else None,
+    )
+    strategic_allocation = analytics.allocation(positions, assets_by_id, plan)
+    dividend_chart = analytics.dividends_by_asset(assets_by_id)
+    performance_chart = analytics.performance()
+
     asset_labels = [row["symbol"] for row in portfolio_rows]
     asset_values = [row["market_value"] or 0.0 for row in portfolio_rows]
 
@@ -193,6 +205,11 @@ def portfolio():
         "allocation_target_form": allocation_target_form,
         "asset_types": asset_labels,
         "asset_allocation": asset_values,
+        "plan_form": plan_form,
+        "plan_is_saved": plan is not None,
+        "strategic_allocation": strategic_allocation,
+        "dividend_chart": dividend_chart,
+        "performance_chart": performance_chart,
         "warnings": service.warnings,
     }
 
@@ -223,3 +240,36 @@ def set_allocation_target():
     else:
         flash('No se pudo guardar el objetivo de alocación', 'error')
     return redirect(url_for('portfolio.portfolio'))
+
+
+@portfolio_bp.route('/portfolio/plan', methods=['POST'])
+@login_required
+def set_portfolio_plan():
+    form = PortfolioPlanForm()
+    if not form.validate_on_submit():
+        flash('Revisá los porcentajes y el saldo de cash', 'error')
+        return redirect(url_for('portfolio.portfolio') + '#portfolio-ideal')
+
+    percentages = (
+        form.equity_etf_percent.data,
+        form.reit_percent.data,
+        form.crypto_percent.data,
+        form.cash_percent.data,
+    )
+    if abs(sum(percentages) - 100) > 0.01:
+        flash('El portafolio ideal debe sumar exactamente 100%', 'error')
+        return redirect(url_for('portfolio.portfolio') + '#portfolio-ideal')
+
+    plan = PortfolioPlan.query.filter_by(user_id=current_user.id).first()
+    if plan is None:
+        plan = PortfolioPlan(user_id=current_user.id)
+        db.session.add(plan)
+
+    plan.equity_etf_percent = float(form.equity_etf_percent.data)
+    plan.reit_percent = float(form.reit_percent.data)
+    plan.crypto_percent = float(form.crypto_percent.data)
+    plan.cash_percent = float(form.cash_percent.data)
+    plan.cash_balance_cad = float(form.cash_balance_cad.data or 0)
+    db.session.commit()
+    flash('Tu portafolio ideal quedó guardado', 'success')
+    return redirect(url_for('portfolio.portfolio') + '#portfolio-ideal')

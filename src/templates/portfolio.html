@@ -64,6 +64,93 @@
     </div>
 </div>
 
+<!-- Strategic allocation: ideal vs current -->
+<section id="portfolio-ideal" class="card p-5 mb-4 scroll-mt-4">
+    <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+            <div class="text-[15px] font-semibold">Tu portafolio ideal</div>
+            <p class="text-[12.5px] text-muted2 mt-1">Definí la mezcla estratégica y comparala con el valor actual de tu cartera.</p>
+        </div>
+        <details class="tn-plan-editor">
+            <summary class="btn cursor-pointer list-none">{{ 'Configurar plan' if not plan_is_saved else 'Editar plan' }}</summary>
+            <div class="tn-plan-popover">
+                <form method="POST" action="{{ url_for('portfolio.set_portfolio_plan') }}">
+                    {{ plan_form.hidden_tag() }}
+                    <div class="grid grid-cols-2 lg:grid-cols-5 gap-2.5">
+                        <div class="space-y-1.5">
+                            <label class="lbl">{{ plan_form.equity_etf_percent.label.text }}</label>
+                            {{ plan_form.equity_etf_percent(class="tn-input plan-percent", step="0.1", min="0", max="100") }}
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="lbl">{{ plan_form.reit_percent.label.text }}</label>
+                            {{ plan_form.reit_percent(class="tn-input plan-percent", step="0.1", min="0", max="100") }}
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="lbl">{{ plan_form.crypto_percent.label.text }}</label>
+                            {{ plan_form.crypto_percent(class="tn-input plan-percent", step="0.1", min="0", max="100") }}
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="lbl">{{ plan_form.cash_percent.label.text }}</label>
+                            {{ plan_form.cash_percent(class="tn-input plan-percent", step="0.1", min="0", max="100") }}
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="lbl">{{ plan_form.cash_balance_cad.label.text }}</label>
+                            {{ plan_form.cash_balance_cad(class="tn-input", step="0.01", min="0") }}
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-3 mt-3">
+                        <span class="text-[12px] text-muted2">Total objetivo: <span id="planPercentTotal" class="num font-semibold text-ink">100.0%</span></span>
+                        <button type="submit" id="savePortfolioPlan" class="btn btn-primary">Guardar portafolio ideal</button>
+                    </div>
+                </form>
+            </div>
+        </details>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[0.8fr_0.8fr_1.4fr] gap-4 items-stretch">
+        <div class="tn-chart-panel">
+            <div class="text-center text-[12px] font-semibold text-muted2 mb-2">OBJETIVO</div>
+            <div class="h-48"><canvas id="targetAllocationChart"></canvas></div>
+        </div>
+        <div class="tn-chart-panel">
+            <div class="text-center text-[12px] font-semibold text-muted2 mb-2">ACTUAL</div>
+            {% if strategic_allocation.has_holdings %}
+            <div class="h-48"><canvas id="currentAllocationChart"></canvas></div>
+            {% else %}
+            <div class="h-48 flex items-center justify-center text-center text-[12.5px] text-faint px-4">Agregá posiciones o indicá tu cash actual para comparar.</div>
+            {% endif %}
+        </div>
+        <div class="tn-chart-panel">
+            <div class="flex items-center justify-between gap-3 mb-3">
+                <span class="text-[12px] font-semibold text-muted2">REBALANCEO ESTIMADO</span>
+                <span class="num text-[11.5px] text-faint">C$ {{ strategic_allocation.total_cad|currency }}</span>
+            </div>
+            <div class="flex flex-col gap-2.5">
+                {% for row in strategic_allocation.rows %}
+                <div class="tn-rebalance-row">
+                    <span class="tn-allocation-dot" style="background:{{ row.color }}"></span>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex justify-between gap-3 text-[12.5px]">
+                            <span class="font-semibold truncate">{{ row.label }}</span>
+                            <span class="num text-muted2">{{ row.current_percent|ratio }}% → {{ row.target_percent|ratio }}%</span>
+                        </div>
+                        <div class="text-[11.5px] mt-0.5 {{ 'pos' if row.amount_to_trade_cad > 0 else ('neg' if row.amount_to_trade_cad < 0 else 'text-faint') }}">
+                            {% if not strategic_allocation.has_holdings %}
+                            Esperando valor actual
+                            {% elif row.amount_to_trade_cad > 0 %}
+                            {{ 'Reservar' if row.key == 'CASH' else 'Aumentar' }} C$ {{ row.amount_to_trade_abs_cad|currency }}
+                            {% elif row.amount_to_trade_cad < 0 %}
+                            {{ 'Invertir' if row.key == 'CASH' else 'Reducir' }} C$ {{ row.amount_to_trade_abs_cad|currency }}
+                            {% else %}En objetivo{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
 <div class="grid grid-cols-1 xl:grid-cols-[2.2fr_1fr] gap-3.5 items-start">
 
     <!-- Positions -->
@@ -216,15 +303,128 @@
             <p class="text-faint text-[13px]">Sin posiciones para graficar.</p>
             {% endif %}
         </div>
+
+        <div class="card p-5">
+            <div class="text-sm font-semibold">Dividendos por activo</div>
+            <p class="text-[11.5px] text-muted mt-1 mb-3">Total confirmado y acumulado por acción, convertidos a CAD.</p>
+            {% if dividend_chart %}
+            <div class="h-60"><canvas id="dividendsByAssetChart"></canvas></div>
+            {% else %}
+            <p class="text-faint text-[13px] py-6">Todavía no hay dividendos confirmados para graficar.</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 
-{% if portfolio %}
+<!-- Return comparison -->
+<section class="card p-5 mt-4">
+    <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+            <div class="text-[15px] font-semibold">Rentabilidad comparada</div>
+            <p class="text-[12px] text-muted mt-1">Cartera vs. Canadá, S&amp;P 500, Nasdaq-100 y el retorno teórico acumulado de la tasa del Banco de Canadá.</p>
+        </div>
+        {% if performance_chart.has_data %}
+        <div class="flex gap-1.5" id="performanceRanges">
+            {% for range in ['1M', '6M', '1A', 'TODO'] %}
+            <button type="button" class="tn-range performance-range-btn{{ ' tn-range-active' if range == '1A' }}" data-range="{{ range }}">{{ range }}</button>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% if performance_chart.has_data %}
+    <div class="h-[330px]"><canvas id="performanceComparisonChart"></canvas></div>
+    <p class="text-[11px] text-faint mt-3">La cartera se normaliza desde el primer snapshot disponible usando valor, costo acumulado y dividendos. Los benchmarks muestran retorno de precio y no incluyen comisiones.</p>
+    {% else %}
+    <div class="h-44 flex flex-col items-center justify-center text-center px-5">
+        <p class="text-[13px] text-muted2">Se necesitan al menos dos snapshots diarios para comparar la rentabilidad.</p>
+        <a href="{{ url_for('portfolio.dash_page') }}" class="text-[12px] font-semibold mt-2">Ir al dashboard para tomar un snapshot →</a>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Hierarchical composition -->
+<section class="card p-5 mt-4">
+    <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+            <div class="text-[15px] font-semibold">Composición por tipo y segmento</div>
+            <p class="text-[12px] text-muted mt-1">El flujo parte de la cartera, pasa por la clase de activo y termina en su sector o segmento.</p>
+        </div>
+        <span class="num text-[11.5px] text-faint">Valores en CAD</span>
+    </div>
+    {% if strategic_allocation.flows %}
+    <div class="h-[380px]"><canvas id="portfolioCompositionChart"></canvas></div>
+    {% else %}
+    <div class="h-44 flex items-center justify-center text-[13px] text-faint">Sin posiciones para construir la composición.</div>
+    {% endif %}
+</section>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% if strategic_allocation.flows %}
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey/dist/chartjs-chart-sankey.min.js"></script>
+{% endif %}
 <script>
     Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
     Chart.defaults.color = '#6f6b60';
 
+    const allocationLabels = {{ strategic_allocation.labels|tojson }};
+    const allocationColors = {{ strategic_allocation.colors|tojson }};
+    const doughnutOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { color: '#6f6b60', boxWidth: 9, boxHeight: 9, padding: 12, font: { size: 11 } },
+            },
+            tooltip: { callbacks: { label: item => `${item.label}: ${item.parsed.toFixed(1)}%` } },
+        },
+    };
+
+    new Chart(document.getElementById('targetAllocationChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: allocationLabels,
+            datasets: [{
+                data: {{ strategic_allocation.target_values|tojson }},
+                backgroundColor: allocationColors,
+                borderColor: '#ffffff',
+                borderWidth: 3,
+            }],
+        },
+        options: doughnutOptions,
+    });
+
+    {% if strategic_allocation.has_holdings %}
+    new Chart(document.getElementById('currentAllocationChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: allocationLabels,
+            datasets: [{
+                data: {{ strategic_allocation.current_values|tojson }},
+                backgroundColor: allocationColors,
+                borderColor: '#ffffff',
+                borderWidth: 3,
+            }],
+        },
+        options: doughnutOptions,
+    });
+    {% endif %}
+
+    const planInputs = Array.from(document.querySelectorAll('.plan-percent'));
+    const planTotal = document.getElementById('planPercentTotal');
+    const planSubmit = document.getElementById('savePortfolioPlan');
+    function updatePlanTotal() {
+        const total = planInputs.reduce((sum, input) => sum + (Number.parseFloat(input.value) || 0), 0);
+        planTotal.textContent = `${total.toFixed(1)}%`;
+        const isValid = Math.abs(total - 100) < 0.01;
+        planTotal.classList.toggle('neg', !isValid);
+        planSubmit.disabled = !isValid;
+    }
+    planInputs.forEach(input => input.addEventListener('input', updatePlanTotal));
+    updatePlanTotal();
+
+    {% if portfolio %}
     const assetAllocationCtx = document.getElementById('assetAllocationChart').getContext('2d');
     new Chart(assetAllocationCtx, {
         type: 'doughnut',
@@ -242,6 +442,173 @@
             plugins: { legend: { position: 'right', labels: { color: '#6f6b60', boxWidth: 9, font: { size: 11.5 } } } }
         }
     });
+    {% endif %}
+
+    {% if dividend_chart %}
+    const dividendRows = {{ dividend_chart|tojson }};
+    new Chart(document.getElementById('dividendsByAssetChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: dividendRows.map(row => row.symbol),
+            datasets: [
+                {
+                    label: 'Total recibido',
+                    data: dividendRows.map(row => row.received_cad),
+                    backgroundColor: '#b3372b',
+                    borderRadius: 4,
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Acumulado por acción',
+                    data: dividendRows.map(row => row.per_share_cad),
+                    backgroundColor: '#b98a2e',
+                    borderRadius: 4,
+                    yAxisID: 'yShare',
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, font: { size: 10.5 } } } },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#efede7' },
+                    ticks: { callback: value => `C$${value}` },
+                },
+                yShare: {
+                    beginAtZero: true,
+                    position: 'right',
+                    grid: { display: false },
+                    ticks: { callback: value => `C$${value}` },
+                },
+            },
+        },
+    });
+    {% endif %}
+
+    {% if performance_chart.has_data %}
+    const performanceSource = {{ performance_chart|tojson }};
+    const performanceRanges = { '1M': 31, '6M': 183, '1A': 365, 'TODO': null };
+    let performanceShownLabels = performanceSource.labels;
+    const performanceChart = new Chart(document.getElementById('performanceComparisonChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: performanceSource.labels,
+            datasets: performanceSource.series.map((series, index) => ({
+                label: series.label,
+                data: series.data,
+                borderColor: series.color,
+                backgroundColor: series.color,
+                borderWidth: index === 0 ? 2.7 : 1.8,
+                pointRadius: 0,
+                pointHoverRadius: 3,
+                tension: 0.18,
+                spanGaps: true,
+            })),
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'top', align: 'start', labels: { boxWidth: 10, boxHeight: 10, padding: 16, font: { size: 11.5 } } },
+                tooltip: {
+                    callbacks: {
+                        title: items => performanceShownLabels[items[0].dataIndex],
+                        label: item => `${item.dataset.label}: ${item.parsed.y >= 0 ? '+' : ''}${item.parsed.y.toFixed(2)}%`,
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        maxTicksLimit: 8,
+                        maxRotation: 0,
+                        callback: function(value) {
+                            const day = this.getLabelForValue(value);
+                            return new Date(`${day}T00:00:00`).toLocaleDateString('es-CA', { month: 'short', year: '2-digit' });
+                        },
+                    },
+                },
+                y: {
+                    grid: { color: '#efede7' },
+                    border: { display: false },
+                    ticks: { callback: value => `${value}%` },
+                },
+            },
+        },
+    });
+
+    function renderPerformanceRange(range) {
+        const days = performanceRanges[range];
+        let from = 0;
+        if (days !== null) {
+            const last = new Date(`${performanceSource.labels.at(-1)}T00:00:00`);
+            const cutoff = new Date(last);
+            cutoff.setDate(cutoff.getDate() - days);
+            from = performanceSource.labels.findIndex(day => new Date(`${day}T00:00:00`) >= cutoff);
+            if (from === -1) from = 0;
+        }
+        performanceShownLabels = performanceSource.labels.slice(from);
+        performanceChart.data.labels = performanceShownLabels;
+        performanceChart.data.datasets.forEach((dataset, index) => {
+            dataset.data = performanceSource.series[index].data.slice(from);
+        });
+        performanceChart.update();
+        document.querySelectorAll('.performance-range-btn').forEach(button => {
+            button.classList.toggle('tn-range-active', button.dataset.range === range);
+        });
+    }
+    document.querySelectorAll('.performance-range-btn').forEach(button => {
+        button.addEventListener('click', () => renderPerformanceRange(button.dataset.range));
+    });
+    renderPerformanceRange('1A');
+    {% endif %}
+
+    {% if strategic_allocation.flows %}
+    const compositionFlows = {{ strategic_allocation.flows|tojson }};
+    const compositionColors = {
+        EQUITY_ETF: '#b3372b',
+        REIT: '#b98a2e',
+        CRYPTO: '#4a6b8a',
+        CASH: '#8a857a',
+    };
+    const flowColor = context => compositionColors[context.dataset.data[context.dataIndex].classKey] || '#8a857a';
+    new Chart(document.getElementById('portfolioCompositionChart').getContext('2d'), {
+        type: 'sankey',
+        data: {
+            datasets: [{
+                label: 'Valor',
+                data: compositionFlows,
+                colorFrom: context => context.dataset.data[context.dataIndex].from === 'Cartera' ? '#1c1b18' : flowColor(context),
+                colorTo: flowColor,
+                hoverColorFrom: flowColor,
+                hoverColorTo: flowColor,
+                colorMode: 'gradient',
+                alpha: 0.64,
+                nodeWidth: 12,
+                nodePadding: 18,
+                size: 'max',
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: item => `C$ ${item.raw.flow.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                    },
+                },
+            },
+        },
+    });
+    {% endif %}
 </script>
-{% endif %}
 {% endblock %}

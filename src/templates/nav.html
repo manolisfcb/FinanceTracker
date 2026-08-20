@@ -19,8 +19,6 @@
                     <span class="num text-[10px] font-semibold rounded-full bg-maple text-white px-1.5 py-0.5">{{ unread_inbox_count }}</span>
                     {% endif %}
                 </a>
-                <a href="{{ url_for('personal_finance.transactions') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['personal_finance.transactions', 'personal_finance.add_transactions', 'personal_finance.edit_transactions', 'personal_finance.upload_transactions'] }}">Transacciones</a>
-                <a href="{{ url_for('personal_finance.transactions_charts') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'personal_finance.transactions_charts' }}">Gráficos</a>
             </div>
             {% endif %}
         </div>
@@ -37,14 +35,25 @@
                 <span class="num text-xs font-semibold border border-border rounded-md px-2.5 py-1 bg-[#fbfaf8]">CAD</span>
 
                 <div class="relative group">
-                    <button class="w-[30px] h-[30px] rounded-full bg-ink text-white flex items-center justify-center text-[13px] font-semibold">
+                    <button aria-label="Abrir menú de perfil" class="w-[30px] h-[30px] rounded-full bg-ink text-white flex items-center justify-center text-[13px] font-semibold">
                         {{ current_user.username[0] | upper }}
                     </button>
-                    <div class="hidden group-hover:block absolute right-0 top-full pt-2 w-44 z-10">
+                    <div class="hidden group-hover:block group-focus-within:block absolute right-0 top-full pt-2 w-52 z-10">
                         <div class="card shadow-lg overflow-hidden">
                             <div class="px-4 py-3 text-sm border-b border-border">
                                 <div class="text-muted text-xs">Sesión iniciada como</div>
                                 <div class="font-medium truncate">{{ current_user.username }}</div>
+                            </div>
+                            <div class="py-2 border-b border-border">
+                                <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Control de gastos</div>
+                                <a href="{{ url_for('personal_finance.transactions') }}"
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint in ['personal_finance.transactions', 'personal_finance.add_transactions', 'personal_finance.edit_transactions', 'personal_finance.upload_transactions'] else 'text-ink' }}">
+                                    Transacciones
+                                </a>
+                                <a href="{{ url_for('personal_finance.transactions_charts') }}"
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'personal_finance.transactions_charts' else 'text-ink' }}">
+                                    Gráficos
+                                </a>
                             </div>
                             <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2.5 text-sm text-ink hover:bg-[#fbfaf8]">Cerrar sesión</a>
                         </div>

@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, url_for
+from flask import flash, jsonify, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
 from src.extensions import db
@@ -14,6 +14,7 @@ def dash_page():
     context = {
         'kpis': service.kpis(),
         'equity': service.equity_series(),
+        'has_equity_history': service.has_equity_history(),
         'sectors': service.sector_allocation(),
         'currencies': service.currency_allocation(),
         'contributions': service.monthly_contributions(),
@@ -24,6 +25,13 @@ def dash_page():
         'today': service.today,
     }
     return render_template('dash.html', warnings=sorted(set(service.warnings)), **context)
+
+
+@portfolio_bp.route('/dashboard/equity/month', methods=['GET'])
+@login_required
+def dashboard_monthly_equity():
+    """Daily month-to-date portfolio history for the 1M chart range."""
+    return jsonify(DashboardService(current_user.id).monthly_equity_series())
 
 
 @portfolio_bp.route('/dashboard/recalculate', methods=['POST'])

@@ -93,6 +93,95 @@ def test_day_change_is_none_with_a_single_snapshot(app, db, user):
     assert _service(user).kpis()['change_percent'] is None
 
 
+class _HistoryProvider:
+    def __init__(self, histories):
+        self.histories = histories
+        self.calls = []
+
+    def get_price_history(self, yahoo_symbol, range_key):
+        self.calls.append((yahoo_symbol, range_key))
+        return self.histories.get(yahoo_symbol, [])
+
+
+def test_monthly_equity_has_one_point_for_every_elapsed_calendar_day(app, db, user):
+    account = _account(db, user)
+    asset = _asset(db)
+    _buy(db, user, account, asset, quantity=10, price=100.0, when=datetime(2026, 8, 5))
+    provider = _HistoryProvider({
+        'RY': [
+            {'date': '2026-08-05', 'close': 100.0},
+            {'date': '2026-08-07', 'close': 105.0},
+            {'date': '2026-08-10', 'close': 110.0},
+            {'date': '2026-08-20', 'close': 120.0},
+        ],
+    })
+
+    series = _service(user).monthly_equity_series(provider)
+
+    assert len(series['dates']) == 20
+    assert series['dates'][0] == '2026-08-01'
+    assert series['dates'][-1] == '2026-08-20'
+    assert series['labels'][4] == '5 ago'
+    assert series['patrimony'][3] == 0.0
+    assert series['patrimony'][4] == 1000.0
+    # August 8 and 9 are a weekend, so both retain Friday's close.
+    assert series['patrimony'][7:9] == [1050.0, 1050.0]
+    assert series['contributed'][4:] == [1000.0] * 16
+    assert provider.calls == [('RY', '1M')]
+
+
+def test_monthly_equity_converts_each_daily_close_to_cad(app, db, user):
+    account = _account(db, user)
+    asset = _asset(db, 'MSFT', 'Technology', currency='USD', exchange='NASDAQ')
+    _buy(
+        db, user, account, asset, quantity=10, price=100.0,
+        when=datetime(2026, 8, 5), fx_rate=1.35,
+    )
+    provider = _HistoryProvider({
+        'MSFT': [{'date': '2026-08-05', 'close': 100.0}],
+        'USDCAD=X': [{'date': '2026-08-05', 'close': 1.4}],
+    })
+
+    series = _service(user).monthly_equity_series(provider)
+
+    assert series['patrimony'][4] == 1400.0
+    assert series['contributed'][4] == 1350.0
+    assert provider.calls == [('MSFT', '1M'), ('USDCAD=X', '1M')]
+
+
+def test_monthly_equity_uses_live_totals_today_even_if_snapshot_is_stale(app, db, user):
+    account = _account(db, user)
+    asset = _asset(db)
+    _buy(db, user, account, asset, quantity=10, price=100.0, when=datetime(2026, 8, 5))
+    _price(db, asset, 120.0)
+    db.session.add_all([
+        PortfolioSnapshotModel(
+            user_id=user.id, account_id=None, date=date(2026, 8, 19),
+            patrimony_cad=1150.0, total_invested_cad=1000.0,
+            dividends_accum_cad=0.0,
+        ),
+        PortfolioSnapshotModel(
+            user_id=user.id, account_id=None, date=TODAY,
+            patrimony_cad=143.03, total_invested_cad=171.75,
+            dividends_accum_cad=0.0,
+        ),
+    ])
+    db.session.commit()
+    provider = _HistoryProvider({
+        'RY': [
+            {'date': '2026-08-19', 'close': 110.0},
+            {'date': '2026-08-20', 'close': 111.0},
+        ],
+    })
+
+    series = _service(user).monthly_equity_series(provider)
+
+    # Past snapshots remain authoritative, but today's point reconciles with
+    # the live KPI cards instead of an earlier, stale snapshot from today.
+    assert series['patrimony'][-2:] == [1150.0, 1200.0]
+    assert series['contributed'][-2:] == [1000.0, 1000.0]
+
+
 def test_yield_on_cost_measures_the_forward_payout_against_cost(app, db, user):
     account = _account(db, user)
     asset = _asset(db)
@@ -323,6 +412,37 @@ def test_dashboard_empty_state_does_not_blow_up(auth_client, db, user):
     assert 'Todavía no hay snapshots diarios' in body
     assert 'Todavía no tienes posiciones abiertas.' in body
     assert 'Sin eventos anunciados' in body
+
+
+def test_dashboard_monthly_equity_endpoint_returns_daily_series(auth_client, monkeypatch):
+    expected = {
+        'dates': ['2026-08-01', '2026-08-02'],
+        'labels': ['1 ago', '2 ago'],
+        'patrimony': [100.0, 101.0],
+        'contributed': [95.0, 95.0],
+    }
+    monkeypatch.setattr(
+        DashboardService, 'monthly_equity_series', lambda service: expected,
+    )
+
+    response = auth_client.get('/dashboard/equity/month')
+
+    assert response.status_code == 200
+    assert response.get_json() == expected
+
+
+def test_dashboard_draws_a_marker_when_there_is_only_one_snapshot(auth_client, db, user):
+    db.session.add(PortfolioSnapshotModel(
+        user_id=user.id, account_id=None, date=date.today(), patrimony_cad=168.89,
+        total_invested_cad=167.20, dividends_accum_cad=0.0,
+    ))
+    db.session.commit()
+
+    body = auth_client.get('/dashboard').get_data(as_text=True)
+
+    assert 'new Chart(document.getElementById(\'equityChart\')' in body
+    assert body.count("equityActiveRange === '1M'") == 2
+    assert "renderEquityRange('1M')" in body
 
 
 def test_recalculate_writes_todays_snapshot(auth_client, db, user):

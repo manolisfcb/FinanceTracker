@@ -10,4 +10,5 @@ from .Orders import OrderModel, OrderType
 from .PortfolioSnapshots import PortfolioSnapshotModel
 from .DividendReceived import DividendReceived
 from .AllocationTarget import AllocationTarget
+from .PortfolioPlan import PortfolioPlan
 from .CompanyEvent import CompanyEvent, CompanyEventKind, CompanyEventRead
