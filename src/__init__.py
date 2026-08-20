@@ -11,6 +11,8 @@ MONTHS_ES = [
     "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
 ]
 
+WEEKDAYS_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+
 CONFIG_MAP = {
     "development": "config.DevelopmentConfig",
     "production": "config.ProductionConfig",
@@ -135,11 +137,37 @@ def create_app(config_name=None):
             return "—"
         return f"{value.day} de {MONTHS_ES[value.month - 1]}"
 
+    @app.template_filter("date_long_es")
+    def format_date_long_es_filter(value):
+        """Full date with weekday, for the dashboard subtitle."""
+        if value is None:
+            return "—"
+        return (
+            f"{WEEKDAYS_ES[value.weekday()]}, {value.day} de "
+            f"{MONTHS_ES[value.month - 1]} {value.year}"
+        )
+
     @app.template_filter("month_abbr_es")
     def format_month_abbr_es_filter(value):
         if value is None:
             return "—"
         return MONTHS_ES[value.month - 1][:3]
+
+    @app.template_filter("quantity")
+    def format_quantity_filter(value):
+        """Share counts: whole numbers stay whole, fractions (DRIP, partial
+        shares) keep up to four decimals without trailing zeros."""
+        if value is None:
+            return "—"
+        if float(value).is_integer():
+            return f"{int(value):,}"
+        return f"{value:,.4f}".rstrip("0").rstrip(".")
+
+    @app.template_filter("fx")
+    def format_fx_filter(value):
+        """FX rates need four decimals — at two, USDCAD 1.3642 and 1.3598
+        both read as 1.36 and the CAD totals stop reconciling."""
+        return "—" if value is None else f"{value:,.4f}"
 
     @app.template_filter("domain")
     def format_domain_filter(value):

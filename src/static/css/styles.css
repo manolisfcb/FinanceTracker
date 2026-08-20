@@ -301,3 +301,85 @@ a:hover { color: var(--tn-maple-dark); }
    anchor and the bubble spans it. */
 .tn-help-row { position: relative; }
 .tn-help-row > * > .tn-help > .tn-help-bubble { left: 0; right: 0; width: auto; }
+
+/* Portfolio account filter chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 5px 13px;
+  border: 1px solid #d9d5cb;
+  color: var(--tn-muted-2);
+  background: #ffffff;
+}
+.chip:hover { color: var(--tn-ink); background: var(--tn-input-bg); }
+.chip-on, .chip-on:hover { background: var(--tn-ink); color: #ffffff; border-color: var(--tn-ink); }
+
+/* Account badge on a position row. Colours come from the route, which keys
+   them off the account type. */
+.acct {
+  display: inline-flex;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  border-radius: 5px;
+  padding: 2px 7px;
+}
+
+/* Totals strip: one card divided into cells, not five separate cards —
+   they're facets of a single number, and the hairlines say so. */
+.tn-totals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tn-total { padding: 16px 20px; border-right: 1px solid var(--tn-divider); border-top: 1px solid var(--tn-divider); }
+.tn-total:nth-child(-n+2) { border-top: none; }
+.tn-total:nth-child(2n) { border-right: none; }
+@media (min-width: 768px) {
+  .tn-totals { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .tn-total { border-top: none; border-right: 1px solid var(--tn-divider); }
+  .tn-total:last-child { border-right: none; }
+  .tn-total:nth-child(2n) { border-right: 1px solid var(--tn-divider); }
+}
+
+/* Positions table: numeric columns right-aligned, so the digits line up in
+   a column you can scan down. */
+.tn-positions { border-collapse: collapse; width: 100%; font-size: 13px; }
+.tn-positions th {
+  text-align: right;
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--tn-muted);
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--tn-border);
+  white-space: nowrap;
+}
+.tn-positions td {
+  text-align: right;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--tn-border-soft);
+  white-space: nowrap;
+}
+.tn-positions th.l, .tn-positions td.l { text-align: left; }
+.tn-positions .tn-edge-l { padding-left: 20px; }
+.tn-positions .tn-edge-r { padding-right: 20px; }
+.tn-positions tbody tr:hover td { background: var(--tn-input-bg); }
+.tn-positions .tn-total-row td { background: var(--tn-input-bg); border-bottom: none; }
+.tn-positions .tn-total-row:hover td { background: var(--tn-input-bg); }
+
+/* Plan-vs-real bar: fill is the real weight, the tick is the target. */
+.tn-bar { position: relative; height: 8px; background: #f0eee8; border-radius: 4px; }
+.tn-bar-fill { height: 8px; border-radius: 4px; }
+.tn-bar-target {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 14px;
+  background: var(--tn-ink);
+}
+
+/* "Editar plan": the <summary> is the card's header row, so the disclosure
+   triangle has to go — the "Editar plan" text is the affordance. */
+.tn-plan-edit > summary::-webkit-details-marker { display: none; }
+.tn-plan-edit > summary { list-style: none; }

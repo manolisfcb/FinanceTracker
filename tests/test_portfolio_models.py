@@ -130,12 +130,11 @@ def test_portfolio_snapshot_unique_user_date_account(db, user):
     db.session.rollback()
 
 
-def test_allocation_target_unique_user_asset(db, user):
-    asset = _asset(db)
-    db.session.add(AllocationTarget(user_id=user.id, asset_id=asset.id, target_percent=10.0))
+def test_allocation_target_unique_user_sector(db, user):
+    db.session.add(AllocationTarget(user_id=user.id, sector='Financial Services', target_percent=10.0))
     db.session.commit()
 
-    db.session.add(AllocationTarget(user_id=user.id, asset_id=asset.id, target_percent=20.0))
+    db.session.add(AllocationTarget(user_id=user.id, sector='Financial Services', target_percent=20.0))
     with pytest.raises(IntegrityError):
         db.session.commit()
     db.session.rollback()

@@ -8,209 +8,218 @@
 {% include 'partials/flash_messages.html' %}
 
 <!-- Header -->
-<div class="flex flex-wrap items-end justify-between gap-3 mb-6">
-    <h1 class="font-serif-display text-3xl text-ink">Portafolio</h1>
-    <div class="flex gap-2.5">
-        <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Importar órdenes</a>
+<div class="flex flex-wrap items-end justify-between gap-4 mb-5">
+    <div>
+        <h1 class="font-serif-display text-3xl text-ink mb-1">Portafolio</h1>
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ url_for('portfolio.portfolio') }}" class="chip {{ 'chip-on' if not selected_account_id }}">Todas</a>
+            {% for account in accounts %}
+            <a href="{{ url_for('portfolio.portfolio', account_id=account.id) }}"
+               class="chip {{ 'chip-on' if selected_account_id == account.id }}">{{ account.name }}</a>
+            {% endfor %}
+            <a href="{{ url_for('portfolio.list_accounts') }}" class="chip">Gestionar cuentas</a>
+        </div>
+    </div>
+    <div class="flex flex-wrap gap-2.5">
+        <a href="{{ url_for('portfolio.import_orders') }}" class="btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9"></path><path d="M7 14l5 5 5-5"></path><path d="M4 3h16"></path></svg>
+            Importar broker
+        </a>
         <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
             Nueva orden
         </a>
-        <a href="{{ url_for('stocks.get_stocks') }}" class="btn">Explorar acciones</a>
     </div>
 </div>
 
 {% if warnings %}
-<div class="tn-alert tn-alert-info mb-5">
+<div class="tn-alert tn-alert-info mb-4">
     <span>{{ warnings|length }} advertencia(s) en el cálculo del portafolio — {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
 </div>
 {% endif %}
 
-<!-- Account filter -->
-<div class="flex items-center gap-2 mb-4 text-[13px]">
-    <span class="text-muted2">Cuenta:</span>
-    <a href="{{ url_for('portfolio.portfolio') }}" class="btn {{ 'btn-primary' if not selected_account_id }}">Todas</a>
-    {% for account in accounts %}
-        <a href="{{ url_for('portfolio.portfolio', account_id=account.id) }}" class="btn {{ 'btn-primary' if selected_account_id == account.id }}">{{ account.name }}</a>
-    {% endfor %}
-    <a href="{{ url_for('portfolio.list_accounts') }}" class="btn">Gestionar cuentas</a>
-</div>
-
-<!-- Summary Cards -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-5">
-    <div class="card p-4">
-        <div class="lbl mb-2">Patrimonio</div>
-        <div class="num text-xl font-semibold">$ {{ patrimony|currency }}</div>
+<!-- Totals strip -->
+<div class="card tn-totals mb-4">
+    <div class="tn-total">
+        <div class="lbl mb-1.5">Costo</div>
+        <div class="num text-xl font-semibold">C$ {{ total_invested|currency }}</div>
     </div>
-    <div class="card p-4">
-        <div class="lbl mb-2">Costo</div>
-        <div class="num text-xl font-semibold">$ {{ total_invested|currency }}</div>
+    <div class="tn-total">
+        <div class="lbl mb-1.5">Valor</div>
+        <div class="num text-xl font-semibold">C$ {{ patrimony|currency }}</div>
     </div>
-    <div class="card p-4">
-        <div class="lbl mb-2">Ganancia no realizada</div>
-        <div class="num text-xl font-semibold {% if (patrimony or 0) < (total_invested or 0) %}neg{% else %}pos{% endif %}">
-            $ {{ ((patrimony or 0) - (total_invested or 0))|currency }}
+    <div class="tn-total">
+        <div class="lbl mb-1.5">Proventos</div>
+        <div class="num text-xl font-semibold">C$ {{ dividends_accum|currency }}</div>
+    </div>
+    <div class="tn-total">
+        <div class="lbl mb-1.5">Lucro trade</div>
+        <div class="num text-xl font-semibold">C$ {{ realized_pnl|currency }}</div>
+    </div>
+    <div class="tn-total">
+        <div class="lbl mb-1.5">Rentabilidad</div>
+        <div class="num text-xl font-semibold {{ 'pos' if (total_return_percent or 0) >= 0 else 'neg' }}">
+            {% if total_return_percent is not none %}{{ '+' if total_return_percent >= 0 }}{{ total_return_percent|ratio }}%{% else %}—{% endif %}
         </div>
     </div>
-    <div class="card p-4">
-        <div class="lbl mb-2">Ganancia realizada</div>
-        <div class="num text-xl font-semibold {{ 'pos' if (realized_pnl or 0) >= 0 else 'neg' }}">$ {{ realized_pnl|currency }}</div>
-    </div>
 </div>
 
-<!-- Portfolio Table -->
-<div class="card p-5 mb-5">
-    <div class="flex justify-between items-center mb-4">
-        <div class="text-sm font-semibold">Activos</div>
-    </div>
+<div class="grid grid-cols-1 xl:grid-cols-[2.2fr_1fr] gap-3.5 items-start">
 
-    <div class="overflow-x-auto">
-        {% if portfolio and portfolio|length > 0 %}
-            <table class="tn-card-table">
+    <!-- Positions -->
+    <div class="card overflow-hidden">
+        {% if portfolio %}
+        <div class="overflow-x-auto">
+            <table class="tn-positions">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Activo</th>
+                        <th class="l tn-edge-l">Activo</th>
+                        <th class="l">Cuenta</th>
                         <th>Precio</th>
-                        <th>Cant.</th>
-                        <th>Costo</th>
-                        <th>Precio prom.</th>
-                        <th>Ganancia</th>
-                        <th>%R</th>
+                        <th>Qtd</th>
+                        <th>Valor</th>
+                        <th>P.M.</th>
                         <th>Proventos</th>
-                        <th></th>
+                        <th>YoC</th>
+                        <th>Lucro</th>
+                        <th class="tn-edge-r">R.%</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for asset in portfolio %}
+                <tbody class="num text-[12.5px]">
+                    {% for row in portfolio %}
                     <tr>
-                        <td class="text-faint">{{ loop.index }}</td>
-                        <td class="font-semibold">{{ asset.symbol }}</td>
-                        <td class="num">{{ asset.actual_price|ratio }}</td>
-                        <td class="num">{{ asset.quantity }}</td>
-                        <td class="num">{{ asset.adquisition_cost|currency }}</td>
-                        <td class="num">{{ asset.avg_price|ratio }}</td>
-                        <td class="num {{ 'pos' if asset.profit|default(0) > 0 else 'neg' }}">
-                            {{ asset.profit|currency }}
+                        <td class="l tn-edge-l font-sans font-semibold">
+                            <a href="{{ row.detail_url }}" class="text-ink hover:text-maple">{{ row.symbol }}</a>
+                            <span class="text-faint font-normal text-[11px]">{{ row.exchange }}</span>
                         </td>
-                        <td class="num">{{ asset.percent_return|ratio }}%</td>
-                        <td class="num">$ {{ asset.percent_return_dividends|currency }}</td>
-                        <td>
-                            <details class="tn-dropdown">
-                                <summary class="btn px-2 py-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                    </svg>
-                                </summary>
-                                <div class="tn-dropdown-menu">
-                                    <a href="{{ url_for('portfolio.add_order') }}">Comprar más / Vender</a>
-                                    <a href="{{ url_for('stocks.get_stocks') }}">Ver detalles</a>
-                                </div>
-                            </details>
+                        <td class="l">
+                            {% for badge in row.accounts %}
+                            <span class="acct" style="background:{{ badge.background }}; color:{{ badge.color }}">{{ badge.label }}</span>
+                            {% else %}
+                            <span class="text-faint">—</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ row.actual_price|ratio }}</td>
+                        <td>{{ row.quantity|quantity }}</td>
+                        <td>{{ row.market_value|currency }}</td>
+                        <td>{{ row.avg_price|ratio }}</td>
+                        <td>{{ row.dividends|currency }}</td>
+                        <td>{% if row.yield_on_cost is not none %}{{ row.yield_on_cost|ratio }}%{% else %}—{% endif %}</td>
+                        <td class="{{ 'pos' if (row.profit or 0) >= 0 else 'neg' }}">
+                            {{ '+' if (row.profit or 0) >= 0 }}{{ row.profit|currency }}
+                        </td>
+                        <td class="tn-edge-r font-semibold {{ 'pos' if (row.percent_return or 0) >= 0 else 'neg' }}">
+                            {% if row.percent_return is not none %}{{ '+' if row.percent_return >= 0 }}{{ row.percent_return|ratio }}%{% else %}—{% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
+                <tbody class="text-[12.5px]">
+                    <tr class="tn-total-row">
+                        <td class="l tn-edge-l font-sans font-bold">Total</td>
+                        <td></td><td></td><td></td>
+                        <td class="num font-bold">{{ patrimony|currency }}</td>
+                        <td></td>
+                        <td class="num font-bold">{{ dividends_accum|currency }}</td>
+                        <td class="num font-bold">{% if total_yield_on_cost is not none %}{{ total_yield_on_cost|ratio }}%{% else %}—{% endif %}</td>
+                        <td class="num font-bold {{ 'pos' if unrealized_total >= 0 else 'neg' }}">{{ '+' if unrealized_total >= 0 }}{{ unrealized_total|currency }}</td>
+                        <td class="num font-bold tn-edge-r {{ 'pos' if (total_return_percent or 0) >= 0 else 'neg' }}">
+                            {% if total_return_percent is not none %}{{ '+' if total_return_percent >= 0 }}{{ total_return_percent|ratio }}%{% else %}—{% endif %}
+                        </td>
+                    </tr>
+                </tbody>
             </table>
+        </div>
+        <div class="px-5 py-3 text-[11.5px] text-faint">
+            Valores en CAD{% if usd_cad_rate %} · USD convertido a <span class="num">{{ usd_cad_rate|fx }}</span>{% endif %}
+            · precios del último snapshot diario, no en tiempo real
+        </div>
         {% else %}
-            <div class="text-center py-10">
-                <p class="text-lg text-muted2">Todavía no tienes activos en tu portafolio.</p>
-                <p class="text-faint text-sm mt-1">Agrega tu primera orden o importa tu historial.</p>
-                <div class="flex items-center justify-center gap-2.5 mt-5">
-                    <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">Agregar primera orden</a>
-                    <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Importar órdenes</a>
-                </div>
+        <div class="text-center py-12 px-5">
+            <p class="text-lg text-muted2">Todavía no tienes activos en tu portafolio.</p>
+            <p class="text-faint text-sm mt-1">Agrega tu primera orden o importa tu historial.</p>
+            <div class="flex items-center justify-center gap-2.5 mt-5">
+                <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">Agregar primera orden</a>
+                <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Importar broker</a>
             </div>
+        </div>
         {% endif %}
     </div>
-</div>
 
-<!-- Allocation target -->
-<div class="card p-5 mb-5">
-    <div class="text-sm font-semibold mb-4">Alocación objetivo</div>
+    <!-- Plan vs. real + allocation -->
+    <div class="flex flex-col gap-3.5">
+        <div class="card p-5">
+            <details class="tn-plan-edit">
+                <summary class="flex justify-between items-center mb-4 cursor-pointer list-none">
+                    <span class="text-sm font-semibold">Plan vs. real</span>
+                    <span class="text-[12px] font-semibold text-maple">Editar plan</span>
+                </summary>
+                {% if allocation_target_form.sector.choices %}
+                <form method="POST" action="{{ url_for('portfolio.set_allocation_target') }}" class="flex flex-wrap items-end gap-2.5 mb-4">
+                    {{ allocation_target_form.hidden_tag() }}
+                    <div class="space-y-1.5 flex-1 min-w-[110px]">
+                        <label class="lbl">{{ allocation_target_form.sector.label.text }}</label>
+                        {{ allocation_target_form.sector(class="tn-input") }}
+                    </div>
+                    <div class="space-y-1.5 flex-1 min-w-[90px]">
+                        <label class="lbl">{{ allocation_target_form.target_percent.label.text }}</label>
+                        {{ allocation_target_form.target_percent(class="tn-input", placeholder="ej. 30") }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </form>
+                {% else %}
+                <p class="text-faint text-[13px] mb-4">Agregá posiciones para poder planificar sus sectores.</p>
+                {% endif %}
+            </details>
 
-    <form method="POST" action="{{ url_for('portfolio.set_allocation_target') }}" class="flex flex-wrap items-end gap-3 mb-4">
-        {{ allocation_target_form.hidden_tag() }}
-        <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ allocation_target_form.asset_symbol.label.text }}</label>
-            {{ allocation_target_form.asset_symbol(class="tn-input", placeholder="ej. RY") }}
-        </div>
-        <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ allocation_target_form.target_percent.label.text }}</label>
-            {{ allocation_target_form.target_percent(class="tn-input", placeholder="ej. 10") }}
-        </div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-    </form>
-
-    {% if allocation_rows %}
-    <div class="overflow-x-auto">
-        <table class="tn-card-table">
-            <thead>
-                <tr>
-                    <th>Activo</th>
-                    <th>% actual</th>
-                    <th>% objetivo</th>
-                    <th>Desvío</th>
-                    <th>Ajuste sugerido</th>
-                </tr>
-            </thead>
-            <tbody>
+            {% if allocation_rows %}
+            <div class="flex flex-col gap-3.5 text-[12px]">
                 {% for row in allocation_rows %}
-                <tr>
-                    <td class="font-semibold">{{ row.symbol }}</td>
-                    <td class="num">{{ row.current_percent|ratio }}%</td>
-                    <td class="num">{{ row.target_percent|ratio }}%</td>
-                    <td class="num {{ 'pos' if row.deviation <= 0 else 'neg' }}">{{ row.deviation|ratio }}%</td>
-                    <td class="num {{ 'pos' if row.amount_to_trade_cad >= 0 else 'neg' }}">
-                        {{ 'Comprar' if row.amount_to_trade_cad >= 0 else 'Vender' }} $ {{ row.amount_to_trade_abs_cad|currency }}
-                    </td>
-                </tr>
+                <div>
+                    <div class="flex justify-between gap-2 mb-1.5">
+                        <span class="font-semibold truncate">{{ row.sector }}</span>
+                        <span class="num text-muted2 shrink-0">
+                            {{ row.current_percent|ratio }}% / meta {% if row.has_target %}{{ row.target_percent|ratio }}%{% else %}—{% endif %}
+                        </span>
+                    </div>
+                    <div class="tn-bar">
+                        <div class="tn-bar-fill" style="width:{{ [row.current_percent, 100]|min }}%; background:{{ row.color }}"></div>
+                        <div class="tn-bar-target" style="left:{{ [row.target_percent, 100]|min }}%"></div>
+                    </div>
+                </div>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-        <p class="text-faint text-sm">Todavía no definiste objetivos de alocación.</p>
-    {% endif %}
-</div>
+            </div>
 
-<!-- Additional Financial Information -->
-<div class="card p-5">
-    <div class="text-sm font-semibold mb-4">Resumen financiero</div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-            <div class="lbl mb-3">Detalle</div>
-            <ul class="space-y-2.5 text-[13.5px]">
-                <li class="flex justify-between border-b border-[#f0eee8] pb-2">
-                    <span class="text-muted2">Patrimonio</span>
-                    <span class="num font-semibold">$ {{ patrimony|currency }}</span>
-                </li>
-                <li class="flex justify-between border-b border-[#f0eee8] pb-2">
-                    <span class="text-muted2">Costo de adquisición</span>
-                    <span class="num font-semibold">$ {{ total_invested|currency }}</span>
-                </li>
-                <li class="flex justify-between border-b border-[#f0eee8] pb-2">
-                    <span class="text-muted2">Proventos acumulados</span>
-                    <span class="num font-semibold">$ {{ dividends_accum|currency }}</span>
-                </li>
-                <li class="flex justify-between">
-                    <span class="text-muted2">Ganancia no realizada</span>
-                    <span class="num font-semibold {% if (patrimony or 0) < (total_invested or 0) %}neg{% else %}pos{% endif %}">
-                        $ {{ ((patrimony or 0) - (total_invested or 0))|currency }}
-                    </span>
-                </li>
-            </ul>
+            {% if biggest_deviation %}
+            <div class="border-t border-[#efede7] mt-4 pt-3.5 text-[12.5px] text-muted2 leading-relaxed">
+                Mayor desvío:
+                <span class="font-semibold text-ink">{{ biggest_deviation.sector }}
+                    {{ '+' if biggest_deviation.deviation >= 0 }}{{ biggest_deviation.deviation|ratio }} pt</span>.
+                {% if biggest_deviation.amount_to_trade_cad >= 0 %}Comprar{% else %}Vender{% endif %}
+                ≈ <span class="num font-semibold text-ink">C$ {{ biggest_deviation.amount_to_trade_abs_cad|currency }}</span>
+                en {{ biggest_deviation.sector }} te acerca al plan.
+            </div>
+            {% endif %}
+            {% else %}
+            <p class="text-faint text-[13px]">Todavía no definiste objetivos de alocación por sector.</p>
+            {% endif %}
+
         </div>
-        <div>
-            <div class="lbl mb-3">Alocación por activo</div>
-            <div class="h-44">
+
+        <div class="card p-5">
+            <div class="text-sm font-semibold mb-3">Alocación por activo</div>
+            {% if portfolio %}
+            <div class="h-52">
                 <canvas id="assetAllocationChart"></canvas>
             </div>
+            {% else %}
+            <p class="text-faint text-[13px]">Sin posiciones para graficar.</p>
+            {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Chart.js Scripts -->
+{% if portfolio %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
@@ -220,9 +229,9 @@
     new Chart(assetAllocationCtx, {
         type: 'doughnut',
         data: {
-            labels: {{ asset_types|default('[]')|tojson }},
+            labels: {{ asset_types|tojson }},
             datasets: [{
-                data: {{ asset_allocation|default('[]')|tojson }},
+                data: {{ asset_allocation|tojson }},
                 backgroundColor: ['#b3372b', '#b98a2e', '#1a7f4e', '#4a6b8a', '#7d5ba6', '#d9d5cb'],
                 borderWidth: 0,
             }]
@@ -234,4 +243,5 @@
         }
     });
 </script>
+{% endif %}
 {% endblock %}

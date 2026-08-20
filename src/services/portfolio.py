@@ -17,7 +17,16 @@ correct, not a bug to reconcile.
 from dataclasses import dataclass
 from datetime import date
 
-from src.models import Account, DividendHistory, DividendReceived, Fundamentals, FxRate, OrderModel, OrderType
+from src.models import (
+    Account,
+    DividendHistory,
+    DividendReceived,
+    Fundamentals,
+    FxRate,
+    OrderModel,
+    OrderType,
+    PortfolioSnapshotModel,
+)
 
 
 @dataclass
@@ -341,3 +350,38 @@ class PortfolioService:
             touched += 1
 
         return touched
+
+
+# -- snapshots (write) ------------------------------------------------------
+
+
+def _write_snapshot(user_id: int, day: date, account_id: int | None, totals: dict):
+    from src.extensions import db
+
+    row = PortfolioSnapshotModel.query.filter_by(
+        user_id=user_id, date=day, account_id=account_id
+    ).first()
+    if row is None:
+        row = PortfolioSnapshotModel(user_id=user_id, date=day, account_id=account_id)
+        db.session.add(row)
+    row.patrimony_cad = totals["patrimony_cad"]
+    row.total_invested_cad = totals["total_invested_cad"]
+    row.dividends_accum_cad = totals["dividends_accum_cad"]
+    return row
+
+
+def write_snapshots(user_id: int, day: date | None = None) -> PortfolioService:
+    """One day's net-worth snapshot for a user: a total row plus one per account.
+
+    Lives here rather than in the nightly job because the dashboard's
+    "Recalcular" button takes the same snapshot on demand — sharing the
+    function is what guarantees the two produce identical rows. Caller
+    commits.
+    """
+    day = day or date.today()
+    service = PortfolioService(user_id)
+    service.sync_suggested_dividends()
+    _write_snapshot(user_id, day, None, service.get_totals())
+    for account in Account.query.filter_by(user_id=user_id).all():
+        _write_snapshot(user_id, day, account.id, service.get_totals(account_id=account.id))
+    return service

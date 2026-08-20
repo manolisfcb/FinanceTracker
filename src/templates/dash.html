@@ -7,136 +7,348 @@
 {% block content %}
 {% include 'partials/flash_messages.html' %}
 
-<div class="flex items-end justify-between mb-6">
+<!-- Header -->
+<div class="flex flex-wrap items-end justify-between gap-4 mb-[22px]">
     <div>
         <h1 class="font-serif-display text-3xl text-ink mb-1">Dashboard</h1>
-        <div class="text-[13px] text-muted">Resumen de tu portafolio</div>
+        <div class="text-[13px] text-muted">
+            {{ today|date_long_es }} · {{ market.label }}{% if usd_cad_rate %} · USD/CAD <span class="num">{{ usd_cad_rate|fx }}</span>{% endif %}
+        </div>
     </div>
     <div class="flex gap-2.5">
-        <a href="{{ url_for('portfolio.portfolio') }}" class="btn">Ver portafolio</a>
-        <a href="{{ url_for('personal_finance.transactions') }}" class="btn btn-primary">
+        <form method="POST" action="{{ url_for('portfolio.recalculate_dashboard') }}">
+            <button type="submit" class="btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4"></path><path d="M21 3v6h-6"></path></svg>
+                Recalcular
+            </button>
+        </form>
+        <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
-            Nueva transacción
+            Nueva orden
         </a>
     </div>
 </div>
 
+{% if warnings %}
+<div class="tn-alert tn-alert-info mb-[18px]">
+    <span>{{ warnings|length }} advertencia(s) en el cálculo del portafolio — {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
+</div>
+{% endif %}
+
 <!-- KPI band -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-5">
-    <div class="card p-4">
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3.5 mb-[18px]">
+    <div class="card py-4 px-[18px]">
         <div class="lbl mb-2">Patrimonio</div>
-        <div class="num text-xl font-semibold">$ {{ totals.patrimonio|currency }}</div>
-    </div>
-    <div class="card p-4">
-        <div class="lbl mb-2">Costo de adquisición</div>
-        <div class="num text-xl font-semibold">$ {{ totals.costo_adquisicion|currency }}</div>
-    </div>
-    <div class="card p-4">
-        <div class="lbl mb-2">Proventos acumulados</div>
-        <div class="num text-xl font-semibold">$ {{ totals.proventos_acumulados|currency }}</div>
-    </div>
-    <div class="card p-4">
-        <div class="lbl mb-2">Lucro con operaciones</div>
-        <div class="num text-xl font-semibold {{ 'pos' if totals.lucro_operaciones >= 0 else 'neg' }}">$ {{ totals.lucro_operaciones|currency }}</div>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-5">
-    <div class="card p-5 md:col-span-2">
-        <div class="flex items-center justify-between mb-3">
-            <div class="text-sm font-semibold">Rentabilidad histórica</div>
-            <div class="num text-xl font-semibold {{ 'pos' if totals.performance >= 0 else 'neg' }}">{{ totals.performance }}%</div>
+        <div class="num text-[23px] font-semibold">C${{ kpis.patrimony_cad|currency }}</div>
+        {% if kpis.change_percent is not none %}
+        <div class="num text-[12px] mt-[5px] {{ 'pos' if kpis.change_percent >= 0 else 'neg' }}">
+            {{ '▲' if kpis.change_percent >= 0 else '▼' }} {{ kpis.change_percent|ratio }}%
+            {{ 'hoy' if kpis.change_is_today else 'desde el último snapshot' }}
         </div>
-        <canvas id="performanceChart" height="90"></canvas>
+        {% else %}
+        <div class="text-[12px] text-muted mt-[5px]">sin snapshot previo</div>
+        {% endif %}
     </div>
-
-    <div class="card p-5">
-        <div class="text-sm font-semibold mb-3">Composición del portafolio</div>
-        <canvas id="portfolioCompositionChart" height="140"></canvas>
+    <div class="card py-4 px-[18px]">
+        <div class="lbl mb-2">Invertido</div>
+        <div class="num text-[23px] font-semibold">C${{ kpis.invested_cad|currency }}</div>
+        <div class="text-[12px] text-muted mt-[5px]">costo promedio</div>
+    </div>
+    <div class="card py-4 px-[18px]">
+        <div class="lbl mb-2">Ganancia total</div>
+        <div class="num text-[23px] font-semibold {{ 'pos' if kpis.gain_cad >= 0 else 'neg' }}">
+            {{ '+' if kpis.gain_cad >= 0 }}C${{ kpis.gain_cad|currency }}
+        </div>
+        {% if kpis.gain_percent is not none %}
+        <div class="num text-[12px] mt-[5px] {{ 'pos' if kpis.gain_percent >= 0 else 'neg' }}">
+            {{ '+' if kpis.gain_percent >= 0 }}{{ kpis.gain_percent|ratio }}%
+        </div>
+        {% else %}
+        <div class="text-[12px] text-muted mt-[5px]">sin costo registrado</div>
+        {% endif %}
+    </div>
+    <div class="card py-4 px-[18px]">
+        <div class="lbl mb-2">Dividendos 12m</div>
+        <div class="num text-[23px] font-semibold">C${{ kpis.dividends_12m_cad|currency }}</div>
+        <div class="text-[12px] text-muted mt-[5px]">
+            <span class="num">C${{ kpis.dividends_monthly_average_cad|currency }}</span>/mes prom.
+        </div>
+    </div>
+    <div class="card py-4 px-[18px]">
+        <div class="lbl mb-2">Yield on cost</div>
+        <div class="num text-[23px] font-semibold">
+            {% if kpis.yield_on_cost_percent is not none %}{{ kpis.yield_on_cost_percent|ratio }}%{% else %}—{% endif %}
+        </div>
+        <div class="text-[12px] text-muted mt-[5px]">
+            proyección <span class="num">C${{ kpis.projection_12m_cad|currency }}</span>/12m
+        </div>
     </div>
 </div>
 
-<div class="card p-5">
-    <div class="flex items-center justify-between mb-3">
-        <div class="text-sm font-semibold">Histórico de aportes</div>
-        <div class="text-[12px] text-muted2">Total: <span class="num font-semibold text-ink">$ {{ totals.total_contribuicoes|currency }}</span></div>
+<!-- Row: evolution + allocation -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 mb-[18px] items-start">
+    <div class="card py-5 px-[22px] lg:col-span-2">
+        <div class="flex justify-between items-center mb-3.5">
+            <div class="text-sm font-semibold">Evolución del patrimonio</div>
+            {% if equity.dates %}
+            <div class="flex gap-1.5" id="equityRangeButtons">
+                {% for key, label in [('1M', '1M'), ('6M', '6M'), ('1A', '1A'), ('ALL', 'Todo')] %}
+                <button type="button" class="tn-range equity-range-btn{{ ' tn-range-active' if key == '1A' }}" data-range="{{ key }}">{{ label }}</button>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% if equity.dates %}
+        <div class="h-[220px]">
+            <canvas id="equityChart"></canvas>
+        </div>
+        <div class="flex gap-5 mt-3 text-[12px] text-muted2">
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-[3px] bg-pos rounded-sm"></span>Patrimonio</span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-0 border-t-2 border-dashed border-[#b3a992]"></span>Aportado</span>
+        </div>
+        {% else %}
+        <div class="h-[220px] flex flex-col items-center justify-center text-center gap-2">
+            <p class="text-[13px] text-faint">Todavía no hay snapshots diarios para dibujar la curva.</p>
+            <form method="POST" action="{{ url_for('portfolio.recalculate_dashboard') }}">
+                <button type="submit" class="btn">Tomar el primer snapshot</button>
+            </form>
+        </div>
+        {% endif %}
     </div>
-    <canvas id="contributionsChart" height="70"></canvas>
+
+    <div class="card py-5 px-[22px]">
+        <div class="text-sm font-semibold mb-3.5">Alocación por sector</div>
+        {% if sectors %}
+        <div class="flex items-center gap-5">
+            <svg width="140" height="140" viewBox="0 0 140 140" class="shrink-0">
+                <g transform="rotate(-90 70 70)">
+                    {% for slice in sectors %}
+                    <circle cx="70" cy="70" r="56" fill="none" stroke="{{ slice.color }}" stroke-width="20"
+                            stroke-dasharray="{{ slice.dash }} {{ slice.gap }}" stroke-dashoffset="{{ slice.offset }}">
+                        <title>{{ slice.label }} — {{ slice.percent|ratio }}%</title>
+                    </circle>
+                    {% endfor %}
+                </g>
+                <text x="70" y="66" text-anchor="middle" font-size="11" fill="#8a857a" font-family="IBM Plex Sans, sans-serif">Total</text>
+                <text x="70" y="84" text-anchor="middle" font-size="14" font-weight="600" fill="#1c1b18" font-family="IBM Plex Mono, monospace">C${{ sectors|sum(attribute='value_cad')|compact_number }}</text>
+            </svg>
+            <div class="flex flex-col gap-2 text-[12px] flex-1 min-w-0">
+                {% for slice in sectors %}
+                <div class="flex justify-between gap-2">
+                    <span class="flex items-center gap-[7px] min-w-0">
+                        <span class="w-[9px] h-[9px] rounded-sm shrink-0" style="background:{{ slice.color }}"></span>
+                        <span class="truncate">{{ slice.label }}</span>
+                    </span>
+                    <span class="num shrink-0">{{ slice.percent|round|int }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <p class="text-[13px] text-faint py-4">Sin posiciones valuadas en CAD para repartir por sector.</p>
+        {% endif %}
+
+        {% if currencies %}
+        <div class="border-t border-[#efede7] mt-4 pt-3.5">
+            <div class="lbl mb-2.5">Por moneda</div>
+            <div class="flex flex-col gap-2 text-[12px]">
+                {% for row in currencies %}
+                <div class="flex items-center gap-2.5">
+                    <span class="num w-[30px]">{{ row.currency }}</span>
+                    <div class="flex-1 h-2 bg-[#f0eee8] rounded">
+                        <div class="h-2 rounded" style="width:{{ row.percent|round(1) }}%; background:{{ row.color }}"></div>
+                    </div>
+                    <span class="num w-8 text-right">{{ row.percent|round|int }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
 
+<!-- Row: contributions + top positions + events -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 items-start">
+    <div class="card py-5 px-[22px]">
+        <div class="text-sm font-semibold mb-3.5">Aportes mensuales</div>
+        <svg width="100%" height="170" viewBox="0 0 340 170" preserveAspectRatio="none">
+            {% for bar in contributions.bars %}
+            <rect x="{{ bar.x }}" y="{{ bar.y }}" width="{{ bar.width }}" height="{{ bar.height }}" rx="3" fill="{{ bar.color }}">
+                <title>{{ bar.month_name }} {{ bar.month.year }} — C${{ bar.total_cad|currency }}</title>
+            </rect>
+            {% endfor %}
+        </svg>
+        <div class="num flex justify-between text-[10.5px] text-faint mt-1.5 px-1.5">
+            {% for bar in contributions.bars %}<span>{{ bar.initial }}</span>{% endfor %}
+        </div>
+        {% if contributions.current %}
+        <div class="text-[12px] text-muted2 mt-3 first-letter:uppercase">
+            {{ contributions.current.month_name }}: <span class="num font-semibold text-ink">C${{ contributions.current.total_cad|currency }}</span> aportados
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card py-5 px-[22px]">
+        <div class="flex justify-between items-center mb-2">
+            <div class="text-sm font-semibold">Top posiciones</div>
+            <a href="{{ url_for('portfolio.portfolio') }}" class="text-[12px] font-semibold">Ver portafolio →</a>
+        </div>
+        {% if top_positions %}
+        <table class="tn-card-table">
+            <tbody>
+                {% for row in top_positions %}
+                <tr>
+                    <td class="font-semibold">
+                        <a href="{{ url_for('stocks.get_stock_detail', exchange=row.exchange, symbol=row.symbol) }}" class="text-ink hover:text-maple">{{ row.symbol }}</a>
+                        <span class="text-faint font-normal">{{ row.exchange }}</span>
+                    </td>
+                    <td class="num text-right">C${{ row.market_value_cad|compact_number }}</td>
+                    <td class="num text-right w-[70px] {{ 'pos' if (row.percent_return or 0) >= 0 else 'neg' }}">
+                        {% if row.percent_return is not none %}{{ '+' if row.percent_return >= 0 }}{{ row.percent_return|ratio }}%{% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-[13px] text-faint py-4">Todavía no tienes posiciones abiertas.</p>
+        {% endif %}
+    </div>
+
+    <div class="card py-5 px-[22px]">
+        <div class="flex justify-between items-center mb-3">
+            <div class="text-sm font-semibold">Próximos eventos</div>
+            <a href="{{ url_for('inbox.inbox_page') }}" class="text-[12px] font-semibold">Inbox →</a>
+        </div>
+        {% if events %}
+        <div class="flex flex-col gap-3">
+            {% for event in events %}
+            <div class="flex gap-3 items-start">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:{{ event.background }}">
+                    {% if event.icon == 'clock' %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ event.color }}" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+                    {% elif event.icon == 'trend' %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ event.color }}" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>
+                    {% elif event.icon == 'file' %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ event.color }}" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path></svg>
+                    {% else %}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ event.color }}" stroke-width="2"><path d="M4 5h16v14H4z"></path><path d="M8 9h8M8 13h5"></path></svg>
+                    {% endif %}
+                </div>
+                <div class="text-[12.5px] leading-[1.45] min-w-0">
+                    <span class="font-semibold">{{ event.symbol }}</span> ·
+                    {% if event.url %}<a href="{{ event.url }}" target="_blank" rel="noopener noreferrer" class="text-ink hover:text-maple">{{ event.title }}</a>{% else %}{{ event.title }}{% endif %}
+                    — <span class="num">{{ event.date.day }} {{ event.date|month_abbr_es }}</span>
+                    {% if event.amount_per_share %}
+                    · <span class="num">{{ event.currency }} {{ event.amount_per_share|ratio }}</span>/acción
+                    {% endif %}
+                    {% if event.estimated_cad is not none %}
+                    <div class="text-muted text-[11.5px] mt-0.5">Recibirás ≈ <span class="num">C${{ event.estimated_cad|currency }}</span></div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-[13px] text-faint py-4">Sin eventos anunciados para tus posiciones.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if equity.dates %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const tnGridColor = '#efede7';
-    const tnTextColor = '#6f6b60';
     Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
-    Chart.defaults.color = tnTextColor;
+    Chart.defaults.color = '#6f6b60';
 
-    // Rentabilidad histórica
-    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
-    new Chart(performanceCtx, {
+    const equitySeries = {
+        dates: {{ equity.dates|tojson }},
+        labels: {{ equity.labels|tojson }},
+        patrimony: {{ equity.patrimony|tojson }},
+        contributed: {{ equity.contributed|tojson }},
+    };
+    // Days of history each range keeps; ALL keeps everything.
+    const equityRanges = { '1M': 31, '6M': 183, '1A': 365, 'ALL': null };
+
+    const equityChart = new Chart(document.getElementById('equityChart').getContext('2d'), {
         type: 'line',
         data: {
-            labels: {{ historical_labels|default([])|tojson }},
-            datasets: [{
-                label: 'Patrimonio',
-                data: {{ historical_data|default([])|tojson }},
-                borderColor: '#1a7f4e',
-                backgroundColor: 'rgba(26, 127, 78, 0.09)',
-                tension: 0.35,
-                fill: true,
-                pointRadius: 0,
-                borderWidth: 2.5,
-            }]
+            labels: [],
+            datasets: [
+                {
+                    label: 'Patrimonio',
+                    data: [],
+                    borderColor: '#1a7f4e',
+                    backgroundColor: 'rgba(26, 127, 78, 0.09)',
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    tension: 0.25,
+                    fill: true,
+                },
+                {
+                    label: 'Aportado',
+                    data: [],
+                    borderColor: '#b3a992',
+                    borderWidth: 1.5,
+                    borderDash: [5, 4],
+                    pointRadius: 0,
+                    tension: 0.25,
+                    fill: false,
+                },
+            ],
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } },
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: items => equityShown.dates[items[0].dataIndex],
+                        label: item => `${item.dataset.label}: C$${item.parsed.y.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                    },
+                },
+            },
             scales: {
-                x: { grid: { color: tnGridColor } },
-                y: { beginAtZero: true, grid: { color: tnGridColor } }
-            }
-        }
+                // The month label carries the x axis, like the design; the
+                // y scale is read off the tooltip, so it keeps the grid
+                // lines and drops the ticks.
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 7, autoSkip: true, maxRotation: 0 } },
+                y: { grid: { color: '#efede7' }, ticks: { display: false }, border: { display: false } },
+            },
+        },
     });
 
-    // Histórico de aportes
-    const contributionsCtx = document.getElementById('contributionsChart').getContext('2d');
-    new Chart(contributionsCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ contributions_labels|default([])|tojson }},
-            datasets: [{
-                label: 'Aportes',
-                data: {{ contributions_data|default([])|tojson }},
-                backgroundColor: '#d9d5cb',
-                borderRadius: 3,
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { grid: { display: false } },
-                y: { beginAtZero: true, grid: { color: tnGridColor } }
-            }
-        }
-    });
+    let equityShown = equitySeries;
 
-    // Composición del portafolio
-    const portfolioCtx = document.getElementById('portfolioCompositionChart').getContext('2d');
-    new Chart(portfolioCtx, {
-        type: 'doughnut',
-        data: {
-            labels: {{ portfolio_labels|default([])|tojson }},
-            datasets: [{
-                data: {{ portfolio_data|default([])|tojson }},
-                backgroundColor: ['#b3372b', '#b98a2e', '#1a7f4e', '#4a6b8a', '#7d5ba6', '#d9d5cb'],
-                borderWidth: 0,
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, padding: 12, font: { size: 11.5 } } } }
+    function renderEquityRange(range) {
+        const days = equityRanges[range];
+        let from = 0;
+        if (days !== null) {
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - days);
+            from = equitySeries.dates.findIndex(d => new Date(d) >= cutoff);
+            if (from === -1) from = Math.max(equitySeries.dates.length - 1, 0);
         }
+        equityShown = {
+            dates: equitySeries.dates.slice(from),
+            labels: equitySeries.labels.slice(from),
+        };
+        equityChart.data.labels = equityShown.labels;
+        equityChart.data.datasets[0].data = equitySeries.patrimony.slice(from);
+        equityChart.data.datasets[1].data = equitySeries.contributed.slice(from);
+        equityChart.update();
+
+        document.querySelectorAll('.equity-range-btn').forEach(btn => {
+            btn.classList.toggle('tn-range-active', btn.dataset.range === range);
+        });
+    }
+
+    document.querySelectorAll('.equity-range-btn').forEach(btn => {
+        btn.addEventListener('click', () => renderEquityRange(btn.dataset.range));
     });
+    renderEquityRange('1A');
 </script>
+{% endif %}
 {% endblock %}
