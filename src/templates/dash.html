@@ -178,8 +178,10 @@
             </rect>
             {% endfor %}
         </svg>
-        <div class="num flex justify-between text-[10.5px] text-faint mt-1.5 px-1.5">
-            {% for bar in contributions.bars %}<span>{{ bar.initial }}</span>{% endfor %}
+        <div class="num flex text-[10.5px] text-faint mt-1.5">
+            {# One equal-width cell per bar, so a label sits under its own bar
+               whatever the card's width. #}
+            {% for bar in contributions.bars %}<span class="flex-1 text-center">{{ bar.initial }}</span>{% endfor %}
         </div>
         {% if contributions.current %}
         <div class="text-[12px] text-muted2 mt-3 first-letter:uppercase">

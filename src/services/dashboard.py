@@ -355,7 +355,9 @@ class DashboardService:
             is_upcoming = event.event_date is not None and event.event_date >= self.today
             entry = {
                 'symbol': asset.symbol,
-                'title': event.title,
+                # The jobs title events "RY — resultados"; the card already
+                # shows the ticker, so the prefix would read twice.
+                'title': event.title.removeprefix(f'{asset.symbol} — '),
                 'url': event.url,
                 'kind': event.kind,
                 'date': event.event_date if is_upcoming else event.published_at.date(),

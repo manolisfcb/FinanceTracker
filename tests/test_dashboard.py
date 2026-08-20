@@ -242,6 +242,7 @@ def test_upcoming_events_estimate_what_a_dividend_will_pay(app, db, user):
 
     assert len(events) == 1
     assert events[0]['symbol'] == 'RY'
+    assert events[0]['title'] == 'ex-dividend'
     assert events[0]['amount_per_share'] == 0.9425
     assert round(events[0]['estimated_cad'], 2) == 94.25
     assert events[0]['is_upcoming'] is True
@@ -259,7 +260,8 @@ def test_upcoming_events_come_first_and_news_never_backfills(app, db, user):
 
     events = _service(user).upcoming_events()
 
-    assert [e['title'] for e in events] == ['RY — resultados', 'RY — 8-K']
+    # The card prints the ticker itself, so the title drops its "RY — " prefix.
+    assert [e['title'] for e in events] == ['resultados', '8-K']
 
 
 def test_events_of_assets_that_are_not_held_are_left_out(app, db, user):
