@@ -1,7 +1,7 @@
-from datetime import date
+from datetime import date, datetime
 from unittest.mock import patch
 
-from src.models import Asset, DividendHistory, Fundamentals
+from src.models import Asset, CompanyEvent, CompanyEventKind, DividendHistory, Fundamentals
 
 
 def _seed_asset(db, **overrides):
@@ -78,6 +78,27 @@ def test_stock_detail_lists_dividend_history(auth_client, db):
 
     assert '2026-03-01' in body
     assert 'Sin historial de dividendos registrado.' not in body
+
+
+def test_stock_detail_lists_news(auth_client, db):
+    asset = _seed_asset(db)
+    db.session.add(CompanyEvent(
+        asset_id=asset.id, kind=CompanyEventKind.NEWS, source='GOOGLE', external_id='n-1',
+        title='RBC nombra nuevo CEO', summary='Publicado por TradingView.',
+        url='https://news.example/ry', published_at=datetime(2026, 8, 18, 9, 0),
+    ))
+    db.session.commit()
+
+    body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
+
+    assert 'RBC nombra nuevo CEO' in body
+    assert 'https://news.example/ry' in body
+    assert 'Sin noticias registradas todavía' not in body
+
+
+def test_stock_detail_shows_empty_state_without_news(auth_client, db):
+    _seed_asset(db)
+    assert 'Sin noticias registradas todavía' in auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
 
 
 @patch('src.routes.stockViews.get_provider')

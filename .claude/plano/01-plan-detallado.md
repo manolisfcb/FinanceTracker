@@ -269,19 +269,34 @@ números reales hace falta o una fuente de FX BRL→CAD o una cartera CA/US.
 > Segunda mitad del split de la Fase 4 original. Depende de `CompanyEvent` (creada en 4a) — agrega
 > eventos `kind=NEWS` con `source` distinguiendo el proveedor.
 
-- [ ] `[M]` Capa de proveedores de noticias (mismo patrón Strategy que `MarketDataProvider`):
-      `YahooNewsProvider` (yfinance `.news`, gratis, ya autenticado por symbol), `GoogleNewsProvider`
-      (RSS público `news.google.com/rss/search?q=...`, gratis, sin API key). Reuters no tiene API
-      pública gratuita — evaluar RSS de Reuters por sección/empresa si existe, si no queda fuera del
-      alcance inicial (documentar, no bloquear la fase).
-- [ ] `[S]` Job periódico que agrega noticias por asset en portafolio → `CompanyEvent` (`kind=NEWS`,
-      `source=YAHOO|GOOGLE|REUTERS`), dedupe por URL.
-- [ ] `[S]` Feed de noticias en la página de empresa (pestaña o sección aparte de "hechos relevantes").
-- [ ] `[S]` Extender `/inbox` para incluir noticias junto a los eventos regulatorios de Fase 4a,
-      con filtro por tipo (filing/earnings/dividendo/noticia).
+- [x] `[M]` Capa de proveedores de noticias (`src/services/news/`, mismo patrón Strategy que
+      `MarketDataProvider`): `YahooNewsProvider` (yfinance `.news`) y `GoogleNewsProvider`
+      (RSS público `news.google.com/rss/search?q=...`, sin API key, locale `es-419/CA` para que los
+      titulares vengan en el idioma de la UI). **Reuters queda fuera**: no tiene API ni RSS público
+      gratuito por empresa. A diferencia de `get_provider()`, la factory `get_news_providers()`
+      devuelve una **lista** — las noticias se agregan de todas las fuentes a la vez, no se
+      intercambian (config `NEWS_PROVIDERS=yahoo,google`).
+- [x] `[S]` Job `refresh_news` (interval 6h — las noticias salen durante el día, a diferencia de los
+      jobs de cierre) sobre assets en cartera → `CompanyEvent` (`kind=NEWS`, `source=YAHOO|GOOGLE`).
+      **Dedupe doble**: por hash de URL dentro de cada fuente, y por título normalizado entre fuentes
+      en una ventana de 14 días — Yahoo y Google publican la misma nota con URLs distintas, así que
+      dedupe solo por URL no alcanzaba.
+- [x] `[S]` Feed de noticias en la página de empresa (sección propia, separada de "Hechos relevantes").
+- [x] `[S]` `/inbox` ya soportaba el filtro "Noticias" desde 4a; se ajustó el render para que la
+      headline sea el cuerpo del evento (no el resumen) y el link diga "Leer ↗" en vez de
+      "Ver en EDGAR ↗" según `source`.
 
-**Criterio de salida**: un asset en portafolio muestra noticias recientes de al menos 2 fuentes
-distintas (Yahoo + Google News), visibles en su página y en el inbox.
+**Criterio de salida**: ✅ verificado en vivo contra la DB de dev — ambas fuentes responden desde
+este entorno y las noticias reales aparecen en la página de empresa y en el inbox (138 noticias de
+los 37 assets en cartera, 71 de Yahoo + 67 de Google).
+
+**Hallazgo durante la ejecución — el feed por ticker de Yahoo trae ruido**: pedirle noticias de `RY`
+devuelve notas de *Rayonier (RYN)*, *Citizens & Northern (CZNC)* y ETFs genéricos; Google mete
+páginas de referencia de bonos. yfinance no expone tickers relacionados por nota (ni `.news` ni
+`yf.Search`), así que se agregó un **filtro de relevancia en el job** (`_is_about_asset`): se guarda
+la nota solo si el símbolo aparece como token suelto, o el nombre de la empresa aparece, en el
+titular o el resumen. En la corrida real descartó **106 de 244** notas (43%). Compromiso conocido:
+puede descartar alguna nota legítima que no nombre a la empresa en el titular ni el resumen.
 
 ---
 

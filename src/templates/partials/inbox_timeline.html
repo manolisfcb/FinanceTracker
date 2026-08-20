@@ -35,9 +35,14 @@
                     <span class="text-[10px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 {{ style[0] }} {{ style[1] }}">{{ style[2] }}</span>
                 </div>
                 <div class="text-[13px] leading-relaxed {{ 'text-muted' if event.read else 'text-[#4a463d]' }}">
-                    {{ event.summary or event.title }}
+                    {% if event.kind.value == 'NEWS' %}
+                        {{ event.title }}
+                        {% if event.summary %}<span class="text-muted">{{ event.summary }}</span>{% endif %}
+                    {% else %}
+                        {{ event.summary or event.title }}
+                    {% endif %}
                     {% if event.url %}
-                    <a href="{{ event.url }}" target="_blank" rel="noopener" class="font-semibold">Ver en EDGAR ↗</a>
+                    <a href="{{ event.url }}" target="_blank" rel="noopener" class="font-semibold">{{ 'Ver en EDGAR ↗' if event.source == 'EDGAR' else 'Leer ↗' }}</a>
                     {% endif %}
                 </div>
             </div>

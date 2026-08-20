@@ -146,6 +146,24 @@ def test_inbox_filters_by_kind(auth_client, db, user):
     assert 'Filing<' not in body
 
 
+def test_inbox_shows_news_headline_and_read_link(auth_client, db, user):
+    asset = _held_asset(db, user)
+    event = CompanyEvent(
+        asset_id=asset.id, kind=CompanyEventKind.NEWS, source='GOOGLE', external_id='n-1',
+        title='RY nombra nuevo CEO', summary='Publicado por TradingView.',
+        url='https://news.example/ry', published_at=datetime.utcnow(),
+    )
+    db.session.add(event)
+    db.session.commit()
+
+    body = auth_client.get('/inbox?kind=NEWS').get_data(as_text=True)
+
+    assert 'RY nombra nuevo CEO' in body
+    assert 'Publicado por TradingView.' in body
+    assert 'Leer ↗' in body
+    assert 'Ver en EDGAR ↗' not in body
+
+
 def test_mark_read_is_idempotent(auth_client, db, user):
     asset = _held_asset(db, user)
     event = _event(db, asset)

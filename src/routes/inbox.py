@@ -85,6 +85,7 @@ def _grouped_events(user_id, kind):
         groups[-1]['events'].append({
             'id': event.id,
             'kind': event.kind,
+            'source': event.source,
             'title': event.title,
             'summary': event.summary,
             'url': event.url,

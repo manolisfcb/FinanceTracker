@@ -332,6 +332,13 @@ def get_stock_detail(exchange, symbol):
         .limit(10)
         .all()
     )
+    news = (
+        CompanyEvent.query
+        .filter_by(asset_id=asset.id, kind=CompanyEventKind.NEWS)
+        .order_by(CompanyEvent.published_at.desc())
+        .limit(12)
+        .all()
+    )
 
     context = {
         'asset': asset,
@@ -346,6 +353,7 @@ def get_stock_detail(exchange, symbol):
         'dividend_totals': list(dividend_totals),
         'next_earnings': next_earnings,
         'filings': filings,
+        'news': news,
         'sedar_search_url': SEDAR_SEARCH_URL.format(query=quote_plus(asset.name)),
         'form': form,
     }

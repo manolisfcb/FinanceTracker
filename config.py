@@ -24,6 +24,9 @@ class Config(object):
     SEC_EDGAR_USER_AGENT = os.getenv(
         "SEC_EDGAR_USER_AGENT", "TrueNorth Analytics mmedinac26@gmail.com"
     )
+    # News sources to aggregate (comma-separated): yahoo, google. Both are
+    # free and keyless. Reuters has no free API — deliberately not included.
+    NEWS_PROVIDERS = os.getenv("NEWS_PROVIDERS", "yahoo,google")
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
