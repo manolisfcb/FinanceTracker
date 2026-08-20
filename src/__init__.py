@@ -57,6 +57,8 @@ def create_app(config_name=None):
     # Importing these registers their view functions onto the blueprints
     # above (decorator side effects) — the imports themselves are unused.
     from src.routes import dash  # noqa: F401
+    from src.routes import orders  # noqa: F401
+    from src.routes import accounts  # noqa: F401
     from src.routes import transactions  # noqa: F401
     from src.routes import transactions_charts  # noqa: F401
 
@@ -70,7 +72,6 @@ def create_app(config_name=None):
     from src.routes import stockResources
 
     api.add_resource(stockResources.StockResources, "/api/stock")
-    api.add_resource(stockResources.UploadPortfolio, "/api/upload-portfolio")
 
     @app.template_filter("currency")
     def format_currency_filter(value):
@@ -112,6 +113,7 @@ def create_app(config_name=None):
         from src.resources.jobs import refresh_fundamentals  # noqa: F401
         from src.resources.jobs import refresh_quotes  # noqa: F401
         from src.resources.jobs import refresh_fx  # noqa: F401
+        from src.resources.jobs import refresh_snapshots  # noqa: F401
 
         if not scheduler.running:
             scheduler.start()

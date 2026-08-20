@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+    Órdenes | TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<div class="flex flex-wrap items-end justify-between gap-3 mb-6">
+    <h1 class="font-serif-display text-3xl text-ink">Órdenes</h1>
+    <div class="flex gap-2.5">
+        <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Importar CSV</a>
+        <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">Nueva orden</a>
+    </div>
+</div>
+
+<div class="flex items-center gap-2 mb-4 text-[13px]">
+    <span class="text-muted2">Cuenta:</span>
+    <a href="{{ url_for('portfolio.list_orders') }}" class="btn {{ 'btn-primary' if not selected_account_id }}">Todas</a>
+    {% for account in accounts %}
+        <a href="{{ url_for('portfolio.list_orders', account_id=account.id) }}" class="btn {{ 'btn-primary' if selected_account_id == account.id }}">{{ account.name }}</a>
+    {% endfor %}
+</div>
+
+<div class="card p-5">
+    <div class="overflow-x-auto">
+        <table class="tn-card-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Activo</th>
+                    <th>Cuenta</th>
+                    <th>Tipo</th>
+                    <th>Cant.</th>
+                    <th>Precio</th>
+                    <th>Comisiones</th>
+                    <th>Moneda</th>
+                    <th>Broker</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if orders %}
+                    {% for order in orders %}
+                    <tr>
+                        <td class="num">{{ order.executed_at.strftime('%Y-%m-%d') }}</td>
+                        <td class="font-semibold">{{ order.asset.symbol }}</td>
+                        <td>{{ order.account.name }}</td>
+                        <td>{{ order.type.value }}</td>
+                        <td class="num">{{ order.quantity }}</td>
+                        <td class="num">{{ order.price }}</td>
+                        <td class="num">{{ order.fees }}</td>
+                        <td>{{ order.currency }}</td>
+                        <td>{{ order.broker or '—' }}</td>
+                        <td>
+                            <a hx-delete="{{ url_for('portfolio.delete_order', id=order.id) }}"
+                               hx-confirm="¿Seguro que quieres eliminar esta orden?"
+                               hx-on="afterRequest: window.location.reload()"
+                               class="cursor-pointer text-muted2 hover:text-neg" title="Eliminar">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-faint py-6">Todavía no hay órdenes registradas.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

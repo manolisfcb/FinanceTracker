@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+    Cuentas | TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<div class="flex flex-wrap items-end justify-between gap-3 mb-6">
+    <h1 class="font-serif-display text-3xl text-ink">Cuentas</h1>
+    <a href="{{ url_for('portfolio.add_account') }}" class="btn btn-primary">Nueva cuenta</a>
+</div>
+
+<div class="card p-5">
+    <div class="overflow-x-auto">
+        <table class="tn-card-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Broker</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if accounts %}
+                    {% for account in accounts %}
+                    <tr>
+                        <td class="font-semibold">{{ account.name }}</td>
+                        <td>{{ account.type.value }}</td>
+                        <td>{{ account.broker or '—' }}</td>
+                        <td>
+                            <a hx-delete="{{ url_for('portfolio.delete_account', id=account.id) }}"
+                               hx-confirm="¿Seguro que quieres eliminar esta cuenta?"
+                               hx-on="afterRequest: window.location.reload()"
+                               class="cursor-pointer text-muted2 hover:text-neg" title="Eliminar">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-faint py-6">Todavía no tenés cuentas. Creá una para empezar a cargar órdenes.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

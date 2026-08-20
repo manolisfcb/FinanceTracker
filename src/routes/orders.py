@@ -1,0 +1,188 @@
+import uuid
+from datetime import datetime
+from io import TextIOWrapper
+
+from flask import flash, redirect, render_template, request, session, url_for
+from flask_login import current_user, login_required
+
+from src.extensions import db
+from src.forms.ManualOrderForm import ManualOrderForm
+from src.forms.OrdersImportForm import OrdersImportForm
+from src.models import Account, OrderModel, OrderType
+from src.resources.orders_import.registry import get_importer, resolve_asset_id
+from src.routes.portfolio import portfolio_bp
+from src.services.portfolio import fx_rate_to_cad_today
+
+
+def _account_choices():
+    accounts = Account.query.filter_by(user_id=current_user.id).order_by(Account.name.asc()).all()
+    return [(str(a.id), f"{a.name} ({a.type.value})") for a in accounts]
+
+
+@portfolio_bp.route('/orders', methods=['GET'])
+@login_required
+def list_orders():
+    account_id = request.args.get('account_id', type=int)
+    query = OrderModel.query.filter_by(user_id=current_user.id)
+    if account_id:
+        query = query.filter_by(account_id=account_id)
+    orders = query.order_by(OrderModel.executed_at.desc()).all()
+    accounts = Account.query.filter_by(user_id=current_user.id).order_by(Account.name.asc()).all()
+    return render_template('orders.html', orders=orders, accounts=accounts, selected_account_id=account_id)
+
+
+@portfolio_bp.route('/orders/delete/<int:id>', methods=['DELETE'])
+@login_required
+def delete_order(id):
+    order = OrderModel.query.filter_by(id=id, user_id=current_user.id).first()
+    if not order:
+        return {'message': 'Order not found'}, 404
+    db.session.delete(order)
+    db.session.commit()
+    flash('Orden eliminada', 'success')
+    return '', 204
+
+
+@portfolio_bp.route('/orders/add', methods=['GET', 'POST'])
+@login_required
+def add_order():
+    form = ManualOrderForm()
+    form.account.choices = _account_choices()
+
+    if form.validate_on_submit():
+        asset_id = resolve_asset_id(form.asset_symbol.data)
+        if asset_id is None:
+            flash(f'No se encontró el activo "{form.asset_symbol.data}" en el universo', 'error')
+            return render_template('add_order.html', form=form)
+
+        currency = form.currency.data.strip().upper()
+        fx_rate = fx_rate_to_cad_today(currency)
+        if fx_rate is None:
+            flash(f'No hay tasa de cambio {currency}->CAD disponible, se usó 1.0', 'error')
+            fx_rate = 1.0
+
+        try:
+            executed_at = datetime.strptime(form.executed_at.data, '%Y-%m-%d')
+            quantity = float(form.quantity.data)
+            price = float(form.price.data)
+            fees = float(form.fees.data) if form.fees.data else 0.0
+        except ValueError:
+            flash('Cantidad, precio, comisiones o fecha inválidos', 'error')
+            return render_template('add_order.html', form=form)
+
+        order = OrderModel(
+            user_id=current_user.id,
+            asset_id=asset_id,
+            account_id=int(form.account.data),
+            type=OrderType(form.type.data),
+            quantity=quantity,
+            price=price,
+            fees=fees,
+            currency=currency,
+            fx_rate_to_cad=fx_rate,
+            executed_at=executed_at,
+            broker=None,
+        )
+        db.session.add(order)
+        db.session.commit()
+        flash('Orden agregada correctamente', 'success')
+        return redirect(url_for('portfolio.list_orders'))
+
+    return render_template('add_order.html', form=form)
+
+
+@portfolio_bp.route('/orders/import', methods=['GET', 'POST'])
+@login_required
+def import_orders():
+    form = OrdersImportForm()
+    form.account.choices = _account_choices()
+
+    if form.validate_on_submit():
+        importer = get_importer(form.broker.data)
+        csv_file = TextIOWrapper(form.file.data.stream, encoding='utf-8')
+        try:
+            parsed_rows = importer.parse(csv_file)
+        except ValueError as exc:
+            flash(f'Error procesando el archivo: {exc}', 'error')
+            return render_template('orders_import.html', form=form)
+
+        existing_hashes = {
+            h for (h,) in OrderModel.query.with_entities(OrderModel.import_hash)
+            .filter(OrderModel.import_hash.isnot(None))
+            .all()
+        }
+
+        preview_rows = []
+        for row in parsed_rows:
+            import_hash = row.import_hash()
+            asset_id = resolve_asset_id(row.symbol)
+            preview_rows.append(
+                {
+                    "symbol": row.symbol,
+                    "type": row.type,
+                    "quantity": row.quantity,
+                    "price": row.price,
+                    "fees": row.fees,
+                    "currency": row.currency,
+                    "executed_at": row.executed_at.isoformat(),
+                    "broker": row.broker,
+                    "asset_id": asset_id,
+                    "import_hash": import_hash,
+                    "is_duplicate": import_hash in existing_hashes,
+                    "is_unknown_symbol": asset_id is None,
+                }
+            )
+
+        batch_id = uuid.uuid4().hex
+        session[f"import_batch:{batch_id}"] = {
+            "account_id": form.account.data,
+            "rows": preview_rows,
+        }
+
+        return render_template(
+            'orders_import_preview.html', batch_id=batch_id, rows=preview_rows
+        )
+
+    return render_template('orders_import.html', form=form)
+
+
+@portfolio_bp.route('/orders/import/confirm', methods=['POST'])
+@login_required
+def confirm_import_orders():
+    batch_id = request.form.get('batch_id')
+    batch = session.get(f"import_batch:{batch_id}") if batch_id else None
+    if not batch:
+        flash('El lote de importación expiró, volvé a subir el archivo', 'error')
+        return redirect(url_for('portfolio.import_orders'))
+
+    selected_indexes = {int(i) for i in request.form.getlist('rows')}
+    account_id = int(batch["account_id"])
+
+    imported = 0
+    for index, row in enumerate(batch["rows"]):
+        if index not in selected_indexes:
+            continue
+        if row["is_duplicate"] or row["is_unknown_symbol"]:
+            continue
+
+        order = OrderModel(
+            user_id=current_user.id,
+            asset_id=row["asset_id"],
+            account_id=account_id,
+            type=OrderType(row["type"]),
+            quantity=row["quantity"],
+            price=row["price"],
+            fees=row["fees"],
+            currency=row["currency"],
+            fx_rate_to_cad=fx_rate_to_cad_today(row["currency"]) or 1.0,
+            executed_at=datetime.fromisoformat(row["executed_at"]),
+            broker=row["broker"],
+            import_hash=row["import_hash"],
+        )
+        db.session.add(order)
+        imported += 1
+
+    db.session.commit()
+    session.pop(f"import_batch:{batch_id}", None)
+    flash(f'{imported} órdenes importadas', 'success')
+    return redirect(url_for('portfolio.list_orders'))

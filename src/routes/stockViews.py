@@ -333,6 +333,22 @@ def get_stock_detail(exchange, symbol):
     return render_template('stocks/company.html', **context)
 
 
+@stocks_bp.route('/api/assets/search', methods=['GET'])
+@login_required
+def search_assets():
+    query = request.args.get('q', '').strip()
+    if not query:
+        return jsonify([])
+
+    assets = (
+        Asset.query.filter(or_(Asset.symbol.ilike(f"%{query}%"), Asset.name.ilike(f"%{query}%")))
+        .order_by(Asset.symbol.asc())
+        .limit(20)
+        .all()
+    )
+    return jsonify([{"symbol": a.symbol, "name": a.name, "exchange": a.exchange} for a in assets])
+
+
 @stocks_bp.route('/api/assets/<int:asset_id>/prices', methods=['GET'])
 @login_required
 def get_asset_prices(asset_id):

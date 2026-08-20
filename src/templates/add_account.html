@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+    Nueva cuenta | TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<h1 class="font-serif-display text-3xl text-ink mb-6">Nueva cuenta</h1>
+
+<div class="card p-6 max-w-lg">
+    <form method="POST" class="space-y-4">
+        {{ form.hidden_tag() }}
+
+        <div class="space-y-1.5">
+            <label class="text-[13px] text-muted2">{{ form.type.label.text }}</label>
+            {{ form.type(class="tn-input") }}
+        </div>
+
+        <div class="space-y-1.5">
+            <label class="text-[13px] text-muted2">{{ form.name.label.text }}</label>
+            {{ form.name(class="tn-input", placeholder="ej. Questrade Margin") }}
+        </div>
+
+        <div class="space-y-1.5">
+            <label class="text-[13px] text-muted2">{{ form.broker.label.text }}</label>
+            {{ form.broker(class="tn-input", placeholder="ej. Questrade") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
+{% endblock %}

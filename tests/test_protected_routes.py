@@ -2,10 +2,15 @@ import pytest
 
 PROTECTED_ROUTES = [
     "/portfolio",
-    "/dash",
+    "/dashboard",
     "/stocks",
     "/transactions",
     "/transactions_charts",
+    "/orders",
+    "/orders/import",
+    "/orders/add",
+    "/accounts",
+    "/accounts/add",
 ]
 
 
@@ -16,7 +21,7 @@ def test_anonymous_access_redirects_to_login(client, path):
     assert "/login" in resp.headers["Location"]
 
 
-@pytest.mark.parametrize("path", ["/portfolio", "/dash", "/stocks", "/transactions", "/transactions_charts"])
+@pytest.mark.parametrize("path", PROTECTED_ROUTES)
 def test_authenticated_access_succeeds(auth_client, path):
     resp = auth_client.get(path)
     assert resp.status_code == 200

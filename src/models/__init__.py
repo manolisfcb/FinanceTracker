@@ -5,6 +5,8 @@ from .Fundamentals import Fundamentals
 from .DividendHistory import DividendHistory
 from .FxRate import FxRate
 from .JobRun import JobRun
-from .Orders import OrderModel
-from .Portfolio import PortfolioModel
+from .Account import Account, AccountType, REGISTERED_ACCOUNT_TYPES
+from .Orders import OrderModel, OrderType
 from .PortfolioSnapshots import PortfolioSnapshotModel
+from .DividendReceived import DividendReceived
+from .AllocationTarget import AllocationTarget

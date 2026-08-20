@@ -10,6 +10,7 @@
             <div class="hidden md:flex items-center gap-6 text-[13.5px] font-medium">
                 <a href="{{ url_for('portfolio.dash_page') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'portfolio.dash_page' }}">Dashboard</a>
                 <a href="{{ url_for('portfolio.portfolio') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'portfolio.portfolio' }}">Portafolio</a>
+                <a href="{{ url_for('portfolio.list_orders') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['portfolio.list_orders', 'portfolio.import_orders', 'portfolio.add_order', 'portfolio.list_accounts', 'portfolio.add_account'] }}">Órdenes</a>
                 <a href="{{ url_for('stocks.get_stocks') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'stocks.get_stocks' }}">Acciones</a>
                 <a href="{{ url_for('personal_finance.transactions') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['personal_finance.transactions', 'personal_finance.add_transactions', 'personal_finance.edit_transactions', 'personal_finance.upload_transactions'] }}">Transacciones</a>
                 <a href="{{ url_for('personal_finance.transactions_charts') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'personal_finance.transactions_charts' }}">Gráficos</a>

@@ -76,10 +76,10 @@
     new Chart(performanceCtx, {
         type: 'line',
         data: {
-            labels: {{ historical_labels|safe }},
+            labels: {{ historical_labels|default([])|tojson }},
             datasets: [{
-                label: 'Rentabilidad',
-                data: {{ historical_data|safe }},
+                label: 'Patrimonio',
+                data: {{ historical_data|default([])|tojson }},
                 borderColor: '#1a7f4e',
                 backgroundColor: 'rgba(26, 127, 78, 0.09)',
                 tension: 0.35,
@@ -103,10 +103,10 @@
     new Chart(contributionsCtx, {
         type: 'bar',
         data: {
-            labels: {{ contributions_labels|safe }},
+            labels: {{ contributions_labels|default([])|tojson }},
             datasets: [{
                 label: 'Aportes',
-                data: {{ contributions_data|safe }},
+                data: {{ contributions_data|default([])|tojson }},
                 backgroundColor: '#d9d5cb',
                 borderRadius: 3,
             }]
@@ -126,9 +126,9 @@
     new Chart(portfolioCtx, {
         type: 'doughnut',
         data: {
-            labels: {{ portfolio_labels|safe }},
+            labels: {{ portfolio_labels|default([])|tojson }},
             datasets: [{
-                data: {{ portfolio_data|safe }},
+                data: {{ portfolio_data|default([])|tojson }},
                 backgroundColor: ['#b3372b', '#b98a2e', '#1a7f4e', '#4a6b8a', '#7d5ba6', '#d9d5cb'],
                 borderWidth: 0,
             }]

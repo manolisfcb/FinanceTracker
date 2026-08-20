@@ -11,8 +11,8 @@
 <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
     <h1 class="font-serif-display text-3xl text-ink">Portafolio</h1>
     <div class="flex gap-2.5">
-        <a href="#IMPORT_PORTFOLIO" class="btn">Importar portafolio</a>
-        <a href="#NEW_OPERATION" class="btn btn-primary">
+        <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Importar órdenes</a>
+        <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
             Nueva orden
         </a>
@@ -20,41 +20,41 @@
     </div>
 </div>
 
+{% if warnings %}
+<div class="tn-alert tn-alert-info mb-5">
+    <span>{{ warnings|length }} advertencia(s) en el cálculo del portafolio — {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
+</div>
+{% endif %}
+
+<!-- Account filter -->
+<div class="flex items-center gap-2 mb-4 text-[13px]">
+    <span class="text-muted2">Cuenta:</span>
+    <a href="{{ url_for('portfolio.portfolio') }}" class="btn {{ 'btn-primary' if not selected_account_id }}">Todas</a>
+    {% for account in accounts %}
+        <a href="{{ url_for('portfolio.portfolio', account_id=account.id) }}" class="btn {{ 'btn-primary' if selected_account_id == account.id }}">{{ account.name }}</a>
+    {% endfor %}
+    <a href="{{ url_for('portfolio.list_accounts') }}" class="btn">Gestionar cuentas</a>
+</div>
+
 <!-- Summary Cards -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-5">
     <div class="card p-4">
-        <div class="lbl mb-2">Rentabilidad</div>
-        <div class="num text-xl font-semibold pos">8,45%</div>
-    </div>
-    <div class="card p-4">
         <div class="lbl mb-2">Patrimonio</div>
-        <div class="num text-xl font-semibold">{{ patrimony }}</div>
+        <div class="num text-xl font-semibold">$ {{ patrimony|currency }}</div>
     </div>
     <div class="card p-4">
         <div class="lbl mb-2">Costo</div>
-        <div class="num text-xl font-semibold">{{ total_invested }}</div>
+        <div class="num text-xl font-semibold">$ {{ total_invested|currency }}</div>
     </div>
     <div class="card p-4">
-        <div class="lbl mb-2">Ganancia</div>
-        <div class="num text-xl font-semibold {% if patrimony < total_invested %}neg{% else %}pos{% endif %}">
-            {{ patrimony - total_invested |default('0.0') }}
+        <div class="lbl mb-2">Ganancia no realizada</div>
+        <div class="num text-xl font-semibold {% if (patrimony or 0) < (total_invested or 0) %}neg{% else %}pos{% endif %}">
+            $ {{ ((patrimony or 0) - (total_invested or 0))|currency }}
         </div>
     </div>
-</div>
-
-<!-- Charts Section -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 mb-5">
-    <div class="card p-5 lg:col-span-2">
-        <div class="text-sm font-semibold mb-3">Historial de rentabilidad</div>
-        <div class="h-56">
-            <canvas id="portfolioPerformanceChart"></canvas>
-        </div>
-    </div>
-    <div class="card p-5">
-        <div class="text-sm font-semibold mb-3">Aportes mensuales</div>
-        <div class="h-56">
-            <canvas id="contributionHistoryChart"></canvas>
-        </div>
+    <div class="card p-4">
+        <div class="lbl mb-2">Ganancia realizada</div>
+        <div class="num text-xl font-semibold {{ 'pos' if (realized_pnl or 0) >= 0 else 'neg' }}">$ {{ realized_pnl|currency }}</div>
     </div>
 </div>
 
@@ -62,18 +62,6 @@
 <div class="card p-5 mb-5">
     <div class="flex justify-between items-center mb-4">
         <div class="text-sm font-semibold">Activos</div>
-        <div class="flex items-center gap-2">
-            <button class="btn">Exportar</button>
-            <details class="tn-dropdown">
-                <summary class="btn">Filtrar</summary>
-                <div class="tn-dropdown-menu">
-                    <a href="#">Todos los activos</a>
-                    <a href="#">Acciones</a>
-                    <a href="#">ETFs</a>
-                    <a href="#">Cripto</a>
-                </div>
-            </details>
-        </div>
     </div>
 
     <div class="overflow-x-auto">
@@ -89,7 +77,7 @@
                         <th>Precio prom.</th>
                         <th>Ganancia</th>
                         <th>%R</th>
-                        <th>%R+d</th>
+                        <th>Proventos</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -98,15 +86,15 @@
                     <tr>
                         <td class="text-faint">{{ loop.index }}</td>
                         <td class="font-semibold">{{ asset.symbol }}</td>
-                        <td class="num">{{ asset.actual_price }}</td>
+                        <td class="num">{{ asset.actual_price|ratio }}</td>
                         <td class="num">{{ asset.quantity }}</td>
-                        <td class="num">{{ asset.adquisition_cost }}</td>
-                        <td class="num">{{ asset.avg_price }}</td>
+                        <td class="num">{{ asset.adquisition_cost|currency }}</td>
+                        <td class="num">{{ asset.avg_price|ratio }}</td>
                         <td class="num {{ 'pos' if asset.profit|default(0) > 0 else 'neg' }}">
-                            {{ asset.profit|default(0) }}
+                            {{ asset.profit|currency }}
                         </td>
-                        <td class="num">{{ asset.percent_return|default('0%') }}</td>
-                        <td class="num">{{ asset.percent_return_dividends|default('0%') }}</td>
+                        <td class="num">{{ asset.percent_return|ratio }}%</td>
+                        <td class="num">$ {{ asset.percent_return_dividends|currency }}</td>
                         <td>
                             <details class="tn-dropdown">
                                 <summary class="btn px-2 py-1">
@@ -115,9 +103,8 @@
                                     </svg>
                                 </summary>
                                 <div class="tn-dropdown-menu">
-                                    <a href="#NEW_OPERATION" onclick="prefillAsset('{{ asset.name }}', '{{ asset.price|default(0) }}', 'BUY')">Comprar más</a>
-                                    <a href="#NEW_OPERATION" onclick="prefillAsset('{{ asset.name }}', '{{ asset.price|default(0) }}', 'SELL')">Vender</a>
-                                    <a href="#">Ver detalles</a>
+                                    <a href="{{ url_for('portfolio.add_order') }}">Comprar más / Vender</a>
+                                    <a href="{{ url_for('stocks.get_stocks') }}">Ver detalles</a>
                                 </div>
                             </details>
                         </td>
@@ -128,14 +115,63 @@
         {% else %}
             <div class="text-center py-10">
                 <p class="text-lg text-muted2">Todavía no tienes activos en tu portafolio.</p>
-                <p class="text-faint text-sm mt-1">Agrega tu primer activo o importa tu portafolio.</p>
+                <p class="text-faint text-sm mt-1">Agrega tu primera orden o importa tu historial.</p>
                 <div class="flex items-center justify-center gap-2.5 mt-5">
-                    <a href="#NEW_OPERATION" class="btn btn-primary">Agregar primer activo</a>
-                    <a href="#IMPORT_PORTFOLIO" class="btn">Importar portafolio</a>
+                    <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">Agregar primera orden</a>
+                    <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Importar órdenes</a>
                 </div>
             </div>
         {% endif %}
     </div>
+</div>
+
+<!-- Allocation target -->
+<div class="card p-5 mb-5">
+    <div class="text-sm font-semibold mb-4">Alocación objetivo</div>
+
+    <form method="POST" action="{{ url_for('portfolio.set_allocation_target') }}" class="flex flex-wrap items-end gap-3 mb-4">
+        {{ allocation_target_form.hidden_tag() }}
+        <div class="space-y-1.5">
+            <label class="text-[13px] text-muted2">{{ allocation_target_form.asset_symbol.label.text }}</label>
+            {{ allocation_target_form.asset_symbol(class="tn-input", placeholder="ej. RY") }}
+        </div>
+        <div class="space-y-1.5">
+            <label class="text-[13px] text-muted2">{{ allocation_target_form.target_percent.label.text }}</label>
+            {{ allocation_target_form.target_percent(class="tn-input", placeholder="ej. 10") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+
+    {% if allocation_rows %}
+    <div class="overflow-x-auto">
+        <table class="tn-card-table">
+            <thead>
+                <tr>
+                    <th>Activo</th>
+                    <th>% actual</th>
+                    <th>% objetivo</th>
+                    <th>Desvío</th>
+                    <th>Ajuste sugerido</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in allocation_rows %}
+                <tr>
+                    <td class="font-semibold">{{ row.symbol }}</td>
+                    <td class="num">{{ row.current_percent|ratio }}%</td>
+                    <td class="num">{{ row.target_percent|ratio }}%</td>
+                    <td class="num {{ 'pos' if row.deviation <= 0 else 'neg' }}">{{ row.deviation|ratio }}%</td>
+                    <td class="num {{ 'pos' if row.amount_to_trade_cad >= 0 else 'neg' }}">
+                        {{ 'Comprar' if row.amount_to_trade_cad >= 0 else 'Vender' }} $ {{ row.amount_to_trade_abs_cad|currency }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="text-faint text-sm">Todavía no definiste objetivos de alocación.</p>
+    {% endif %}
 </div>
 
 <!-- Additional Financial Information -->
@@ -143,26 +179,30 @@
     <div class="text-sm font-semibold mb-4">Resumen financiero</div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-            <div class="lbl mb-3">Detalle de rentabilidad</div>
+            <div class="lbl mb-3">Detalle</div>
             <ul class="space-y-2.5 text-[13.5px]">
                 <li class="flex justify-between border-b border-[#f0eee8] pb-2">
                     <span class="text-muted2">Patrimonio</span>
-                    <span class="num font-semibold">{{ patrimony }}</span>
+                    <span class="num font-semibold">$ {{ patrimony|currency }}</span>
                 </li>
                 <li class="flex justify-between border-b border-[#f0eee8] pb-2">
                     <span class="text-muted2">Costo de adquisición</span>
-                    <span class="num font-semibold">{{ total_invested }}</span>
+                    <span class="num font-semibold">$ {{ total_invested|currency }}</span>
+                </li>
+                <li class="flex justify-between border-b border-[#f0eee8] pb-2">
+                    <span class="text-muted2">Proventos acumulados</span>
+                    <span class="num font-semibold">$ {{ dividends_accum|currency }}</span>
                 </li>
                 <li class="flex justify-between">
-                    <span class="text-muted2">Ganancia</span>
-                    <span class="num font-semibold {% if patrimony < total_invested %}neg{% else %}pos{% endif %}">
-                        {{ patrimony - total_invested |default('0.0') }}
+                    <span class="text-muted2">Ganancia no realizada</span>
+                    <span class="num font-semibold {% if (patrimony or 0) < (total_invested or 0) %}neg{% else %}pos{% endif %}">
+                        $ {{ ((patrimony or 0) - (total_invested or 0))|currency }}
                     </span>
                 </li>
             </ul>
         </div>
         <div>
-            <div class="lbl mb-3">Alocación de activos</div>
+            <div class="lbl mb-3">Alocación por activo</div>
             <div class="h-44">
                 <canvas id="assetAllocationChart"></canvas>
             </div>
@@ -170,159 +210,20 @@
     </div>
 </div>
 
-<!-- NEW_OPERATION MODAL -->
-<div class="tn-modal" id="NEW_OPERATION">
-    <div class="tn-modal-box">
-        <h3 class="font-semibold text-base mb-4">Nueva orden</h3>
-
-        <form id="operationForm" method="POST" action="/api/stock">
-            {{ form.hidden_tag() }}
-
-            <div class="space-y-1.5 mb-3">
-                <label class="lbl">{{ form.ticket.label.text }}</label>
-                {{ form.ticket(class="tn-input", id="ticket") }}
-            </div>
-
-            <div class="space-y-1.5 mb-3">
-                <label class="lbl">{{ form.quantity.label.text }}</label>
-                {{ form.quantity(class="tn-input", type="number", step="0.01", id="quantity") }}
-            </div>
-
-            <div class="space-y-1.5 mb-3">
-                <label class="lbl">{{ form.price.label.text }}</label>
-                {{ form.price(class="tn-input", type="number", step="0.01", id="price") }}
-            </div>
-
-            <div class="space-y-1.5 mb-4">
-                <label class="lbl">{{ form.date.label.text }}</label>
-                {{ form.date(class="tn-input", type="date", id="date") }}
-            </div>
-
-            <div class="flex justify-between gap-2">
-                <button type="submit" name="action" value="BUY" class="btn" style="background:#1a7f4e;border-color:#1a7f4e;color:#fff">Comprar</button>
-                <button type="submit" name="action" value="SELL" class="btn" style="background:#c23934;border-color:#c23934;color:#fff">Vender</button>
-                <a href="#" class="btn">Cancelar</a>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- IMPORT_PORTFOLIO MODAL -->
-<div class="tn-modal" id="IMPORT_PORTFOLIO">
-    <div class="tn-modal-box">
-        <h3 class="font-semibold text-base mb-4">Importar portafolio</h3>
-
-        <form method="POST" action="/api/upload-portfolio" enctype="multipart/form-data">
-            <div class="mb-4">
-                <div class="lbl mb-2">Tipo de importación</div>
-                <div class="flex flex-col gap-2 text-[13.5px]">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="file_type" id="mov" value="mov" checked style="accent-color:#b3372b" />
-                        <span>Subir todas las transacciones</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="file_type" id="position" value="pos" style="accent-color:#b3372b" />
-                        <span>Subir solo posiciones</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="mb-5">
-                <label class="lbl block mb-2">Archivo a subir</label>
-                <input type="file" id="file" name="file" class="tn-input" required />
-                <span class="text-[11.5px] text-faint">Formatos soportados: CSV, XLS, XLSX</span>
-            </div>
-
-            <div class="flex justify-between gap-2">
-                <button type="submit" class="btn btn-primary">Subir</button>
-                <a href="#" class="btn">Cancelar</a>
-            </div>
-        </form>
-    </div>
-</div>
-
 <!-- Chart.js Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    function prefillAsset(assetName, assetPrice, actionType) {
-        setTimeout(function() {
-            document.getElementById('ticket').value = assetName;
-            document.getElementById('price').value = assetPrice;
-            document.getElementById('quantity').focus();
-        }, 100);
-    }
-
     Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
     Chart.defaults.color = '#6f6b60';
 
-    const tnGridColor = '#efede7';
-    const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: '#6f6b60' } } },
-        scales: {
-            x: { grid: { color: tnGridColor } },
-            y: { grid: { color: tnGridColor } }
-        }
-    };
-
-    // Performance Chart
-    const performanceCtx = document.getElementById('portfolioPerformanceChart').getContext('2d');
-    new Chart(performanceCtx, {
-        type: 'line',
-        data: {
-            labels: {{ performance_dates|default('[]')|safe }},
-            datasets: [{
-                label: 'Valor del portafolio',
-                data: {{ performance_values|default('[]')|safe }},
-                backgroundColor: 'rgba(26, 127, 78, 0.09)',
-                borderColor: '#1a7f4e',
-                tension: 0.25,
-                fill: true,
-                borderWidth: 2.5,
-                pointRadius: 0,
-            }]
-        },
-        options: commonOptions
-    });
-
-    // Contribution History Chart
-    const contributionCtx = document.getElementById('contributionHistoryChart').getContext('2d');
-    new Chart(contributionCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ contribution_dates|default('[]')|safe }},
-            datasets: [{
-                label: 'Aportes mensuales',
-                data: {{ contribution_values|default('[]')|safe }},
-                backgroundColor: '#d9d5cb',
-                borderRadius: 3,
-            }]
-        },
-        options: {
-            ...commonOptions,
-            plugins: {
-                ...commonOptions.plugins,
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return '$' + context.raw.toLocaleString();
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    // Asset Allocation Chart
     const assetAllocationCtx = document.getElementById('assetAllocationChart').getContext('2d');
     new Chart(assetAllocationCtx, {
         type: 'doughnut',
         data: {
-            labels: {{ asset_types|default('["Acciones", "ETFs", "Bonos", "Cripto", "Efectivo"]')|safe }},
+            labels: {{ asset_types|default('[]')|tojson }},
             datasets: [{
-                data: {{ asset_allocation|default('[45, 25, 15, 10, 5]')|safe }},
-                backgroundColor: ['#b3372b', '#b98a2e', '#1a7f4e', '#4a6b8a', '#7d5ba6'],
+                data: {{ asset_allocation|default('[]')|tojson }},
+                backgroundColor: ['#b3372b', '#b98a2e', '#1a7f4e', '#4a6b8a', '#7d5ba6', '#d9d5cb'],
                 borderWidth: 0,
             }]
         },

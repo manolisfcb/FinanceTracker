@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+    Confirmar importación | TrueNorth Analytics
+{% endblock %}
+
+{% block content %}
+{% include 'partials/flash_messages.html' %}
+
+<h1 class="font-serif-display text-3xl text-ink mb-2">Confirmar importación</h1>
+<p class="text-[13px] text-muted mb-6">
+    Se encontraron {{ rows|length }} órdenes. Las filas duplicadas o con símbolo desconocido vienen destildadas y no se importarán.
+</p>
+
+<form method="POST" action="{{ url_for('portfolio.confirm_import_orders') }}">
+    <input type="hidden" name="batch_id" value="{{ batch_id }}">
+
+    <div class="card p-5 mb-5">
+        <div class="overflow-x-auto">
+            <table class="tn-card-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Fecha</th>
+                        <th>Símbolo</th>
+                        <th>Tipo</th>
+                        <th>Cant.</th>
+                        <th>Precio</th>
+                        <th>Comisiones</th>
+                        <th>Moneda</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="rows" value="{{ loop.index0 }}"
+                                {% if not row.is_duplicate and not row.is_unknown_symbol %}checked{% endif %}
+                                {% if row.is_duplicate or row.is_unknown_symbol %}disabled{% endif %} />
+                        </td>
+                        <td class="num">{{ row.executed_at[:10] }}</td>
+                        <td class="font-semibold">{{ row.symbol }}</td>
+                        <td>{{ row.type }}</td>
+                        <td class="num">{{ row.quantity }}</td>
+                        <td class="num">{{ row.price }}</td>
+                        <td class="num">{{ row.fees }}</td>
+                        <td>{{ row.currency }}</td>
+                        <td>
+                            {% if row.is_duplicate %}
+                                <span class="text-faint">Duplicada</span>
+                            {% elif row.is_unknown_symbol %}
+                                <span class="neg">Símbolo desconocido</span>
+                            {% else %}
+                                <span class="pos">Nueva</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="flex gap-2.5">
+        <button type="submit" class="btn btn-primary">Confirmar e importar</button>
+        <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Cancelar</a>
+    </div>
+</form>
+{% endblock %}
