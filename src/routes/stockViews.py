@@ -11,6 +11,7 @@ from src.forms.StockForm import Stock
 from src.models import Asset, CompanyEvent, CompanyEventKind, DividendHistory, Fundamentals
 from src.services.company_data import backfill_asset, needs_backfill
 from src.services.fundamentals import ensure_statement_metrics
+from src.services.insights import build_company_insight
 from src.services.market_data import get_provider
 
 stocks_bp = Blueprint('stocks', __name__)
@@ -774,6 +775,7 @@ def get_stock_detail(exchange, symbol):
         'change_amount': change_amount,
         'change_percent': change_percent,
         'indicator_groups': _indicator_groups_for(fundamentals),
+        'insight': build_company_insight(asset, fundamentals),
         'key_stat_help': KEY_STAT_HELP,
         'price_ranges': PRICE_HISTORY_RANGES,
         'dividends': dividends,

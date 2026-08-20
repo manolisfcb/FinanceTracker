@@ -315,8 +315,15 @@ puede descartar alguna nota legítima que no nombre a la empresa en el titular n
 
 ## Fase 5 — Insights y calificación (continuo)
 
-- [ ] `[M]` Semáforos por indicador: reglas configurables por sector (ej. P/E < mediana sector = verde).
-- [ ] `[L]` Score de calidad 0–100 por empresa (ponderación de valuación/rentabilidad/deuda/dividendos), con explicación por componente.
+- [x] `[M]` Semáforos por indicador: 19 reglas declarativas en `src/services/insights.py`, con
+      medianas calculadas sobre el último snapshot de cada empresa (mínimo 3 comparables), fallback general
+      y overrides explícitos para Financial Services, Real Estate, Utilities y Technology. Las empresas con
+      múltiplos no comparables o datos ausentes quedan "Sin datos", no verdes ni en cero.
+- [x] `[L]` Score de calidad 0–100 por empresa, calculado on-demand desde el último `Fundamentals`:
+      valuación 25%, rentabilidad 30%, solidez 25%, dividendos 20%. La página de empresa muestra score total,
+      cobertura, score/peso/indicadores disponibles y explicación favorable/neutral/atención por componente;
+      los datos ausentes se excluyen y la cobertura hace visible la incertidumbre. No se persiste para evitar
+      que quede desincronizado del snapshot que lo origina.
 - [ ] `[M]` Rankings: top dividend yield TSX, aristócratas canadienses (≥5 años subiendo dividendo — calculable desde `DividendHistory`), mejores ROE por sector.
 - [ ] `[M]` Comparador de 2–4 empresas lado a lado.
 - [ ] `[M]` Alertas por email: precio objetivo, ex-date próxima, nuevo filing.
@@ -326,8 +333,8 @@ puede descartar alguna nota legítima que no nombre a la empresa en el titular n
 
 ## Fase 6 — Comunidad de inversores (2–3 semanas)
 
-> Referencia: pestaña "Comunidade" de meusdividendos — feed continuo de análisis, dudas y
-> lecturas de mercado entre inversores.
+> Referencias: pestaña "Comunidade" de meusdividendos — feed continuo de análisis, dudas y
+> lecturas de mercado entre inversores. esta tambien es otra referencia: https://investidor10.com.br/comunidade/
 
 - [ ] `[M]` Modelos: `Post` (user, title, body, category, created_at), `Comment`,
       `Vote` (up/down por user+post), `PostTickerMention` (N-N post↔asset).

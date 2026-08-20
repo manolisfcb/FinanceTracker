@@ -85,6 +85,7 @@ def create_app(config_name=None):
     from src.routes.personal_finance import personal_finance_bp
     from src.routes.dividends import dividends_bp
     from src.routes.inbox import inbox_bp, unread_inbox_count
+    from src.routes.tools import tools_bp
 
     # Importing these registers their view functions onto the blueprints
     # above (decorator side effects) — the imports themselves are unused.
@@ -101,6 +102,7 @@ def create_app(config_name=None):
     app.register_blueprint(personal_finance_bp)
     app.register_blueprint(dividends_bp)
     app.register_blueprint(inbox_bp)
+    app.register_blueprint(tools_bp)
 
     @app.context_processor
     def inject_unread_inbox_count():

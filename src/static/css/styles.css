@@ -296,6 +296,48 @@ a:hover { color: var(--tn-maple-dark); }
   background: var(--tn-input-bg);
 }
 
+/* Phase 5 insights: a compact score summary and traffic lights that keep the
+   raw metric visible. Colour never carries the whole meaning: every dot has
+   an aria-label/title and the score cards include their numeric values. */
+.tn-score-card { border-top: 3px solid var(--tn-ink); }
+.tn-score-ring {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  padding-top: 16px;
+  border: 5px solid var(--tn-border);
+  border-radius: 50%;
+  background: #fff;
+}
+.tn-score-ring .num { font-size: 19px; font-weight: 700; line-height: 1; }
+.tn-score-ring small { margin-left: 1px; color: var(--tn-muted); font-size: 9px; }
+.tn-score-ring.tn-signal-green { border-color: #7fc49e; }
+.tn-score-ring.tn-signal-yellow { border-color: #d8b75a; }
+.tn-score-ring.tn-signal-red { border-color: #dc8b86; }
+.tn-score-component {
+  padding: 11px 12px;
+  border: 1px solid var(--tn-divider);
+  border-radius: 8px;
+  background: var(--tn-input-bg);
+}
+.tn-score-track { height: 4px; overflow: hidden; border-radius: 4px; background: var(--tn-border); }
+.tn-score-track span { display: block; height: 100%; border-radius: inherit; background: var(--tn-ink); }
+.tn-signal {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 5px;
+  border: 1px solid rgba(28, 27, 24, .12);
+  border-radius: 50%;
+  vertical-align: 1px;
+}
+.tn-signal-green { background: var(--tn-pos); }
+.tn-signal-yellow { background: #c49316; }
+.tn-signal-red { background: var(--tn-neg); }
+.tn-signal-unavailable { background: var(--tn-border); }
+
 /* Indicator help: a "?" next to a label, explained on hover, focus or tap. */
 .tn-help {
   display: inline-flex;

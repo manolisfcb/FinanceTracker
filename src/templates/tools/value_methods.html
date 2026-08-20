@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% from 'partials/company_icon.html' import company_icon %}
+
+{% block head_title %}Métodos de valuación | TrueNorth Analytics{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4 mb-5">
+    <div>
+        <div class="lbl text-maple mb-1">Herramientas</div>
+        <h1 class="font-serif-display text-3xl text-ink mb-1">Análisis de acciones por grandes inversores</h1>
+        <p class="text-[13px] text-muted max-w-3xl">
+            Rankings reproducibles con los últimos fundamentos disponibles, comparados dentro de cada sector{% if last_update %} · actualizado {{ last_update|date_es }}{% endif %}.
+        </p>
+    </div>
+    <div class="text-[11.5px] text-muted border border-border rounded-lg bg-white px-3 py-2">
+        Uso educativo · no constituye recomendación de inversión
+    </div>
+</div>
+
+<nav class="grid grid-cols-2 md:grid-cols-5 gap-2.5 mb-5" aria-label="Métodos de valuación">
+    {% for slug, method in methods.items() %}
+    <a href="{{ method_urls[slug] }}"
+       class="card px-4 py-3.5 transition-colors {{ 'border-maple bg-[#fffaf8]' if slug == method_slug else 'hover:border-[#d6d1c6]' }}">
+        <div class="text-[11px] font-semibold uppercase tracking-wider {{ 'text-maple' if slug == method_slug else 'text-muted' }}">
+            {{ 'Precio justo' if method.has_fair_value else 'Puntuación' }}
+        </div>
+        <div class="text-[14px] font-semibold text-ink mt-1">{{ method.short_name }}</div>
+    </a>
+    {% endfor %}
+</nav>
+
+<section class="card overflow-hidden mb-5">
+    <div class="grid lg:grid-cols-[1.45fr_1fr]">
+        <div class="p-6 lg:p-7">
+            <div class="lbl text-maple mb-2">{{ active_method.eyebrow }}</div>
+            <h2 class="font-serif-display text-[28px] leading-tight mb-3">Ranking según {{ active_method.name }}</h2>
+            <p class="text-[14px] leading-6 text-muted2 mb-5">{{ active_method.summary }}</p>
+
+            <h3 class="text-[13px] font-semibold mb-2">En qué se basa</h3>
+            <p class="text-[13px] leading-5 text-muted2 mb-5">{{ active_method.basis }}</p>
+
+            <h3 class="text-[13px] font-semibold mb-2">Cómo se calcula</h3>
+            <ol class="space-y-2 text-[13px] leading-5 text-muted2">
+                {% for step in active_method.calculation %}
+                <li class="flex gap-2.5"><span class="num text-maple font-semibold">{{ loop.index }}.</span><span>{{ step }}</span></li>
+                {% endfor %}
+            </ol>
+        </div>
+        <aside class="bg-[#fbfaf8] border-t lg:border-t-0 lg:border-l border-border p-6 lg:p-7">
+            <h3 class="text-[13px] font-semibold mb-2">Para qué sirve</h3>
+            <p class="text-[13px] leading-5 text-muted2 mb-5">{{ active_method.useful_for }}</p>
+            <h3 class="text-[13px] font-semibold mb-2">Antes de interpretar el ranking</h3>
+            <ul class="space-y-2.5 text-[12.5px] leading-5 text-muted2">
+                {% for caveat in active_method.caveats %}
+                <li class="flex gap-2.5">
+                    <svg class="shrink-0 mt-1" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b3372b" stroke-width="2"><path d="M12 9v4M12 17h.01"></path><circle cx="12" cy="12" r="9"></circle></svg>
+                    <span>{{ caveat }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+    </div>
+</section>
+
+<form method="get" class="card px-[18px] py-3.5 mb-5 flex items-center gap-2.5 flex-wrap">
+    <input type="hidden" name="method" value="{{ method_slug }}">
+    <label for="sector" class="text-[12px] font-semibold text-muted">Sector</label>
+    <select id="sector" name="sector" class="sel" onchange="this.form.submit()">
+        <option value="">Todos los sectores</option>
+        {% for sector in sectors %}<option value="{{ sector }}" {{ 'selected' if sector == selected_sector }}>{{ sector }}</option>{% endfor %}
+    </select>
+    <label for="exchange" class="text-[12px] font-semibold text-muted ml-1">Mercado</label>
+    <select id="exchange" name="exchange" class="sel" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        {% for exchange in exchanges %}<option value="{{ exchange }}" {{ 'selected' if exchange == selected_exchange }}>{{ exchange }}</option>{% endfor %}
+    </select>
+    <div class="ml-auto text-[12px] text-muted">
+        <span class="font-semibold text-ink">{{ eligible_count|quantity }}</span> empresas con datos suficientes
+    </div>
+</form>
+
+{% if leaders and not selected_sector %}
+<section class="mb-6">
+    <div class="flex items-baseline justify-between gap-3 mb-3">
+        <h2 class="font-serif-display text-2xl">Líderes por sector</h2>
+        <span class="text-[11.5px] text-muted">Mejor posición relativa en cada sector</span>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {% for row in leaders %}
+        <a href="#sector-{{ loop.index }}" class="card p-4 hover:border-[#d6d1c6]">
+            <div class="text-[10.5px] font-semibold uppercase tracking-wider text-muted truncate">{{ row.sector }}</div>
+            <div class="flex items-center gap-2.5 mt-2.5">
+                {{ company_icon(row.asset, 'sm') }}
+                <div class="min-w-0 flex-1">
+                    <div class="font-semibold text-ink">{{ row.asset.symbol }} <span class="text-[10px] text-faint">{{ row.asset.exchange }}</span></div>
+                    <div class="text-[11px] text-muted truncate">{{ row.asset.name }}</div>
+                </div>
+                <div class="num text-[12px] font-semibold {{ 'pos' if active_method.has_fair_value and row.result >= 0 }}">
+                    {{ row.result|percent if active_method.has_fair_value else row.result|ratio }}{{ '' if active_method.has_fair_value else '/100' }}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section>
+    <div class="flex items-baseline justify-between gap-3 mb-3">
+        <h2 class="font-serif-display text-2xl">{{ selected_sector or 'Ranking detallado por sector' }}</h2>
+        <span class="text-[11.5px] text-muted">Hasta 10 resultados por sector</span>
+    </div>
+
+    {% for group in sector_groups %}
+    <div id="sector-{{ loop.index }}" class="card overflow-hidden mb-4 scroll-mt-20">
+        <div class="px-5 py-3.5 border-b border-border flex items-center justify-between">
+            <h3 class="text-[14px] font-semibold">{{ group.sector }}</h3>
+            <span class="text-[11px] text-muted">{{ group.rows|length }} elegibles</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="tn-positions">
+                <thead>
+                    <tr>
+                        <th class="l tn-edge-l">#</th>
+                        <th class="l">Activo</th>
+                        <th>Precio actual</th>
+                        {% if active_method.has_fair_value %}<th>Precio calculado</th>{% endif %}
+                        <th>{{ active_method.result_label }}</th>
+                        <th>{{ 'Earnings yield' if method_slug == 'greenblatt' else 'ROE / ROIC' if method_slug == 'buffett' else group.rows[0].metric_a[0] }}</th>
+                        <th class="tn-edge-r">{{ 'Retorno capital' if method_slug == 'greenblatt' else group.rows[0].metric_b[0] }}</th>
+                    </tr>
+                </thead>
+                <tbody class="num">
+                    {% for row in group.rows[:10] %}
+                    <tr data-row-href="{{ url_for('stocks.get_stock_detail', exchange=row.asset.exchange, symbol=row.asset.symbol) }}">
+                        <td class="l tn-edge-l text-muted">{{ row.sector_rank }}</td>
+                        <td class="l font-sans">
+                            <div class="flex items-center gap-2.5 min-w-[210px]">
+                                {{ company_icon(row.asset, 'sm') }}
+                                <div class="min-w-0">
+                                    <a href="{{ url_for('stocks.get_stock_detail', exchange=row.asset.exchange, symbol=row.asset.symbol) }}" class="font-semibold text-ink hover:text-maple">{{ row.asset.symbol }}</a>
+                                    <span class="text-faint text-[10.5px]">{{ row.asset.exchange }}</span>
+                                    <div class="text-[11px] text-muted truncate max-w-[210px]">{{ row.asset.name }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ row.asset.currency|currency_symbol }}{{ row.fundamentals.price|ratio }}</td>
+                        {% if active_method.has_fair_value %}<td class="font-semibold">{{ row.asset.currency|currency_symbol }}{{ row.fair_value|ratio }}</td>{% endif %}
+                        <td class="font-semibold {{ 'pos' if active_method.has_fair_value and row.result >= 0 }} {{ 'neg' if active_method.has_fair_value and row.result < 0 }}">
+                            {{ row.result|percent if active_method.has_fair_value else row.result|ratio }}{{ '' if active_method.has_fair_value else '/100' }}
+                        </td>
+                        <td>
+                            {{ row.metric_a[1]|percent if row.metric_a[2] == 'percent' else row.metric_a[1]|ratio }}
+                            {% if method_slug in ('greenblatt', 'buffett') %}<div class="font-sans text-[10px] text-faint mt-0.5">{{ row.metric_a[0] }}</div>{% endif %}
+                        </td>
+                        <td class="tn-edge-r">
+                            {{ row.metric_b[1]|percent if row.metric_b[2] == 'percent' else row.metric_b[1]|ratio }}
+                            {% if method_slug == 'greenblatt' %}<div class="font-sans text-[10px] text-faint mt-0.5">{{ row.metric_b[0] }}</div>{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card text-center py-12 px-6">
+        <div class="font-serif-display text-2xl mb-2">Aún no hay empresas elegibles</div>
+        <p class="text-[13px] text-muted max-w-lg mx-auto">Este método necesita indicadores positivos y completos. El próximo refresco de fundamentos puede incorporar nuevos resultados.</p>
+    </div>
+    {% endfor %}
+</section>
+
+<div class="mt-5 text-[11.5px] leading-5 text-muted border-t border-border pt-4">
+    Los cálculos usan el último snapshot almacenado y pueden mezclar monedas entre compañías; cada precio calculado permanece en la moneda del activo. Los rankings son filtros educativos, no predicciones ni asesoramiento financiero.
+</div>
+{% endblock %}

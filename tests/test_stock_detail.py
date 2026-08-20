@@ -239,3 +239,33 @@ def test_price_chart_comes_before_the_indicators(
     body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
 
     assert body.index('priceHistoryChart') < body.index('Indicadores fundamentales')
+
+
+@patch('src.routes.stockViews.needs_backfill', return_value=False)
+@patch('src.services.fundamentals.get_provider')
+@patch('src.routes.stockViews.get_provider')
+def test_stock_detail_shows_explainable_quality_score_and_traffic_lights(
+    mock_view_provider, mock_fundamentals_provider, _mock_needs_backfill,
+    auth_client, db,
+):
+    mock_view_provider.return_value.get_quote.return_value = None
+    mock_fundamentals_provider.return_value.get_statement_metrics.return_value = None
+    mock_fundamentals_provider.return_value.get_fundamentals.return_value = None
+    asset = _seed_asset(db)
+    db.session.add(Fundamentals(
+        asset_id=asset.id, as_of_date=date(2026, 8, 20),
+        pe=10.0, pb=1.2, roe=0.18, roa=0.08, net_margin=0.12,
+        debt_to_equity=150.0, current_ratio=1.7,
+        dividend_yield=0.04, payout_ratio=0.60,
+        total_assets=2_000.0, enterprise_value=2_500.0,
+    ))
+    db.session.commit()
+
+    body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
+
+    assert 'Score de calidad' in body
+    assert 'Cobertura' in body
+    assert 'Valuación' in body
+    assert 'Peso 25%' in body
+    assert 'tn-signal-green' in body
+    assert 'favorable' in body

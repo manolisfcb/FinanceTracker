@@ -55,6 +55,13 @@
                                     Gráficos
                                 </a>
                             </div>
+                            <div class="py-2 border-b border-border">
+                                <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Herramientas</div>
+                                <a href="{{ url_for('tools.value_methods') }}"
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.value_methods' else 'text-ink' }}">
+                                    Métodos de valuación
+                                </a>
+                            </div>
                             <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2.5 text-sm text-ink hover:bg-[#fbfaf8]">Cerrar sesión</a>
                         </div>
                     </div>
