@@ -1,12 +1,12 @@
 """Portfolio positions and P&L, computed on the fly from `Order` rows.
 
-CRA average-cost pooling: non-registered accounts (MARGIN, CASH) share one
+CRA average-cost pooling: non-registered accounts share one
 Adjusted Cost Base pool per (user, asset) — CRA treats identical property
 held in taxable accounts as one taxpayer-level position, regardless of which
-specific account or broker holds it. Each registered account (TFSA, RRSP,
-FHSA) is its own isolated pool keyed by (account_id, asset) — shares can't
-move between registered accounts via ordinary buy/sell, so pooling them
-together would misstate book value, not just be tax-technically irrelevant.
+specific account or broker holds it. Each registered account is its own
+isolated pool keyed by (account_id, asset) — shares can't move between
+registered accounts via ordinary buy/sell, so pooling them together would
+misstate book value, not just be tax-technically irrelevant.
 
 CAD cost basis vs. CAD market value are intentionally asymmetric: cost basis
 uses each order's own `fx_rate_to_cad` (the rate at trade time — the correct

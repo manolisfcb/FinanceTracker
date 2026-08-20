@@ -4,7 +4,7 @@ from datetime import datetime
 from src.models import Asset
 from src.resources.orders_import.ibkr import IBKRFlexImporter
 from src.resources.orders_import.questrade import QuestradeCSVImporter
-from src.resources.orders_import.registry import resolve_asset_id
+from src.resources.orders_import.registry import resolve_asset_id, resolve_or_create_manual_asset
 from src.resources.orders_import.wealthsimple import WealthsimpleCSVImporter
 
 
@@ -75,3 +75,19 @@ def test_resolve_asset_id_matches_yahoo_symbol_then_symbol(db):
     assert resolve_asset_id('ry.to') == asset.id
     assert resolve_asset_id('RY') == asset.id
     assert resolve_asset_id('UNKNOWN') is None
+
+
+def test_manual_asset_resolver_creates_supported_crypto_in_cad(db):
+    asset_id = resolve_or_create_manual_asset('btc')
+    asset = db.session.get(Asset, asset_id)
+
+    assert asset.symbol == 'BTC'
+    assert asset.yahoo_symbol == 'BTC-CAD'
+    assert asset.exchange == 'CRYPTO'
+    assert asset.currency == 'CAD'
+    assert resolve_or_create_manual_asset('BTC-CAD') == asset_id
+
+
+def test_manual_asset_resolver_does_not_create_unknown_symbol(db):
+    assert resolve_or_create_manual_asset('NOTACOIN') is None
+    assert Asset.query.filter_by(symbol='NOTACOIN').first() is None

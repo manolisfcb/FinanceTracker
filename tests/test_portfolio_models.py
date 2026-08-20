@@ -41,9 +41,13 @@ def test_account_unique_user_name(db, user):
 
 def test_account_is_registered(db, user):
     tfsa = Account(user_id=user.id, type=AccountType.TFSA, name='TFSA')
+    resp = Account(user_id=user.id, type=AccountType.RESP, name='RESP')
     margin = Account(user_id=user.id, type=AccountType.MARGIN, name='Margin')
+    crypto = Account(user_id=user.id, type=AccountType.CRYPTO, name='Crypto')
     assert tfsa.is_registered is True
+    assert resp.is_registered is True
     assert margin.is_registered is False
+    assert crypto.is_registered is False
 
 
 def test_order_requires_account_id(db, user):

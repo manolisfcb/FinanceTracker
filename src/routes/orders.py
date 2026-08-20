@@ -9,7 +9,11 @@ from src.extensions import db
 from src.forms.ManualOrderForm import ManualOrderForm
 from src.forms.OrdersImportForm import OrdersImportForm
 from src.models import Account, OrderModel, OrderType
-from src.resources.orders_import.registry import get_importer, resolve_asset_id
+from src.resources.orders_import.registry import (
+    get_importer,
+    resolve_asset_id,
+    resolve_or_create_manual_asset,
+)
 from src.routes.portfolio import portfolio_bp
 from src.services.portfolio import fx_rate_to_cad_today
 
@@ -50,7 +54,7 @@ def add_order():
     form.account.choices = _account_choices()
 
     if form.validate_on_submit():
-        asset_id = resolve_asset_id(form.asset_symbol.data)
+        asset_id = resolve_or_create_manual_asset(form.asset_symbol.data)
         if asset_id is None:
             flash(f'No se encontró el activo "{form.asset_symbol.data}" en el universo', 'error')
             return render_template('add_order.html', form=form)

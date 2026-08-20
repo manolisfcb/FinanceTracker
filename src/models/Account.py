@@ -7,11 +7,43 @@ class AccountType(Enum):
     TFSA = 'TFSA'
     RRSP = 'RRSP'
     FHSA = 'FHSA'
+    RESP = 'RESP'
+    RDSP = 'RDSP'
+    RRIF = 'RRIF'
+    LIRA = 'LIRA'
+    LIF = 'LIF'
     MARGIN = 'MARGIN'
     CASH = 'CASH'
+    JOINT = 'JOINT'
+    CRYPTO = 'CRYPTO'
 
 
-REGISTERED_ACCOUNT_TYPES = {AccountType.TFSA, AccountType.RRSP, AccountType.FHSA}
+ACCOUNT_TYPE_LABELS = {
+    AccountType.TFSA: 'TFSA — Cuenta de ahorro libre de impuestos',
+    AccountType.RRSP: 'RRSP — Ahorro para la jubilación',
+    AccountType.FHSA: 'FHSA — Ahorro para la primera vivienda',
+    AccountType.RESP: 'RESP — Ahorro para educación',
+    AccountType.RDSP: 'RDSP — Ahorro por discapacidad',
+    AccountType.RRIF: 'RRIF — Fondo de ingresos de jubilación',
+    AccountType.LIRA: 'LIRA — Jubilación bloqueada',
+    AccountType.LIF: 'LIF — Fondo de ingresos vitalicios',
+    AccountType.MARGIN: 'Margin — Cuenta con margen',
+    AccountType.CASH: 'Cash — Cuenta no registrada',
+    AccountType.JOINT: 'Joint — Cuenta conjunta',
+    AccountType.CRYPTO: 'Crypto — Criptomonedas',
+}
+
+
+REGISTERED_ACCOUNT_TYPES = {
+    AccountType.TFSA,
+    AccountType.RRSP,
+    AccountType.FHSA,
+    AccountType.RESP,
+    AccountType.RDSP,
+    AccountType.RRIF,
+    AccountType.LIRA,
+    AccountType.LIF,
+}
 
 
 class Account(db.Model):
