@@ -4,7 +4,7 @@
         {{ row.symbol }}
         <div class="text-[11.5px] text-muted font-normal">{{ row.name }}</div>
     </td>
-    <td class="num">{{ row.quantity_held|round(2) }}</td>
+    <td class="num">{{ row.quantity_held|quantity }}</td>
     <td class="num">{{ row.currency }} {{ row.total_amount|currency }}</td>
     <td>
         <div class="flex gap-2 justify-end">

@@ -59,6 +59,37 @@ def test_get_profile_returns_none_when_info_unavailable(mock_ticker_cls, mock_sl
 
 
 @patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_asset_metadata_accepts_a_tsx_etf(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.get_info.return_value = {
+        'symbol': 'VFV.TO', 'quoteType': 'ETF', 'exchange': 'TOR',
+        'currency': 'CAD', 'longName': 'Vanguard S&P 500 Index ETF',
+        'regularMarketPrice': 187.98, 'category': 'US Equity',
+    }
+    mock_ticker_cls.return_value = mock_ticker
+
+    metadata = _provider().get_asset_metadata('VFV.TO')
+
+    assert metadata == {
+        'symbol': 'VFV', 'yahoo_symbol': 'VFV.TO', 'exchange': 'TSX',
+        'currency': 'CAD', 'name': 'Vanguard S&P 500 Index ETF',
+        'sector': 'ETFs', 'industry': 'US Equity', 'country': 'Canada',
+    }
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_asset_metadata_rejects_unsupported_instrument_or_exchange(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.get_info.return_value = {
+        'symbol': 'FUND.L', 'quoteType': 'ETF', 'exchange': 'LSE',
+        'currency': 'GBP', 'regularMarketPrice': 10.0,
+    }
+    mock_ticker_cls.return_value = mock_ticker
+
+    assert _provider().get_asset_metadata('FUND.L') is None
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
 def test_get_fundamentals_maps_known_fields_and_leaves_roic_none(mock_ticker_cls):
     mock_ticker = MagicMock()
     mock_ticker.get_info.return_value = {

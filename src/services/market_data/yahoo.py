@@ -19,6 +19,23 @@ _PRICE_HISTORY_PERIODS = {
 _PRICE_HISTORY_CACHE_TTL_SECONDS = 900
 _price_history_cache: dict[tuple[str, str], tuple[float, list[dict]]] = {}
 
+# Yahoo exchange codes corresponding to the major North American exchanges
+# supported by Wealthsimple.  This deliberately excludes OTC and non-North
+# American listings from automatic catalog creation.
+_DISCOVERABLE_EXCHANGES = {
+    "TOR": "TSX",
+    "VAN": "TSXV",
+    "CNQ": "CSE",
+    "NEO": "NEO",
+    "NYQ": "US",
+    "NMS": "US",
+    "NGM": "US",
+    "NCM": "US",
+    "PCX": "US",
+    "ASE": "US",
+    "BTS": "US",
+}
+
 
 def _as_fraction(percent_value):
     return percent_value / 100 if percent_value is not None else None
@@ -135,7 +152,8 @@ class YahooProvider(MarketDataProvider):
                 return fn()
             except Exception as exc:
                 last_error = exc
-                time.sleep(random.uniform(1, 3))
+                if attempt < self.max_retries - 1:
+                    time.sleep(random.uniform(1, 3))
         print(f"[YahooProvider] giving up after {self.max_retries} attempts: {last_error}")
         return None
 
@@ -146,6 +164,45 @@ class YahooProvider(MarketDataProvider):
     def get_profile(self, yahoo_symbol: str) -> dict | None:
         info = self._with_retries(lambda: self._ticker(yahoo_symbol).get_info())
         return self._map_profile(info) if info else None
+
+    def get_asset_metadata(self, yahoo_symbol: str) -> dict | None:
+        """Validate a North American stock/ETF and map it to an Asset row.
+
+        Used only for exact, user-entered tickers missing from the local
+        catalog. A current price is required so invalid/delisted symbols do
+        not become permanent assets because Yahoo returned a partial page.
+        """
+        info = self._with_retries(lambda: self._ticker(yahoo_symbol).get_info())
+        if not info or info.get("quoteType") not in {"ETF", "EQUITY"}:
+            return None
+
+        exchange = _DISCOVERABLE_EXCHANGES.get(info.get("exchange"))
+        currency = info.get("currency")
+        price = _float(info.get("currentPrice") or info.get("regularMarketPrice"))
+        if exchange is None or currency not in {"CAD", "USD"} or price is None:
+            return None
+
+        canonical = (info.get("symbol") or yahoo_symbol).upper()
+        symbol = canonical.removesuffix(".TO") if exchange == "TSX" else canonical
+        if exchange == "TSX":
+            symbol = symbol.replace("-", ".")
+        if len(symbol) > 10:
+            return None
+        quote_type = info["quoteType"]
+        return {
+            "symbol": symbol,
+            "yahoo_symbol": canonical,
+            "exchange": exchange,
+            "currency": currency,
+            "name": info.get("longName") or info.get("shortName") or symbol,
+            "sector": "ETFs" if quote_type == "ETF" else info.get("sector"),
+            "industry": (
+                info.get("category") or "Exchange-Traded Fund"
+                if quote_type == "ETF"
+                else info.get("industry")
+            ),
+            "country": "Canada" if currency == "CAD" else "United States",
+        }
 
     def get_quote(self, yahoo_symbol: str) -> dict | None:
         def _fetch():

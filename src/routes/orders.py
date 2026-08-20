@@ -17,7 +17,7 @@ from src.resources.orders_import.registry import (
     resolve_or_create_manual_asset,
 )
 from src.routes.portfolio import portfolio_bp
-from src.services.portfolio import fx_rate_to_cad_today
+from src.services.fx import fx_rate_to_cad_on
 
 
 def _account_choices():
@@ -103,6 +103,15 @@ def add_order():
     form.account.choices = _account_choices()
 
     if form.validate_on_submit():
+        try:
+            executed_at = datetime.strptime(form.executed_at.data, '%Y-%m-%d')
+            quantity = float(form.quantity.data)
+            price = float(form.price.data)
+            fees = float(form.fees.data) if form.fees.data else 0.0
+        except ValueError:
+            flash('Cantidad, precio, comisiones o fecha inválidos', 'error')
+            return render_template('add_order.html', form=form)
+
         asset_id = None
         if form.asset_id.data:
             try:
@@ -122,24 +131,21 @@ def add_order():
                 asset_id = selected_asset.id
 
         if asset_id is None:
-            asset_id = resolve_or_create_manual_asset(form.asset_symbol.data)
+            asset_id = resolve_or_create_manual_asset(
+                form.asset_symbol.data, currency_hint=form.currency.data,
+            )
         if asset_id is None:
             flash(f'No se encontró el activo "{form.asset_symbol.data}" en el universo', 'error')
             return render_template('add_order.html', form=form)
 
         currency = form.currency.data.strip().upper()
-        fx_rate = fx_rate_to_cad_today(currency)
+        fx_rate = fx_rate_to_cad_on(currency, executed_at.date())
         if fx_rate is None:
-            flash(f'No hay tasa de cambio {currency}->CAD disponible, se usó 1.0', 'error')
-            fx_rate = 1.0
-
-        try:
-            executed_at = datetime.strptime(form.executed_at.data, '%Y-%m-%d')
-            quantity = float(form.quantity.data)
-            price = float(form.price.data)
-            fees = float(form.fees.data) if form.fees.data else 0.0
-        except ValueError:
-            flash('Cantidad, precio, comisiones o fecha inválidos', 'error')
+            flash(
+                f'No hay tasa de cambio {currency}->CAD disponible. '
+                'La orden no se guardó para evitar un valor incorrecto en el portafolio.',
+                'error',
+            )
             return render_template('add_order.html', form=form)
 
         order = OrderModel(
@@ -245,10 +251,17 @@ def confirm_import_orders():
     account_id = int(batch["account_id"])
 
     imported = 0
+    missing_fx = []
     for index, row in enumerate(batch["rows"]):
         if index not in selected_indexes:
             continue
         if row["is_duplicate"] or row["is_unknown_symbol"]:
+            continue
+
+        executed_at = datetime.fromisoformat(row["executed_at"])
+        fx_rate = fx_rate_to_cad_on(row["currency"], executed_at.date())
+        if fx_rate is None:
+            missing_fx.append(f'{row["currency"]}->CAD ({executed_at.date().isoformat()})')
             continue
 
         order = OrderModel(
@@ -260,8 +273,8 @@ def confirm_import_orders():
             price=row["price"],
             fees=row["fees"],
             currency=row["currency"],
-            fx_rate_to_cad=fx_rate_to_cad_today(row["currency"]) or 1.0,
-            executed_at=datetime.fromisoformat(row["executed_at"]),
+            fx_rate_to_cad=fx_rate,
+            executed_at=executed_at,
             broker=row["broker"],
             import_hash=row["import_hash"],
         )
@@ -271,4 +284,10 @@ def confirm_import_orders():
     db.session.commit()
     session.pop(f"import_batch:{batch_id}", None)
     flash(f'{imported} órdenes importadas', 'success')
+    if missing_fx:
+        flash(
+            f'{len(missing_fx)} órdenes no se importaron porque no se encontró la tasa '
+            f'{", ".join(sorted(set(missing_fx)))}.',
+            'error',
+        )
     return redirect(url_for('portfolio.list_orders'))

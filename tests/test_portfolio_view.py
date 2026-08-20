@@ -174,3 +174,12 @@ def test_whole_share_counts_render_without_decimals(auth_client, db, user):
 
     assert '>208</td>' in body
     assert '208.00' not in body
+
+
+def test_fractional_share_counts_render_with_four_decimals(auth_client, db, user):
+    account = _account(db, user)
+    _position(db, user, account, quantity=0.2254, dividends=0)
+
+    body = auth_client.get('/portfolio').get_data(as_text=True)
+
+    assert '>0.2254</td>' in body

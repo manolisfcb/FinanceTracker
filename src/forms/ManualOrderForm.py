@@ -11,6 +11,14 @@ class ManualOrderForm(FlaskForm):
     quantity = StringField('Cantidad', validators=[DataRequired()])
     price = StringField('Precio', validators=[DataRequired()])
     fees = StringField('Comisiones', validators=[Optional()])
-    currency = StringField('Moneda', validators=[DataRequired()])
+    currency = SelectField(
+        'Moneda del precio',
+        choices=[
+            ('CAD', 'CAD — Dólar canadiense'),
+            ('USD', 'USD — Dólar estadounidense'),
+        ],
+        default='CAD',
+        validators=[DataRequired()],
+    )
     executed_at = StringField('Fecha', validators=[DataRequired()])
     submit = SubmitField('Guardar orden')

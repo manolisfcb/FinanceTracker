@@ -30,7 +30,7 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src import create_app
-from src.data.asset_catalog import CRYPTO_ASSETS, REIT_ASSETS, SUPPLEMENTAL_ASSETS
+from src.data.asset_catalog import CRYPTO_ASSETS, ETF_ASSETS, REIT_ASSETS, SUPPLEMENTAL_ASSETS
 from src.extensions import db
 from src.models import Asset, Fundamentals
 from src.resources.jobs._common import get_or_create_snapshot
@@ -191,7 +191,7 @@ def main():
         db.session.commit()
         print(
             f"Upserted {len(assets)} assets ({len(ca_rows)} index CA + {len(us_rows)} index US + "
-            f"{len(CRYPTO_ASSETS)} crypto + {len(REIT_ASSETS)} REIT catalog rows)."
+            f"{len(CRYPTO_ASSETS)} crypto + {len(REIT_ASSETS)} REIT + {len(ETF_ASSETS)} ETF catalog rows)."
         )
 
         if args.skip_enrichment:

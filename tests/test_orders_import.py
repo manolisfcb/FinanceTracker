@@ -1,7 +1,9 @@
 import io
 from datetime import datetime
 
-from src.data.asset_catalog import CRYPTO_ASSETS, REIT_ASSETS
+from unittest.mock import MagicMock, patch
+
+from src.data.asset_catalog import CRYPTO_ASSETS, ETF_ASSETS, REIT_ASSETS
 from src.models import Asset
 from src.resources.orders_import.ibkr import IBKRFlexImporter
 from src.resources.orders_import.questrade import QuestradeCSVImporter
@@ -99,3 +101,33 @@ def test_supplemental_catalog_has_broad_crypto_and_reit_coverage():
     assert len(REIT_ASSETS) >= 50
     assert {'BTC', 'ETH', 'SOL', 'XRP', 'SHIB'} <= {row['symbol'] for row in CRYPTO_ASSETS}
     assert {'O', 'PLD', 'REI.UN', 'MRG.UN'} <= {row['symbol'] for row in REIT_ASSETS}
+
+
+def test_etf_catalog_includes_canadian_and_us_core_funds(db):
+    assert len(ETF_ASSETS) >= 60
+
+    vfv_id = resolve_or_create_manual_asset('VFV')
+    voo_id = resolve_or_create_manual_asset('VOO')
+
+    vfv = db.session.get(Asset, vfv_id)
+    voo = db.session.get(Asset, voo_id)
+    assert (vfv.yahoo_symbol, vfv.exchange, vfv.currency) == ('VFV.TO', 'TSX', 'CAD')
+    assert (voo.yahoo_symbol, voo.exchange, voo.currency) == ('VOO', 'US', 'USD')
+
+
+@patch('src.services.market_data.get_provider')
+def test_manual_resolver_discovers_a_live_north_american_etf(mock_get_provider, app, db):
+    app.config['DISCOVER_UNKNOWN_ASSETS_ON_ORDER_CREATE'] = True
+    provider = MagicMock()
+    provider.get_asset_metadata.return_value = {
+        'symbol': 'NEWETF', 'yahoo_symbol': 'NEWETF.TO', 'exchange': 'TSX',
+        'currency': 'CAD', 'name': 'New ETF', 'sector': 'ETFs',
+        'industry': 'Exchange-Traded Fund', 'country': 'Canada',
+    }
+    mock_get_provider.return_value = provider
+
+    asset_id = resolve_or_create_manual_asset('NEWETF', currency_hint='CAD')
+
+    asset = db.session.get(Asset, asset_id)
+    assert asset.yahoo_symbol == 'NEWETF.TO'
+    provider.get_asset_metadata.assert_called_once_with('NEWETF.TO')

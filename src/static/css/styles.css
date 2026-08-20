@@ -329,6 +329,10 @@ a:hover { color: var(--tn-maple-dark); }
   display: none;
   position: absolute;
   bottom: calc(100% + 7px);
+  /* Keep the absolutely positioned bubble as one composited box. Chromium
+     otherwise fragments it across the balanced `.tn-ind-groups` columns,
+     painting the first lines at the bottom of the previous column. */
+  transform: translateZ(0);
   /* Above the tiles and cards that come later in the flow, which would
      otherwise paint over a bubble escaping its own tile. */
   z-index: 60;

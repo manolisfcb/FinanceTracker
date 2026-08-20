@@ -16,6 +16,11 @@ def refresh_asset_quote(asset, provider=None) -> bool:
     price = quote.get("price") if quote else None
     if price is None:
         return False
+    quote_currency = quote.get("currency")
+    if quote_currency in {"CAD", "USD"}:
+        # Yahoo's quote denomination is independent from the currency a user
+        # selected when entering an order.
+        asset.currency = quote_currency
     snapshot = get_or_create_snapshot(asset.id)
     snapshot.price = price
     return True

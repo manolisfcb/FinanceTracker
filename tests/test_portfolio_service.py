@@ -1,5 +1,7 @@
 from datetime import date, datetime
 
+import pytest
+
 from src.models import Account, AccountType, Asset, DividendHistory, DividendReceived, Fundamentals, FxRate, OrderModel, OrderType
 from src.services.portfolio import PortfolioService
 
@@ -91,6 +93,34 @@ def test_cad_cost_uses_trade_fx_value_uses_todays_fx(db, user):
 
     assert lot.avg_cost_cad == 100.0 * 1.30
     assert lot.market_value_cad == 10 * 110.0 * 1.35
+
+
+def test_usd_yahoo_price_is_converted_even_when_the_order_price_was_cad(db, user):
+    asset = _asset(db, symbol='AAPL', currency='USD')
+    account = _account(db, user)
+    db.session.add(
+        _order(
+            user, asset, account, OrderType.BUY, 0.23, 440.15,
+            currency='CAD', fx_rate=1.0,
+        )
+    )
+    db.session.add(Fundamentals(asset_id=asset.id, as_of_date=date(2026, 8, 20), price=316.27))
+    db.session.add(FxRate(date=date(2026, 8, 20), pair='USDCAD', rate=1.3824))
+    db.session.commit()
+
+    lot = PortfolioService(user.id).compute_lots()[0]
+    position = PortfolioService(user.id).get_positions_by_asset()[0]
+
+    assert lot.currency == 'CAD'
+    assert lot.price_currency == 'USD'
+    assert lot.avg_cost_cad == 440.15
+    assert lot.current_price == 316.27
+    assert lot.current_price_cad == pytest.approx(316.27 * 1.3824)
+    assert lot.market_value_cad == pytest.approx(0.23 * 316.27 * 1.3824)
+    assert lot.unrealized_pnl_cad == pytest.approx(
+        0.23 * (316.27 * 1.3824 - 440.15)
+    )
+    assert position['current_price'] == pytest.approx(316.27 * 1.3824)
 
 
 def test_missing_fx_rate_excludes_lot_from_cad_totals(db, user):

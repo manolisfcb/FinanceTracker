@@ -19,14 +19,15 @@ from datetime import date
 
 from src.models import (
     Account,
+    Asset,
     DividendHistory,
     DividendReceived,
     Fundamentals,
-    FxRate,
     OrderModel,
     OrderType,
     PortfolioSnapshotModel,
 )
+from src.services.fx import latest_fx_rate_to_cad
 
 
 @dataclass
@@ -36,12 +37,16 @@ class PositionLot:
     account_ids: list
     quantity_by_account: dict
     quantity: float = 0.0
+    # Currency entered on the order. It applies to trade cost/proceeds only.
     currency: str = "CAD"
+    # Currency of the market quote, sourced from Asset/Yahoo independently.
+    price_currency: str = "CAD"
     avg_cost_original: float = 0.0
     avg_cost_cad: float = 0.0
     realized_pnl_original: float = 0.0
     realized_pnl_cad: float = 0.0
     current_price: float | None = None
+    current_price_cad: float | None = None
     market_value_original: float | None = None
     market_value_cad: float | None = None
     unrealized_pnl_original: float | None = None
@@ -56,16 +61,8 @@ def _pool_key(asset_id: int, account: Account) -> str:
 
 
 def fx_rate_to_cad_today(currency: str) -> float | None:
-    """Today's FX rate to convert `currency` into CAD, or None if unknown.
-
-    Shared by PortfolioService (current market value) and anywhere else that
-    needs to convert a foreign-currency amount to CAD as of today (e.g. a
-    manual order entry route defaulting fx_rate_to_cad for a non-CAD order).
-    """
-    if currency == "CAD":
-        return 1.0
-    row = FxRate.query.filter_by(pair=f"{currency}CAD").order_by(FxRate.date.desc()).first()
-    return row.rate if row else None
+    """Newest cached FX rate for current portfolio valuation."""
+    return latest_fx_rate_to_cad(currency)
 
 
 class PortfolioService:
@@ -142,27 +139,37 @@ class PortfolioService:
     def _price_and_value_lots(self, lots: list[PositionLot]):
         asset_ids = {lot.asset_id for lot in lots}
         prices = self._latest_prices(asset_ids)
+        price_currencies = self._asset_currencies(asset_ids)
         fx_cache: dict[str, float | None] = {}
 
         for lot in lots:
             lot.current_price = prices.get(lot.asset_id)
+            lot.price_currency = price_currencies.get(lot.asset_id, "CAD")
             if lot.current_price is None:
                 self.warnings.append(f"asset {lot.asset_id}: no current price available")
                 continue
 
             lot.market_value_original = lot.quantity * lot.current_price
-            lot.unrealized_pnl_original = lot.market_value_original - lot.quantity * lot.avg_cost_original
+            # An original-currency P&L is meaningful only when the order and
+            # the live quote use the same currency. CAD P&L below is always
+            # valid because each side is converted independently.
+            if lot.currency == lot.price_currency:
+                lot.unrealized_pnl_original = (
+                    lot.market_value_original - lot.quantity * lot.avg_cost_original
+                )
 
-            if lot.currency not in fx_cache:
-                fx_cache[lot.currency] = fx_rate_to_cad_today(lot.currency)
-            fx_rate = fx_cache[lot.currency]
+            if lot.price_currency not in fx_cache:
+                fx_cache[lot.price_currency] = fx_rate_to_cad_today(lot.price_currency)
+            fx_rate = fx_cache[lot.price_currency]
 
             if fx_rate is None:
                 self.warnings.append(
-                    f"asset {lot.asset_id}: no FxRate for {lot.currency}->CAD, excluded from CAD totals"
+                    f"asset {lot.asset_id}: no FxRate for {lot.price_currency}->CAD, "
+                    "excluded from CAD totals"
                 )
                 continue
 
+            lot.current_price_cad = lot.current_price * fx_rate
             lot.market_value_cad = lot.market_value_original * fx_rate
             lot.unrealized_pnl_cad = lot.market_value_cad - lot.quantity * lot.avg_cost_cad
             invested_cad = lot.quantity * lot.avg_cost_cad
@@ -183,6 +190,15 @@ class PortfolioService:
         for row in rows:
             prices.setdefault(row.asset_id, row.price)
         return prices
+
+    @staticmethod
+    def _asset_currencies(asset_ids) -> dict[int, str]:
+        if not asset_ids:
+            return {}
+        return {
+            asset.id: asset.currency
+            for asset in Asset.query.filter(Asset.id.in_(asset_ids)).all()
+        }
 
     # -- public reads -------------------------------------------------------
 

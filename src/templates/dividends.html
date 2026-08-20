@@ -73,7 +73,7 @@
                 <div class="flex-1 text-[12.5px]">
                     <span class="font-semibold">{{ entry.symbol }}</span> ex-dividend
                     <div class="text-muted text-[11.5px]">
-                        {% if entry.amount_per_share %}{{ entry.currency }} {{ entry.amount_per_share|currency }}/acción · {% endif %}{{ entry.quantity|round(2) }} acciones
+                        {% if entry.amount_per_share %}{{ entry.currency }} {{ entry.amount_per_share|currency }}/acción · {% endif %}{{ entry.quantity|quantity }} acciones
                     </div>
                 </div>
                 <span class="num text-[13px] font-semibold">

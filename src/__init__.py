@@ -159,13 +159,16 @@ def create_app(config_name=None):
 
     @app.template_filter("quantity")
     def format_quantity_filter(value):
-        """Share counts: whole numbers stay whole, fractions (DRIP, partial
-        shares) keep up to four decimals without trailing zeros."""
+        """Share counts without trailing zeros.
+
+        Equities such as 0.2254 keep their four decimals, while crypto can
+        retain up to eight; whole quantities still render as whole numbers.
+        """
         if value is None:
             return "—"
         if float(value).is_integer():
             return f"{int(value):,}"
-        return f"{value:,.4f}".rstrip("0").rstrip(".")
+        return f"{value:,.8f}".rstrip("0").rstrip(".")
 
     @app.template_filter("fx")
     def format_fx_filter(value):

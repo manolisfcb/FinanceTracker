@@ -222,7 +222,7 @@ class DashboardService:
         for lot in self.portfolio.get_positions():
             if lot.quantity <= 0 or lot.market_value_cad is None:
                 continue
-            by_currency[lot.currency] += lot.market_value_cad
+            by_currency[lot.price_currency] += lot.market_value_cad
 
         total = sum(by_currency.values())
         if not total:

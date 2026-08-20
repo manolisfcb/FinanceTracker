@@ -42,7 +42,7 @@
                         <td class="num">{{ row.executed_at[:10] }}</td>
                         <td class="font-semibold">{{ row.symbol }}</td>
                         <td>{{ row.type }}</td>
-                        <td class="num">{{ row.quantity }}</td>
+                        <td class="num">{{ row.quantity|quantity }}</td>
                         <td class="num">{{ row.price }}</td>
                         <td class="num">{{ row.fees }}</td>
                         <td>{{ row.currency }}</td>

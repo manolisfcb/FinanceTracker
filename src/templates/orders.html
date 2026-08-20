@@ -48,7 +48,7 @@
                         <td class="font-semibold">{{ order.asset.symbol }}</td>
                         <td>{{ order.account.name }}</td>
                         <td>{{ order.type.value }}</td>
-                        <td class="num">{{ order.quantity }}</td>
+                        <td class="num">{{ order.quantity|quantity }}</td>
                         <td class="num">{{ order.price }}</td>
                         <td class="num">{{ order.fees }}</td>
                         <td>{{ order.currency }}</td>

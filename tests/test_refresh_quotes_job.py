@@ -23,6 +23,20 @@ def test_refresh_asset_quote_writes_crypto_price(db):
     provider.get_quote.assert_called_once_with('BTC-CAD')
 
 
+def test_refresh_asset_quote_keeps_yahoo_quote_currency_on_the_asset(db):
+    asset = Asset(
+        symbol='AAPL', yahoo_symbol='AAPL', exchange='US',
+        currency='CAD', name='Apple Inc.', sector='Technology',
+    )
+    db.session.add(asset)
+    db.session.flush()
+    provider = MagicMock()
+    provider.get_quote.return_value = {'price': 316.27, 'currency': 'USD'}
+
+    assert refresh_asset_quote(asset, provider) is True
+    assert asset.currency == 'USD'
+
+
 def test_refresh_asset_quote_does_not_create_empty_snapshot(db):
     asset = Asset(
         symbol='BTC', yahoo_symbol='BTC-CAD', exchange='CRYPTO',

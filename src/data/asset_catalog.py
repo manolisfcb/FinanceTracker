@@ -156,4 +156,92 @@ REIT_ASSETS = (
 )
 
 
-SUPPLEMENTAL_ASSETS = CRYPTO_ASSETS + REIT_ASSETS
+def _etf(symbol: str, name: str, exchange: str, industry: str) -> dict:
+    return {
+        "symbol": symbol,
+        "name": name,
+        "sector": "ETFs",
+        "industry": industry,
+        "exchange": exchange,
+        "currency": "CAD" if exchange == "TSX" else "USD",
+        "yahoo_symbol": f"{symbol}.TO" if exchange == "TSX" else symbol,
+        "country": "Canada" if exchange == "TSX" else "United States",
+    }
+
+
+# High-use Canadian and U.S. ETFs are available immediately in search.  This
+# is a starter cache, not a closed allowlist: the manual-order resolver also
+# discovers and validates other North American ETFs on demand.
+ETF_ASSETS = (
+    # Canada — Vanguard
+    _etf("VFV", "Vanguard S&P 500 Index ETF", "TSX", "US Large Cap Equity"),
+    _etf("VSP", "Vanguard S&P 500 Index ETF CAD-hedged", "TSX", "US Large Cap Equity"),
+    _etf("VCN", "Vanguard FTSE Canada All Cap Index ETF", "TSX", "Canadian Equity"),
+    _etf("VUN", "Vanguard U.S. Total Market Index ETF", "TSX", "US Broad Market Equity"),
+    _etf("VIU", "Vanguard FTSE Developed All Cap ex North America ETF", "TSX", "International Equity"),
+    _etf("VEE", "Vanguard FTSE Emerging Markets All Cap Index ETF", "TSX", "Emerging Markets Equity"),
+    _etf("VGRO", "Vanguard Growth ETF Portfolio", "TSX", "Asset Allocation"),
+    _etf("VEQT", "Vanguard All-Equity ETF Portfolio", "TSX", "Asset Allocation"),
+    _etf("VBAL", "Vanguard Balanced ETF Portfolio", "TSX", "Asset Allocation"),
+    _etf("VCNS", "Vanguard Conservative ETF Portfolio", "TSX", "Asset Allocation"),
+    # Canada — iShares
+    _etf("XIU", "iShares S&P/TSX 60 Index ETF", "TSX", "Canadian Equity"),
+    _etf("XIC", "iShares Core S&P/TSX Capped Composite Index ETF", "TSX", "Canadian Equity"),
+    _etf("XSP", "iShares Core S&P 500 Index ETF CAD-hedged", "TSX", "US Large Cap Equity"),
+    _etf("XUS", "iShares Core S&P 500 Index ETF", "TSX", "US Large Cap Equity"),
+    _etf("XUU", "iShares Core S&P U.S. Total Market Index ETF", "TSX", "US Broad Market Equity"),
+    _etf("XEF", "iShares Core MSCI EAFE IMI Index ETF", "TSX", "International Equity"),
+    _etf("XEC", "iShares Core MSCI Emerging Markets IMI Index ETF", "TSX", "Emerging Markets Equity"),
+    _etf("XAW", "iShares Core MSCI All Country World ex Canada Index ETF", "TSX", "Global Equity"),
+    _etf("XEQT", "iShares Core Equity ETF Portfolio", "TSX", "Asset Allocation"),
+    _etf("XGRO", "iShares Core Growth ETF Portfolio", "TSX", "Asset Allocation"),
+    _etf("XBAL", "iShares Core Balanced ETF Portfolio", "TSX", "Asset Allocation"),
+    # Canada — BMO and Global X
+    _etf("ZSP", "BMO S&P 500 Index ETF", "TSX", "US Large Cap Equity"),
+    _etf("ZCN", "BMO S&P/TSX Capped Composite Index ETF", "TSX", "Canadian Equity"),
+    _etf("ZEA", "BMO MSCI EAFE Index ETF", "TSX", "International Equity"),
+    _etf("ZEM", "BMO MSCI Emerging Markets Index ETF", "TSX", "Emerging Markets Equity"),
+    _etf("ZAG", "BMO Aggregate Bond Index ETF", "TSX", "Fixed Income"),
+    _etf("ZGRO", "BMO Growth ETF", "TSX", "Asset Allocation"),
+    _etf("ZEQT", "BMO All-Equity ETF", "TSX", "Asset Allocation"),
+    _etf("HXT", "Global X S&P/TSX 60 Index Corporate Class ETF", "TSX", "Canadian Equity"),
+    _etf("HXS", "Global X S&P 500 Index Corporate Class ETF", "TSX", "US Large Cap Equity"),
+    _etf("HXQ", "Global X NASDAQ-100 Index Corporate Class ETF", "TSX", "US Large Cap Equity"),
+    _etf("QQC", "Invesco NASDAQ 100 Index ETF", "TSX", "US Large Cap Equity"),
+    # United States — broad market and allocation building blocks
+    _etf("VOO", "Vanguard S&P 500 ETF", "US", "US Large Cap Equity"),
+    _etf("VTI", "Vanguard Total Stock Market ETF", "US", "US Broad Market Equity"),
+    _etf("VT", "Vanguard Total World Stock ETF", "US", "Global Equity"),
+    _etf("VXUS", "Vanguard Total International Stock ETF", "US", "International Equity"),
+    _etf("VIG", "Vanguard Dividend Appreciation ETF", "US", "Dividend Equity"),
+    _etf("VYM", "Vanguard High Dividend Yield ETF", "US", "Dividend Equity"),
+    _etf("VNQ", "Vanguard Real Estate ETF", "US", "Real Estate Equity"),
+    _etf("BND", "Vanguard Total Bond Market ETF", "US", "Fixed Income"),
+    _etf("IVV", "iShares Core S&P 500 ETF", "US", "US Large Cap Equity"),
+    _etf("SPY", "SPDR S&P 500 ETF Trust", "US", "US Large Cap Equity"),
+    _etf("QQQ", "Invesco QQQ Trust", "US", "US Large Cap Equity"),
+    _etf("QQQM", "Invesco NASDAQ 100 ETF", "US", "US Large Cap Equity"),
+    _etf("DIA", "SPDR Dow Jones Industrial Average ETF Trust", "US", "US Large Cap Equity"),
+    _etf("IWM", "iShares Russell 2000 ETF", "US", "US Small Cap Equity"),
+    _etf("ACWI", "iShares MSCI ACWI ETF", "US", "Global Equity"),
+    _etf("EFA", "iShares MSCI EAFE ETF", "US", "International Equity"),
+    _etf("IEMG", "iShares Core MSCI Emerging Markets ETF", "US", "Emerging Markets Equity"),
+    _etf("AGG", "iShares Core U.S. Aggregate Bond ETF", "US", "Fixed Income"),
+    _etf("SCHD", "Schwab U.S. Dividend Equity ETF", "US", "Dividend Equity"),
+    _etf("DGRO", "iShares Core Dividend Growth ETF", "US", "Dividend Equity"),
+    _etf("USMV", "iShares MSCI USA Min Vol Factor ETF", "US", "Factor Equity"),
+    _etf("JEPI", "JPMorgan Equity Premium Income ETF", "US", "Covered Call Equity"),
+    _etf("JEPQ", "JPMorgan Nasdaq Equity Premium Income ETF", "US", "Covered Call Equity"),
+    _etf("ARKK", "ARK Innovation ETF", "US", "Thematic Equity"),
+    _etf("XLK", "Technology Select Sector SPDR Fund", "US", "Technology Equity"),
+    _etf("XLF", "Financial Select Sector SPDR Fund", "US", "Financial Equity"),
+    _etf("XLE", "Energy Select Sector SPDR Fund", "US", "Energy Equity"),
+    _etf("XLV", "Health Care Select Sector SPDR Fund", "US", "Healthcare Equity"),
+    _etf("XLI", "Industrial Select Sector SPDR Fund", "US", "Industrial Equity"),
+    _etf("XLY", "Consumer Discretionary Select Sector SPDR Fund", "US", "Consumer Equity"),
+    _etf("XLP", "Consumer Staples Select Sector SPDR Fund", "US", "Consumer Equity"),
+    _etf("XLU", "Utilities Select Sector SPDR Fund", "US", "Utilities Equity"),
+)
+
+
+SUPPLEMENTAL_ASSETS = CRYPTO_ASSETS + REIT_ASSETS + ETF_ASSETS
