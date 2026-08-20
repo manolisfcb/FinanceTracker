@@ -224,17 +224,45 @@ automatizados para los casos sin datos).
 
 ---
 
-## Fase 4 — Proventos, calendario y hechos relevantes (2 semanas)
+## Fase 4a — Proventos, calendario y hechos relevantes oficiales (1–2 semanas)
+
+> Split de la Fase 4 original (decisión 2026-08-20): se separa la parte de datos oficiales/estructurados
+> (dividendos propios, filings regulatorios, earnings) de la parte de noticias de terceros (Fase 4b),
+> porque tienen fuentes, formato de dato y criterio de salida distintos.
 
 - [ ] `[M]` `/dividends` (Proventos): recibidos por mes (gráfico barras), YoC por posición,
       proyección próximos 12 meses, calendario de ex-dates y pay-dates de las posiciones.
-- [ ] `[L]` Hechos relevantes:
-      - US: job que consulta **SEC EDGAR** (API pública JSON) para 8-K/10-Q/10-K de assets en portafolio → tabla `CompanyEvent`.
-      - Canadá: **SEDAR+ no tiene API pública** → empezar con feed de noticias por ticker
-        (yfinance news / RSS del exchange) y link directo a la búsqueda SEDAR+ de la empresa;
-        evaluar proveedor (QuoteMedia) si se vuelve crítico.
-- [ ] `[M]` `/inbox`: timeline de eventos de las empresas del portafolio (dividendo anunciado, filing, resultado) con marcado leído/no leído.
+- [ ] `[L]` Hechos relevantes regulatorios:
+      - US: job que consulta **SEC EDGAR** (API pública JSON) para 8-K/10-Q/10-K de assets en portafolio → tabla `CompanyEvent` (`source=EDGAR`).
+      - Canadá: **SEDAR+ no tiene API pública** → por ahora solo link directo a la búsqueda SEDAR+
+        de la empresa (sin ingestión estructurada); evaluar proveedor pago (QuoteMedia) si se vuelve crítico.
 - [ ] `[S]` Calendario de earnings (yfinance calendar) en página de empresa y en inbox.
+- [ ] `[M]` `/inbox`: timeline de eventos de las empresas del portafolio (dividendo anunciado, filing EDGAR,
+      earnings) con marcado leído/no leído. Se extiende en Fase 4b para incluir noticias.
+
+**Criterio de salida**: posiciones con dividendos reales muestran YoC/proyección/calendario correctos;
+un asset US en portafolio con filings recientes en EDGAR aparece en su página y en el inbox.
+
+---
+
+## Fase 4b — Noticias (Reuters, Yahoo, Google News, etc.) (1 semana)
+
+> Segunda mitad del split de la Fase 4 original. Depende de `CompanyEvent` (creada en 4a) — agrega
+> eventos `kind=NEWS` con `source` distinguiendo el proveedor.
+
+- [ ] `[M]` Capa de proveedores de noticias (mismo patrón Strategy que `MarketDataProvider`):
+      `YahooNewsProvider` (yfinance `.news`, gratis, ya autenticado por symbol), `GoogleNewsProvider`
+      (RSS público `news.google.com/rss/search?q=...`, gratis, sin API key). Reuters no tiene API
+      pública gratuita — evaluar RSS de Reuters por sección/empresa si existe, si no queda fuera del
+      alcance inicial (documentar, no bloquear la fase).
+- [ ] `[S]` Job periódico que agrega noticias por asset en portafolio → `CompanyEvent` (`kind=NEWS`,
+      `source=YAHOO|GOOGLE|REUTERS`), dedupe por URL.
+- [ ] `[S]` Feed de noticias en la página de empresa (pestaña o sección aparte de "hechos relevantes").
+- [ ] `[S]` Extender `/inbox` para incluir noticias junto a los eventos regulatorios de Fase 4a,
+      con filtro por tipo (filing/earnings/dividendo/noticia).
+
+**Criterio de salida**: un asset en portafolio muestra noticias recientes de al menos 2 fuentes
+distintas (Yahoo + Google News), visibles en su página y en el inbox.
 
 ---
 
@@ -279,8 +307,9 @@ automatizados para los casos sin datos).
 
 ## Orden recomendado de ejecución
 ```
-Fase 0 ──► Fase 1 ──► Fase 2 ──► Fase 3 ──► Fase 4 ──► Fase 5 ──► Fase 6
-(salud)   (datos)    (empresa)  (portafolio) (eventos)  (insights) (comunidad)
+Fase 0 ──► Fase 1 ──► Fase 2 ──► Fase 3 ──► Fase 4a ──► Fase 4b ──► Fase 5 ──► Fase 6
+(salud)   (datos)    (empresa)  (portafolio) (proventos+  (noticias) (insights) (comunidad)
+                                              regulatorio)
 ```
 La comunidad va al final: necesita usuarios activos y páginas de empresa a las cuales enlazar
 las menciones; puede adelantarse si el objetivo es validar interés temprano.
