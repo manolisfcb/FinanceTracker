@@ -1144,19 +1144,55 @@ a:hover { color: var(--tn-maple-dark); }
    Market strip, ticker chips, category badges and vote controls. */
 
 .tn-market-strip {
-  display: flex;
-  align-items: center;
-  gap: 26px;
   height: 34px;
-  padding: 0 36px;
   background: var(--tn-ink);
   color: #c9c4b8;
   font-size: 11.5px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  line-height: 1;
+  overflow: hidden;
   white-space: nowrap;
 }
-.tn-market-strip::-webkit-scrollbar { display: none; }
+.tn-market-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  height: 100%;
+  will-change: transform;
+  animation: tn-market-scroll 30s linear infinite;
+  animation-delay: var(--tn-market-animation-delay, 0s);
+}
+.tn-market-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 52px;
+  width: max-content;
+  min-width: 100vw;
+  height: 100%;
+  padding: 0 36px;
+  box-sizing: border-box;
+}
+.tn-market-indicators {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+.tn-market-item,
+.tn-market-session {
+  flex: none;
+}
+.tn-market-session {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.tn-market-strip:hover .tn-market-track,
+.tn-market-strip:focus-within .tn-market-track {
+  animation-play-state: paused;
+}
+@keyframes tn-market-scroll {
+  to { transform: translate3d(-50%, 0, 0); }
+}
 /* The strip sits on ink, where the light-background pos/neg pair goes muddy. */
 .tn-market-pos { color: #5fbf8f; }
 .tn-market-neg { color: #e88a80; }
@@ -1234,7 +1270,19 @@ a.tick:hover { background: #dde8dd; color: #15633d; }
 .tn-composer:hover { border-color: #d9d5cb; }
 
 @media (max-width: 640px) {
-  .tn-market-strip { gap: 18px; padding: 0 16px; }
+  .tn-market-track { animation-duration: 34s; }
+  .tn-market-group { gap: 36px; padding: 0 16px; }
+  .tn-market-indicators { gap: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn-market-strip {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tn-market-strip::-webkit-scrollbar { display: none; }
+  .tn-market-track { animation: none; }
+  .tn-market-group[aria-hidden="true"] { display: none; }
 }
 
 /* Tailwind's display utilities (`flex`, `grid`, `block`) out-specify the
@@ -1242,3 +1290,61 @@ a.tick:hover { background: #dde8dd; color: #15633d; }
    both `hidden` and `flex` renders anyway. Progressive-disclosure panels
    (the composer, inline comment editing) rely on `hidden` being honoured. */
 [hidden] { display: none !important; }
+
+/* ---------------------------------------------------------------------
+   Landing pública y pantallas de acceso
+   --------------------------------------------------------------------- */
+
+/* The marketing CTAs and the auth forms need a bigger target than the
+   13px .btn the app's toolbars use — 44px tall, which is also the minimum
+   comfortable tap target on a phone. */
+.btn-lg { font-size: 14.5px; padding: 12px 22px; border-radius: 9px; }
+.btn-auth { font-size: 13.5px; padding: 11px 16px; }
+.btn-block { width: 100%; justify-content: center; }
+
+/* .btn on an ink panel: the default #d9d5cb border disappears against it. */
+.btn-onink { background: #ffffff; border-color: #ffffff; color: var(--tn-ink); }
+.btn-onink:hover { background: #f2f0eb; border-color: #f2f0eb; }
+
+.tn-eyebrow {
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--tn-muted);
+  font-weight: 600;
+}
+
+/* Password field with a show/hide control. One field with a toggle instead
+   of a second "confirm" field: it catches the same typos without asking
+   anyone to type their password twice. */
+.tn-password { position: relative; }
+.tn-password .tn-input { padding-right: 68px; }
+.tn-password-toggle {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 4px 6px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--tn-muted);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tn-password-toggle:hover { color: var(--tn-ink); background: var(--tn-border-soft); }
+
+.tn-checkbox {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  border: 1px solid #d9d5cb;
+  accent-color: var(--tn-maple);
+  cursor: pointer;
+}
+
+/* Tailwind's CDN build is v3; text-wrap landed in 3.4 but this keeps the
+   landing's headline wrapping sane even if that build ever moves. */
+.text-pretty { text-wrap: pretty; }

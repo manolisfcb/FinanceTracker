@@ -5,7 +5,7 @@ import flask
 from flask_login import current_user
 from flask_restful import Api
 
-from src.extensions import db, migration, jwt, login_manager, htmx, scheduler
+from src.extensions import db, migration, jwt, login_manager, htmx, oauth, scheduler
 
 MONTHS_ES = [
     "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -71,12 +71,27 @@ def create_app(config_name=None):
     jwt.init_app(app)
     login_manager.init_app(app)
     htmx.init_app(app)
+    oauth.init_app(app)
+
+    # Google sign-in is opt-in per deployment. Registering the client only
+    # when both credentials are present keeps `_google_client()` returning
+    # None elsewhere, which is what hides the button.
+    if app.config.get("GOOGLE_CLIENT_ID") and app.config.get("GOOGLE_CLIENT_SECRET"):
+        oauth.register(
+            name="google",
+            client_id=app.config["GOOGLE_CLIENT_ID"],
+            client_secret=app.config["GOOGLE_CLIENT_SECRET"],
+            server_metadata_url=app.config["GOOGLE_DISCOVERY_URL"],
+            client_kwargs={"scope": "openid email profile"},
+        )
 
     # Import models so their mappers register with SQLAlchemy before any
     # request or `flask db migrate` run.
     from src.models import UserModel
 
     login_manager.login_view = "auth.login"
+    login_manager.login_message = "Iniciá sesión para continuar."
+    login_manager.login_message_category = "info"
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -111,6 +126,20 @@ def create_app(config_name=None):
     app.register_blueprint(community_bp)
 
     @app.context_processor
+    def inject_google_enabled():
+        """Whether to render the "Continuar con Google" buttons.
+
+        The landing page, the login form and the register form all need this
+        and none of them owns it, so it is decided once here — the same
+        condition that governs whether the client was registered above.
+        """
+        return {
+            "google_enabled": bool(
+                app.config.get("GOOGLE_CLIENT_ID") and app.config.get("GOOGLE_CLIENT_SECRET")
+            )
+        }
+
+    @app.context_processor
     def inject_unread_inbox_count():
         if not current_user.is_authenticated:
             return {}
@@ -120,9 +149,11 @@ def create_app(config_name=None):
     def inject_market_strip():
         """The strip sits above the nav on every page, so it has to be a
         context processor rather than a per-view context. It reads only the
-        cached MarketIndicator rows the 15-minute job writes."""
-        if not current_user.is_authenticated:
-            return {}
+        cached MarketIndicator rows the 15-minute job writes.
+
+        Anonymous visitors get it too: the landing page and the auth screens
+        lead with it, and index levels are public information — one cached
+        query, no per-user data."""
         from src.services.market_strip import market_strip_context
 
         return market_strip_context()

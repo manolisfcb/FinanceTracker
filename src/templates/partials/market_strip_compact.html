@@ -1,0 +1,19 @@
+{# The strip's figures without the bar chrome, for the auth screens' dark
+   panel. Same cached MarketIndicator rows as the site-wide strip. #}
+{% if market_indices or market_usdcad or market_boc_rate %}
+<div class="num flex flex-wrap items-center gap-x-6 gap-y-2 text-[11.5px] text-[#c9c4b8]">
+    {% for indicator in market_indices %}
+    <span>{{ indicator.label }}
+        {% if indicator.change_percent is not none %}
+        <span class="{{ 'tn-market-pos' if indicator.change_percent >= 0 else 'tn-market-neg' }}">
+            {{ '+' if indicator.change_percent >= 0 }}{{ indicator.change_percent|ratio }}%
+        </span>
+        {% else %}
+        <span class="text-muted">—</span>
+        {% endif %}
+    </span>
+    {% endfor %}
+    {% if market_usdcad %}<span>USD/CAD {{ market_usdcad.value|fx }}</span>{% endif %}
+    {% if market_boc_rate %}<span>Tasa BoC {{ market_boc_rate.value|ratio }}%</span>{% endif %}
+</div>
+{% endif %}

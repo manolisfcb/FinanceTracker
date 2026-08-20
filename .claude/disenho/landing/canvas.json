@@ -1,0 +1,55 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 2820,
+      "title": "Landing pública"
+    },
+    {
+      "file": "LandingMovil.dc.html",
+      "x": 1560,
+      "y": 0,
+      "w": 390,
+      "h": 2700,
+      "title": "Landing — móvil 390px"
+    },
+    {
+      "file": "Acceso.dc.html",
+      "x": 2070,
+      "y": 0,
+      "w": 1440,
+      "h": 840,
+      "title": "Iniciar sesión"
+    },
+    {
+      "file": "Registro.dc.html",
+      "x": 2070,
+      "y": 960,
+      "w": 1440,
+      "h": 840,
+      "title": "Crear cuenta"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": 0,
+      "y": -230,
+      "w": 460,
+      "text": "TrueNorth Analytics — entrada pública.\nMismo sistema que el resto de la app: fondo #f7f6f3, IBM Plex Sans/Mono, Instrument Serif para titulares, acento maple #b3372b, cards de 10px con borde #e7e4dc.\nUna sola acción primaria repetida: Crear cuenta gratis. Google como alternativa en cada punto de entrada."
+    },
+    {
+      "id": "nota-acceso",
+      "x": 2070,
+      "y": -230,
+      "w": 420,
+      "text": "Login/registro sin fricción: Google arriba, un solo campo de identidad (usuario o email), contraseña con toggle Mostrar, sin confirmar contraseña y sin verificación por email. El registro loguea y manda directo al dashboard.\nEl panel oscuro se oculta por debajo de 1024px; el formulario queda centrado."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

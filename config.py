@@ -33,6 +33,16 @@ class Config(object):
     # News sources to aggregate (comma-separated): yahoo, google. Both are
     # free and keyless. Reuters has no free API — deliberately not included.
     NEWS_PROVIDERS = os.getenv("NEWS_PROVIDERS", "yahoo,google")
+    # Google sign-in. Optional: without both values the button is hidden and
+    # /auth/google says the feature is off, so a checkout with no Google
+    # project still runs with password login.
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+    # OpenID Connect discovery: Authlib reads the authorize/token/jwks
+    # endpoints from here rather than us pinning URLs that Google rotates.
+    GOOGLE_DISCOVERY_URL = (
+        "https://accounts.google.com/.well-known/openid-configuration"
+    )
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
@@ -81,6 +91,10 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False
     # Tests use explicit provider mocks; never let a form POST reach Yahoo.
     REFRESH_QUOTE_ON_ORDER_CREATE = False
+    # Hermetic regardless of the developer's .env: a machine with real Google
+    # credentials must not make the auth tests take a different branch.
+    GOOGLE_CLIENT_ID = None
+    GOOGLE_CLIENT_SECRET = None
     DISCOVER_UNKNOWN_ASSETS_ON_ORDER_CREATE = False
     # In-memory SQLite is per-connection — without a single shared
     # connection, tables created via db.create_all() are invisible to the

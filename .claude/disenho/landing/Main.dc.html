@@ -1,0 +1,469 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Instrument+Serif&amp;display=swap">
+  <style>
+    body { margin:0; background:#f7f6f3; color:#1c1b18; font-family:'IBM Plex Sans',system-ui,sans-serif; }
+    a { color:#b3372b; text-decoration:none; } a:hover { color:#8f2b22; }
+    .num { font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+    .pos { color:#1a7f4e; } .neg { color:#c23934; }
+    .card { background:#ffffff; border:1px solid #e7e4dc; border-radius:10px; }
+    .lbl { font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:#8a857a; font-weight:600; }
+    .btn { display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; border-radius:8px; padding:8px 14px; border:1px solid #d9d5cb; background:#ffffff; color:#1c1b18; }
+    .btn-primary { background:#b3372b; border-color:#b3372b; color:#ffffff; }
+    .btn-lg { font-size:14.5px; padding:12px 22px; border-radius:9px; }
+    .h-serif { font-family:'Instrument Serif',Georgia,serif; font-weight:400; margin:0; }
+    .eyebrow { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8a857a; font-weight:600; }
+    .tick { display:inline-flex; font-size:11.5px; font-weight:700; border-radius:6px; padding:2px 8px; background:#e9efe9; color:#1a7f4e; font-family:'IBM Plex Mono',monospace; }
+    table { border-collapse:collapse; width:100%; font-size:13px; }
+    th { text-align:left; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#8a857a; font-weight:600; padding:9px 12px; border-bottom:1px solid #e7e4dc; }
+    td { padding:10px 12px; border-bottom:1px solid #f0eee8; }
+  </style>
+</helmet>
+<div style="width:1440px; background:#f7f6f3">
+
+  <!-- Market strip -->
+  <div class="num" style="display:flex; align-items:center; gap:26px; height:34px; padding:0 36px; background:#1c1b18; color:#c9c4b8; font-size:11.5px; box-sizing:border-box">
+    <span>S&amp;P/TSX <span style="color:#5fbf8f">+0.62%</span></span>
+    <span>S&amp;P 500 <span style="color:#5fbf8f">+0.41%</span></span>
+    <span>NASDAQ <span style="color:#e88a80">-0.18%</span></span>
+    <span>USD/CAD 1.3642</span>
+    <span>Tasa BoC 2.75%</span>
+    <span style="margin-left:auto; display:flex; align-items:center; gap:7px"><span style="width:7px; height:7px; border-radius:50%; background:#5fbf8f"></span>TSX abierto · cierra 16:00 ET</span>
+  </div>
+
+  <!-- Top navigation -->
+  <div style="display:flex; align-items:center; justify-content:space-between; height:60px; padding:0 116px; background:#ffffff; border-bottom:1px solid #e7e4dc; box-sizing:border-box">
+    <div style="display:flex; align-items:center; gap:44px">
+      <div style="display:flex; align-items:center; gap:9px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#b3372b"><path d="M12 2l1.8 3.4 2.6-1.2-.6 3 3.2-.4-1.4 2.6 3.4 1.6-3 1.8 1.6 2.8-3.4-.6.4 3.4-3-1.8L12 22l-1.6-4.4-3 1.8.4-3.4-3.4.6 1.6-2.8-3-1.8 3.4-1.6L5 7.8l3.2.4-.6-3 2.6 1.2L12 2z"></path></svg>
+        <span style="font-family:'Instrument Serif',Georgia,serif; font-size:21px">TrueNorth</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:26px; font-size:13.5px; font-weight:500; color:#6f6b60">
+        <span>Portafolio</span>
+        <span>Análisis</span>
+        <span>Dividendos</span>
+        <span>Comunidad</span>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px">
+      <span class="btn" style="border-color:transparent; background:transparent">Iniciar sesión</span>
+      <span class="btn btn-primary">Crear cuenta</span>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div style="max-width:1280px; margin:0 auto; padding:66px 36px 60px; box-sizing:border-box">
+    <div style="display:flex; align-items:center; gap:44px">
+
+      <div style="width:556px; flex:none">
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:20px">
+          <span class="eyebrow">TSX · NYSE · NASDAQ&nbsp;<span style="letter-spacing: 1.54px">·</span>&nbsp;B3<br></span>
+          <span style="width:22px; height:1px; background:#d9d5cb"></span>
+          <span class="eyebrow" style="color:#b3372b">HECHO PARA TI</span>
+        </div>
+
+        <h1 class="h-serif" style="font-size:57px; line-height:1.04; letter-spacing:-.015em; text-wrap:pretty">Tu portafolio,<br>con el análisis que le falta.
+        </h1>
+
+        <p style="margin:22px 0 0; font-size:16.5px; line-height:1.62; color:#6f6b60; max-width:510px; text-wrap:pretty">Reuní todas tus inversiones en una sola cartera. TrueNorth sigue tus posiciones y dividendos, calcula métricas clave de tu portafolio y te muestra los fundamentales de cada empresa que tenés.</p>
+
+        <div style="display:flex; align-items:center; gap:12px; margin-top:30px">
+          <span class="btn btn-primary btn-lg">
+            Crear cuenta gratis
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h13"></path><path d="M12 5l7 7-7 7"></path></svg>
+          </span>
+          <span class="btn btn-lg" style="gap:9px">
+            <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v8.9h11.8c-.5 2.7-2.1 5-4.4 6.6v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.3z"></path><path fill="#34A853" d="M24 46c6 0 11-2 14.5-5.2l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.6-3.9-12.3-9.1H4.4v5.7C7.9 41 15.4 46 24 46z"></path><path fill="#FBBC05" d="M11.7 28.3c-.4-1.3-.7-2.7-.7-4.3s.3-3 .7-4.3v-5.7H4.4C2.9 17 2 20.4 2 24s.9 7 2.4 10l7.3-5.7z"></path><path fill="#EA4335" d="M24 10.6c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4 30 2 24 2 15.4 2 7.9 7 4.4 14l7.3 5.7c1.7-5.2 6.6-9.1 12.3-9.1z"></path></svg>
+            Continuar con Google
+          </span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:16px; margin-top:20px; font-size:12.5px; color:#a8a396">
+          <span>Gratis, sin tarjeta</span>
+          <span style="width:3px; height:3px; border-radius:50%; background:#d9d5cb"></span>
+          <span>CAD y USD con FX diario</span>
+          <span style="width:3px; height:3px; border-radius:50%; background:#d9d5cb"></span>
+          <span>Tus datos son solo tuyos</span>
+        </div>
+      </div>
+
+      <!-- Product preview -->
+      <div style="flex:1; min-width:0">
+        <div class="card" style="padding:20px; box-shadow:0 24px 60px rgba(28,27,24,.10)">
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:16px">
+            <div>
+              <div class="lbl">Patrimonio total</div>
+              <div class="num" style="font-size:30px; font-weight:600; letter-spacing:-.02em; margin-top:5px">C$ 184,920.55</div>
+            </div>
+            <div style="text-align:right">
+              <div class="num pos" style="font-size:15px; font-weight:600">+C$ 21,438.10</div>
+              <div class="num pos" style="font-size:12.5px">+13.11% total</div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; margin-bottom:16px">
+            <div style="border:1px solid #efede7; border-radius:8px; background:#fbfaf8; padding:11px 13px">
+              <div class="lbl" style="font-size:10.5px">Aportado</div>
+              <div class="num" style="font-size:15px; font-weight:600; margin-top:4px">C$ 163,482</div>
+            </div>
+            <div style="border:1px solid #efede7; border-radius:8px; background:#fbfaf8; padding:11px 13px">
+              <div class="lbl" style="font-size:10.5px">Dividendos 12m</div>
+              <div class="num" style="font-size:15px; font-weight:600; margin-top:4px">C$ 6,204</div>
+            </div>
+            <div style="border:1px solid #efede7; border-radius:8px; background:#fbfaf8; padding:11px 13px">
+              <div class="lbl" style="font-size:10.5px">Yield on cost</div>
+              <div class="num" style="font-size:15px; font-weight:600; margin-top:4px">3.79%</div>
+            </div>
+          </div>
+
+          <!-- Sector allocation bars -->
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:9px">
+            <span class="lbl">Plan por sector</span>
+            <span style="font-size:11.5px; color:#a8a396">real vs. objetivo</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:9px; margin-bottom:18px">
+            <div style="display:flex; align-items:center; gap:12px">
+              <span style="width:104px; font-size:12.5px; color:#6f6b60">Financiero</span>
+              <span style="flex:1; height:6px; border-radius:4px; background:#efede7; display:block; position:relative">
+                <span style="position:absolute; inset:0 42% 0 0; border-radius:4px; background:#1c1b18; display:block"></span>
+              </span>
+              <span class="num" style="width:74px; text-align:right; font-size:12px; color:#6f6b60">58% / 50%</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px">
+              <span style="width:104px; font-size:12.5px; color:#6f6b60">Energía</span>
+              <span style="flex:1; height:6px; border-radius:4px; background:#efede7; display:block; position:relative">
+                <span style="position:absolute; inset:0 79% 0 0; border-radius:4px; background:#b98a2e; display:block"></span>
+              </span>
+              <span class="num" style="width:74px; text-align:right; font-size:12px; color:#6f6b60">21% / 20%</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px">
+              <span style="width:104px; font-size:12.5px; color:#6f6b60">Tecnología</span>
+              <span style="flex:1; height:6px; border-radius:4px; background:#efede7; display:block; position:relative">
+                <span style="position:absolute; inset:0 88% 0 0; border-radius:4px; background:#4a6b8a; display:block"></span>
+              </span>
+              <span class="num" style="width:74px; text-align:right; font-size:12px; color:#6f6b60">12% / 20%</span>
+            </div>
+          </div>
+
+          <div style="border:1px solid #efede7; border-radius:9px; overflow:hidden">
+            <table>
+              <thead>
+                <tr style="background:#fbfaf8">
+                  <th style="border-bottom:1px solid #efede7">Activo</th>
+                  <th style="border-bottom:1px solid #efede7; text-align:right">Costo prom.</th>
+                  <th style="border-bottom:1px solid #efede7; text-align:right">Valor</th>
+                  <th style="border-bottom:1px solid #efede7; text-align:right">P&amp;L</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="num" style="font-weight:600">RY.TO</span><div style="font-size:11.5px; color:#8a857a; margin-top:2px">Royal Bank of Canada</div></td>
+                  <td class="num" style="text-align:right">138.59</td>
+                  <td class="num" style="text-align:right">27,392.00</td>
+                  <td class="num pos" style="text-align:right; font-weight:600">+23.5%</td>
+                </tr>
+                <tr>
+                  <td><span class="num" style="font-weight:600">ENB.TO</span><div style="font-size:11.5px; color:#8a857a; margin-top:2px">Enbridge</div></td>
+                  <td class="num" style="text-align:right">49.02</td>
+                  <td class="num" style="text-align:right">18,640.00</td>
+                  <td class="num pos" style="text-align:right; font-weight:600">+9.1%</td>
+                </tr>
+                <tr>
+                  <td><span class="num" style="font-weight:600">CNR.TO</span><div style="font-size:11.5px; color:#8a857a; margin-top:2px">Canadian National Railway</div></td>
+                  <td class="num" style="text-align:right">156.40</td>
+                  <td class="num" style="text-align:right">14,088.00</td>
+                  <td class="num neg" style="text-align:right; font-weight:600">-4.6%</td>
+                </tr>
+                <tr>
+                  <td style="border-bottom:none"><span class="num" style="font-weight:600">VFV.TO</span><div style="font-size:11.5px; color:#8a857a; margin-top:2px">Vanguard S&amp;P 500 Index ETF</div></td>
+                  <td class="num" style="text-align:right; border-bottom:none">112.75</td>
+                  <td class="num" style="text-align:right; border-bottom:none">31,204.00</td>
+                  <td class="num pos" style="text-align:right; font-weight:600; border-bottom:none">+18.2%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Broker import strip -->
+  <div style="border-top:1px solid #e7e4dc; border-bottom:1px solid #e7e4dc; background:#ffffff">
+    <div style="max-width:1280px; margin:0 auto; padding:22px 36px; box-sizing:border-box; display:flex; align-items:center; gap:36px">
+      <span style="font-size:13px; color:#8a857a; flex:none">Importá tu historial desde</span>
+      <div style="display:flex; align-items:center; gap:34px; flex:1">
+        <span style="font-size:16px; font-weight:600; color:#6f6b60; letter-spacing:-.01em">Questrade</span>
+        <span style="font-size:16px; font-weight:600; color:#6f6b60; letter-spacing:-.01em">Wealthsimple</span>
+        <span style="font-size:16px; font-weight:600; color:#6f6b60; letter-spacing:-.01em">Interactive Brokers</span>
+      </div>
+      <span style="font-size:13px; color:#a8a396; flex:none">…o cargá cada orden a mano en 20 segundos</span>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div style="max-width:1280px; margin:0 auto; padding:64px 36px 12px; box-sizing:border-box">
+    <div style="max-width:640px; margin-bottom:34px">
+      <h2 class="h-serif" style="font-size:38px; line-height:1.12; letter-spacing:-.01em">Seis cosas que hoy hacés en cinco planillas</h2>
+      <p style="margin:12px 0 0; font-size:15px; line-height:1.6; color:#6f6b60">Cada una vive acá, con los mismos datos y la misma moneda base.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px">
+
+      <div class="card" style="padding:22px">
+        <div style="width:36px; height:36px; border-radius:9px; background:#f3ece3; display:flex; align-items:center; justify-content:center; margin-bottom:14px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b98a2e" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M3 12h18"></path></svg>
+        </div>
+        <div style="font-size:15px; font-weight:600; margin-bottom:7px">Portafolio consolidado</div>
+        <p style="margin:0; font-size:13.5px; line-height:1.6; color:#6f6b60">Todas tus cuentas en una sola cartera, o filtradas de a una. Posiciones, costo, valor de mercado y P&amp;L, siempre en CAD.</p>
+      </div>
+
+      <div class="card" style="padding:22px">
+        <div style="width:36px; height:36px; border-radius:9px; background:#e9efe9; display:flex; align-items:center; justify-content:center; margin-bottom:14px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M8 6h8"></path><path d="M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h4"></path></svg>
+        </div>
+        <div style="font-size:15px; font-weight:600; margin-bottom:7px">Costo base según la CRA</div>
+        <p style="margin:0; font-size:13.5px; line-height:1.6; color:#6f6b60">Costo promedio ponderado recalculado en cada compra, para que la ganancia de capital de una venta no sea una estimación.</p>
+      </div>
+
+      <div class="card" style="padding:22px">
+        <div style="width:36px; height:36px; border-radius:9px; background:#eceef2; display:flex; align-items:center; justify-content:center; margin-bottom:14px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4a6b8a" stroke-width="2"><path d="M3 5h18"></path><path d="M6 12h12"></path><path d="M10 19h4"></path></svg>
+        </div>
+        <div style="font-size:15px; font-weight:600; margin-bottom:7px">Screener fundamental</div>
+        <p style="margin:0; font-size:13.5px; line-height:1.6; color:#6f6b60">P/E, P/B, ROE, margen, deuda y dividend yield de empresas de TSX, NYSE y Nasdaq. Filtrá, ordená y comparalas lado a lado.</p>
+      </div>
+
+      <div class="card" style="padding:22px">
+        <div style="width:36px; height:36px; border-radius:9px; background:#f3ece3; display:flex; align-items:center; justify-content:center; margin-bottom:14px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b3372b" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4M16 3v4"></path><path d="M8.5 15.5h7"></path></svg>
+        </div>
+        <div style="font-size:15px; font-weight:600; margin-bottom:7px">Dividendos, antes y después</div>
+        <p style="margin:0; font-size:13.5px; line-height:1.6; color:#6f6b60">Calendario de ex-dates y pagos de lo que tenés, con los proventos ya recibidos confirmados uno por uno.</p>
+      </div>
+
+      <div class="card" style="padding:22px">
+        <div style="width:36px; height:36px; border-radius:9px; background:#eceef2; display:flex; align-items:center; justify-content:center; margin-bottom:14px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4a6b8a" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+        </div>
+        <div style="font-size:15px; font-weight:600; margin-bottom:7px">Hechos relevantes</div>
+        <p style="margin:0; font-size:13.5px; line-height:1.6; color:#6f6b60">Filings de SEC EDGAR, resultados y noticias de tus empresas, en un inbox que se lee y se archiva.</p>
+      </div>
+
+      <div class="card" style="padding:22px">
+        <div style="width:36px; height:36px; border-radius:9px; background:#e9efe9; display:flex; align-items:center; justify-content:center; margin-bottom:14px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2"><path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 20v-2a4 4 0 0 0-3-3.9"></path><path d="M16 3.1a4 4 0 0 1 0 7.8"></path></svg>
+        </div>
+        <div style="font-size:15px; font-weight:600; margin-bottom:7px">Comunidad por ticker</div>
+        <p style="margin:0; font-size:13.5px; line-height:1.6; color:#6f6b60">Tesis y preguntas de otros inversores. Una mención <span class="tick">$RY</span> enlaza directo a la ficha de la empresa.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Deep dive: ACB -->
+  <div style="max-width:1280px; margin:0 auto; padding:66px 36px 0; box-sizing:border-box">
+    <div style="display:flex; align-items:center; gap:52px">
+      <div style="width:512px; flex:none">
+        <span class="eyebrow" style="color:#b3372b">Adjusted cost base</span>
+        <h2 class="h-serif" style="font-size:38px; line-height:1.12; letter-spacing:-.01em; margin-top:14px">Lo que tu broker no te dice cuando vendés</h2>
+        <p style="margin:16px 0 0; font-size:15px; line-height:1.65; color:#6f6b60">
+          La CRA no acepta FIFO: la ganancia de capital se calcula contra el costo promedio de todas tus compras de ese activo. Si comprás la misma acción en tres momentos y en dos cuentas distintas, ese promedio se mueve cada vez.
+        </p>
+        <p style="margin:14px 0 0; font-size:15px; line-height:1.65; color:#6f6b60">
+          TrueNorth lo recalcula solo, orden por orden, y guarda el número que vas a necesitar en abril.
+        </p>
+        <div style="display:flex; flex-direction:column; gap:11px; margin-top:24px">
+          <div style="display:flex; align-items:flex-start; gap:10px">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2.4" style="flex:none; margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg>
+            <span style="font-size:14px; color:#1c1b18">Compras, ventas, splits y órdenes en USD convertidas al FX del día</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2.4" style="flex:none; margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg>
+            <span style="font-size:14px; color:#1c1b18">Un costo promedio por activo, aunque esté repartido en RRSP y TFSA</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2.4" style="flex:none; margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg>
+            <span style="font-size:14px; color:#1c1b18">La ganancia realizada de cada venta, ya calculada</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1; min-width:0">
+        <div class="card" style="padding:22px; box-shadow:0 16px 40px rgba(28,27,24,.07)">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px">
+            <span style="font-size:14.5px; font-weight:600">Historial de RY.TO</span>
+            <span class="num" style="font-size:12px; color:#8a857a">160 unidades</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Operación</th>
+                <th style="text-align:right">Precio</th>
+                <th style="text-align:right">Costo prom.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="num" style="color:#6f6b60">2024-03-15</td>
+                <td>Compra <span class="num" style="color:#8a857a">100</span></td>
+                <td class="num" style="text-align:right">132.40</td>
+                <td class="num" style="text-align:right; font-weight:600">132.40</td>
+              </tr>
+              <tr>
+                <td class="num" style="color:#6f6b60">2024-07-22</td>
+                <td>Compra <span class="num" style="color:#8a857a">60</span></td>
+                <td class="num" style="text-align:right">148.90</td>
+                <td class="num" style="text-align:right; font-weight:600">138.59</td>
+              </tr>
+              <tr>
+                <td class="num" style="color:#6f6b60; border-bottom:none">2025-11-08</td>
+                <td style="border-bottom:none">Venta <span class="num" style="color:#8a857a">40</span></td>
+                <td class="num" style="text-align:right; border-bottom:none">171.20</td>
+                <td class="num" style="text-align:right; font-weight:600; border-bottom:none">138.59</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; padding:14px 16px; border-radius:9px; background:#e9efe9; border:1px solid #cfe2d3">
+            <div>
+              <div class="lbl" style="color:#1a7f4e">Ganancia de capital realizada</div>
+              <div style="font-size:12px; color:#6f6b60; margin-top:3px">40 × (171.20 − 138.59)</div>
+            </div>
+            <span class="num" style="font-size:21px; font-weight:600; color:#1a7f4e">C$ 1,304.50</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deep dive: inbox + dividendos -->
+  <div style="max-width:1280px; margin:0 auto; padding:66px 36px 0; box-sizing:border-box">
+    <div style="display:flex; align-items:center; gap:52px">
+
+      <div style="flex:1; min-width:0">
+        <div class="card" style="padding:20px; box-shadow:0 16px 40px rgba(28,27,24,.07)">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px">
+            <span style="font-size:14.5px; font-weight:600">Inbox</span>
+            <span class="num" style="font-size:10.5px; font-weight:600; border-radius:999px; background:#b3372b; color:#ffffff; padding:2px 8px">3</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <div style="display:flex; gap:12px; padding:13px 14px; border:1px solid #efede7; border-radius:9px; background:#fbfaf8">
+              <div style="width:30px; height:30px; border-radius:7px; background:#eceef2; display:flex; align-items:center; justify-content:center; flex:none">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4a6b8a" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
+              </div>
+              <div style="flex:1; min-width:0">
+                <div style="display:flex; align-items:center; gap:8px">
+                  <span class="tick">$BAM</span>
+                  <span style="font-size:11px; color:#a8a396">SEC EDGAR · hace 2 h</span>
+                </div>
+                <div style="font-size:13.5px; margin-top:5px; line-height:1.45">Form 6-K — Resultados del tercer trimestre</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:12px; padding:13px 14px; border:1px solid #efede7; border-radius:9px; background:#fbfaf8">
+              <div style="width:30px; height:30px; border-radius:7px; background:#e9efe9; display:flex; align-items:center; justify-content:center; flex:none">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M14.5 9.5a2.5 2.5 0 0 0-2.5-1.5c-1.4 0-2.5.7-2.5 2s1.1 2 2.5 2 2.5.7 2.5 2-1.1 2-2.5 2a2.5 2.5 0 0 1-2.5-1.5"></path></svg>
+              </div>
+              <div style="flex:1; min-width:0">
+                <div style="display:flex; align-items:center; gap:8px">
+                  <span class="tick">$ENB</span>
+                  <span style="font-size:11px; color:#a8a396">Dividendo · ex-date 15 nov</span>
+                </div>
+                <div style="font-size:13.5px; margin-top:5px; line-height:1.45">C$ 0.9425 por acción — te tocan <span class="num" style="font-weight:600">C$ 358.15</span></div>
+              </div>
+            </div>
+            <div style="display:flex; gap:12px; padding:13px 14px; border:1px solid #efede7; border-radius:9px; background:#fbfaf8">
+              <div style="width:30px; height:30px; border-radius:7px; background:#f3ece3; display:flex; align-items:center; justify-content:center; flex:none">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b98a2e" stroke-width="2"><path d="M4 5h13a2 2 0 0 1 2 2v11a2 2 0 0 0 2 2H5a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1z"></path><path d="M7 9h7M7 13h7M7 17h4"></path></svg>
+              </div>
+              <div style="flex:1; min-width:0">
+                <div style="display:flex; align-items:center; gap:8px">
+                  <span class="tick">$CNR</span>
+                  <span style="font-size:11px; color:#a8a396">Noticia · hace 6 h</span>
+                </div>
+                <div style="font-size:13.5px; margin-top:5px; line-height:1.45">CN recorta su guidance de volumen para el cuarto trimestre</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:512px; flex:none">
+        <span class="eyebrow" style="color:#b3372b">Seguimiento</span>
+        <h2 class="h-serif" style="font-size:38px; line-height:1.12; letter-spacing:-.01em; margin-top:14px">Enterate por tu cartera, no por Twitter</h2>
+        <p style="margin:16px 0 0; font-size:15px; line-height:1.65; color:#6f6b60">
+          TrueNorth mira solamente las empresas que tenés. Cada filing de SEC EDGAR, cada anuncio de dividendo y cada nota relevante llega a un inbox propio, con el ticker adelante y el monto que te toca ya calculado.
+        </p>
+        <p style="margin:14px 0 0; font-size:15px; line-height:1.65; color:#6f6b60">
+          Sin feed infinito, sin notificaciones de empresas que no te importan.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Closing CTA -->
+  <div style="max-width:1280px; margin:0 auto; padding:72px 36px 76px; box-sizing:border-box">
+    <div style="border-radius:14px; background:#1c1b18; padding:56px 60px; display:flex; align-items:center; justify-content:space-between; gap:48px">
+      <div style="max-width:600px">
+        <h2 class="h-serif" style="font-size:40px; line-height:1.1; color:#faf9f6; letter-spacing:-.01em">Empezá con una orden.<br>El resto se arma solo.</h2>
+        <p style="margin:16px 0 0; font-size:15px; line-height:1.6; color:#a8a396">
+          Creás la cuenta, importás tu historial o cargás la primera compra, y ya tenés portafolio, costo base y calendario de dividendos.
+        </p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:11px; flex:none; width:270px">
+        <span class="btn btn-primary btn-lg" style="justify-content:center">Crear cuenta gratis</span>
+        <span class="btn btn-lg" style="justify-content:center; gap:9px; background:#ffffff; border-color:#ffffff">
+          <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v8.9h11.8c-.5 2.7-2.1 5-4.4 6.6v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.3z"></path><path fill="#34A853" d="M24 46c6 0 11-2 14.5-5.2l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.6-3.9-12.3-9.1H4.4v5.7C7.9 41 15.4 46 24 46z"></path><path fill="#FBBC05" d="M11.7 28.3c-.4-1.3-.7-2.7-.7-4.3s.3-3 .7-4.3v-5.7H4.4C2.9 17 2 20.4 2 24s.9 7 2.4 10l7.3-5.7z"></path><path fill="#EA4335" d="M24 10.6c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4 30 2 24 2 15.4 2 7.9 7 4.4 14l7.3 5.7c1.7-5.2 6.6-9.1 12.3-9.1z"></path></svg>
+          Continuar con Google
+        </span>
+        <span style="font-size:12px; color:#8a857a; text-align:center; margin-top:3px">¿Ya tenés cuenta? <span style="color:#e0dbd0">Iniciá sesión</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="border-top:1px solid #e7e4dc; background:#ffffff">
+    <div style="max-width:1280px; margin:0 auto; padding:34px 36px; box-sizing:border-box; display:flex; align-items:flex-start; justify-content:space-between; gap:40px">
+      <div style="max-width:400px">
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:10px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#b3372b"><path d="M12 2l1.8 3.4 2.6-1.2-.6 3 3.2-.4-1.4 2.6 3.4 1.6-3 1.8 1.6 2.8-3.4-.6.4 3.4-3-1.8L12 22l-1.6-4.4-3 1.8.4-3.4-3.4.6 1.6-2.8-3-1.8 3.4-1.6L5 7.8l3.2.4-.6-3 2.6 1.2L12 2z"></path></svg>
+          <span style="font-family:'Instrument Serif',Georgia,serif; font-size:18px">TrueNorth Analytics</span>
+        </div>
+        <p style="margin:0; font-size:12.5px; line-height:1.6; color:#a8a396">
+          Herramienta de seguimiento y análisis para inversores. No es asesoramiento financiero ni fiscal: los cálculos son una ayuda, no un sustituto de tu contador.
+        </p>
+      </div>
+      <div style="display:flex; gap:56px">
+        <div style="display:flex; flex-direction:column; gap:8px">
+          <span class="lbl" style="margin-bottom:2px">Producto</span>
+          <span style="font-size:13px; color:#6f6b60">Portafolio</span>
+          <span style="font-size:13px; color:#6f6b60">Screener</span>
+          <span style="font-size:13px; color:#6f6b60">Dividendos</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px">
+          <span class="lbl" style="margin-bottom:2px">Cuenta</span>
+          <span style="font-size:13px; color:#6f6b60">Crear cuenta</span>
+          <span style="font-size:13px; color:#6f6b60">Iniciar sesión</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -102,3 +102,54 @@
 - If more date ranges become available in the market-data provider, extend the current 1M/6M/1A/5A control without changing the comparison layout.
 
 final result: blocked
+
+---
+
+# Design QA — cintillo animado de mercados
+
+## Artifacts
+
+- Source visual truth path: `/Users/manuel/Documents/FinanceTracker/.claude/disenho/Comunidad.dc.html`, market strip at lines 29–37.
+- Source dimensions: 1440 CSS px wide; the target strip is 34 CSS px high. Source density is not applicable to the HTML specification.
+- Implementation: `src/templates/partials/market_strip.html` and the `.tn-market-*` rules in `src/static/css/styles.css`.
+- Implementation screenshot path: unavailable because neither the in-app Browser nor Chrome was connected in this session.
+- Intended comparison viewport: 1440 × 900 CSS px at device scale factor 1.
+- State: authenticated page with S&P/TSX, S&P 500, NASDAQ, USD/CAD, BoC rate, and TSX session status populated.
+
+## Findings
+
+- [P2] Browser-rendered animation and visual comparison are unavailable.
+  - Location: the global 34 px market ticker above the main navigation.
+  - Evidence: browser selection failed for both the in-app surface and Chrome, so neither the source HTML nor the implementation could be captured and placed into a joint comparison.
+  - Impact: final animation continuity, font antialiasing, exact gap rhythm, hover pause, clipping, and mobile speed cannot be visually confirmed.
+  - Fix: connect a supported browser, capture the source and implementation at 1440 px, capture a second implementation frame after several seconds, and compare the strip region jointly.
+
+## Fidelity surfaces
+
+- Fonts and typography: implementation reuses the source product's IBM Plex Mono numeric style, 11.5 px size, and compact single-line treatment; browser rendering remains unverified.
+- Spacing and layout rhythm: source measurements are preserved at 34 px height, 36 px desktop inset, 26 px indicator gaps, and 7 px status-dot gap; browser-level alignment remains unverified.
+- Colors and visual tokens: dark ink background, muted warm foreground, green positive state, red negative state, and 7 px market-status dot match the HTML source values.
+- Image quality and asset fidelity: the strip contains no raster assets or icons; the status dot is an existing semantic CSS indicator from the source component.
+- Copy and content: labels and session copy remain data-backed and match the source component.
+
+## Interaction and automated evidence
+
+- Continuous behavior: two equal feed groups animate linearly from right to left without a reset gap.
+- Primary interactions tested in a browser: unavailable. Hover/focus pause and reduced-motion fallback were verified by code and response structure only.
+- Console errors checked: unavailable without a connected browser.
+- Automated evidence: all 19 market-strip tests passed; Ruff and `git diff --check` passed. Full application visual startup remains unavailable because of unrelated concurrent authentication edits.
+- Focused comparison evidence: unavailable because both source and implementation browser captures are missing.
+- Comparison history: no visual iteration was possible because the required browser capture was blocked on the first pass.
+
+## Implementation checklist
+
+- Connect the in-app Browser or Chrome.
+- Capture source and implementation at 1440 px and the implementation at 390 px.
+- Confirm seamless looping, hover pause, reduced-motion behavior, and absence of console errors.
+- Fix any resulting P0/P1/P2 mismatch and repeat the joint comparison.
+
+## Follow-up polish
+
+- Tune the 30-second desktop duration only after observing the ticker with production-length data.
+
+final result: blocked

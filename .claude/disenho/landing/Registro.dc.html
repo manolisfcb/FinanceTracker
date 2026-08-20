@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif&display=swap">
+  <style>
+    body { margin:0; background:#f7f6f3; color:#1c1b18; font-family:'IBM Plex Sans',system-ui,sans-serif; }
+    a { color:#b3372b; text-decoration:none; } a:hover { color:#8f2b22; }
+    .num { font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+    .card { background:#ffffff; border:1px solid #e7e4dc; border-radius:10px; }
+    .lbl { font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:#8a857a; font-weight:600; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; font-size:13.5px; font-weight:600; border-radius:8px; padding:11px 16px; border:1px solid #d9d5cb; background:#ffffff; color:#1c1b18; }
+    .btn-primary { background:#b3372b; border-color:#b3372b; color:#ffffff; }
+    .tn-input { background:#fbfaf8; border:1px solid #e7e4dc; border-radius:8px; padding:10px 12px; font-size:13.5px; color:#1c1b18; width:100%; box-sizing:border-box; }
+    .ph { color:#a8a396; }
+  </style>
+</helmet>
+<div style="width:1440px; height:840px; display:flex; background:#f7f6f3; box-sizing:border-box">
+
+  <!-- Form column -->
+  <div style="width:720px; flex:none; display:flex; flex-direction:column; padding:34px 36px; box-sizing:border-box">
+
+    <div style="display:flex; align-items:center; gap:9px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#b3372b"><path d="M12 2l1.8 3.4 2.6-1.2-.6 3 3.2-.4-1.4 2.6 3.4 1.6-3 1.8 1.6 2.8-3.4-.6.4 3.4-3-1.8L12 22l-1.6-4.4-3 1.8.4-3.4-3.4.6 1.6-2.8-3-1.8 3.4-1.6L5 7.8l3.2.4-.6-3 2.6 1.2L12 2z"></path></svg>
+      <span style="font-family:'Instrument Serif',Georgia,serif; font-size:21px">TrueNorth</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center">
+      <div style="width:396px; margin:0 auto">
+
+        <h1 style="font-family:'Instrument Serif',Georgia,serif; font-weight:400; font-size:38px; line-height:1.1; margin:0">Creá tu cuenta</h1>
+        <p style="margin:10px 0 0; font-size:14px; color:#6f6b60">Tres campos y entrás directo. Sin confirmar nada por email.</p>
+
+        <div style="display:flex; flex-direction:column; gap:14px; margin-top:28px">
+
+          <span class="btn" style="width:100%; box-sizing:border-box">
+            <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v8.9h11.8c-.5 2.7-2.1 5-4.4 6.6v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.3z"></path><path fill="#34A853" d="M24 46c6 0 11-2 14.5-5.2l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.6-3.9-12.3-9.1H4.4v5.7C7.9 41 15.4 46 24 46z"></path><path fill="#FBBC05" d="M11.7 28.3c-.4-1.3-.7-2.7-.7-4.3s.3-3 .7-4.3v-5.7H4.4C2.9 17 2 20.4 2 24s.9 7 2.4 10l7.3-5.7z"></path><path fill="#EA4335" d="M24 10.6c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4 30 2 24 2 15.4 2 7.9 7 4.4 14l7.3 5.7c1.7-5.2 6.6-9.1 12.3-9.1z"></path></svg>
+            Continuar con Google
+          </span>
+
+          <div style="display:flex; align-items:center; gap:12px">
+            <span style="flex:1; height:1px; background:#e7e4dc; display:block"></span>
+            <span style="font-size:11.5px; color:#a8a396">o con tu email</span>
+            <span style="flex:1; height:1px; background:#e7e4dc; display:block"></span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <span class="lbl">Usuario</span>
+            <span class="tn-input ph" style="display:block">manuel</span>
+            <span style="font-size:11.5px; color:#a8a396">Así te ven en la comunidad.</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <span class="lbl">Email</span>
+            <span class="tn-input ph" style="display:block">manuel@ejemplo.ca</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <span class="lbl">Contraseña</span>
+            <span style="position:relative; display:block">
+              <span class="tn-input ph" style="display:block; padding-right:64px">Mínimo 8 caracteres</span>
+              <span style="position:absolute; right:11px; top:9px; font-size:11.5px; font-weight:600; color:#8a857a">Mostrar</span>
+            </span>
+          </div>
+
+          <span class="btn btn-primary" style="width:100%; box-sizing:border-box; margin-top:2px">Crear cuenta y entrar</span>
+
+          <p style="margin:0; font-size:11.5px; line-height:1.55; color:#a8a396; text-align:center">
+            TrueNorth es una herramienta de seguimiento y análisis. No damos asesoramiento financiero ni fiscal.
+          </p>
+
+        </div>
+
+        <div style="margin-top:20px; text-align:center; font-size:13px; color:#6f6b60">
+          ¿Ya tenés cuenta? <span style="color:#b3372b; font-weight:600">Iniciá sesión</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="font-size:12px; color:#a8a396">TrueNorth Analytics · Portafolio y análisis para inversores desde Canadá</div>
+  </div>
+
+  <!-- Brand column -->
+  <div style="width:720px; flex:none; background:#1c1b18; color:#f2f0eb; padding:52px 60px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:center; gap:38px">
+
+    <div>
+      <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8a857a; font-weight:600">Después de crear la cuenta</span>
+      <h2 style="font-family:'Instrument Serif',Georgia,serif; font-weight:400; font-size:42px; line-height:1.14; margin:14px 0 0; letter-spacing:-.01em; text-wrap:pretty">
+        Tres pasos y ya tenés tu cartera viva.
+      </h2>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:20px">
+
+      <div style="display:flex; gap:16px">
+        <span class="num" style="width:30px; height:30px; flex:none; border-radius:50%; border:1px solid #4a4842; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:#c9c4b8">1</span>
+        <div>
+          <div style="font-size:15px; font-weight:600; color:#faf9f6">Agregá tus cuentas</div>
+          <p style="margin:5px 0 0; font-size:13.5px; line-height:1.55; color:#8a857a">RRSP, TFSA, FHSA o no registrada, con el broker donde estén.</p>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:16px">
+        <span class="num" style="width:30px; height:30px; flex:none; border-radius:50%; border:1px solid #4a4842; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:#c9c4b8">2</span>
+        <div>
+          <div style="font-size:15px; font-weight:600; color:#faf9f6">Importá o cargá tus órdenes</div>
+          <p style="margin:5px 0 0; font-size:13.5px; line-height:1.55; color:#8a857a">Un archivo de Questrade, Wealthsimple o IBKR — o una compra a mano.</p>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:16px">
+        <span class="num" style="width:30px; height:30px; flex:none; border-radius:50%; border:1px solid #4a4842; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:#c9c4b8">3</span>
+        <div>
+          <div style="font-size:15px; font-weight:600; color:#faf9f6">Mirá el dashboard</div>
+          <p style="margin:5px 0 0; font-size:13.5px; line-height:1.55; color:#8a857a">Patrimonio, costo base, dividendos y hechos relevantes, ya calculados.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="num" style="display:flex; align-items:center; gap:22px; font-size:11.5px; color:#c9c4b8; border-top:1px solid #33312c; padding-top:24px">
+      <span>S&amp;P/TSX <span style="color:#5fbf8f">+0.62%</span></span>
+      <span>USD/CAD 1.3642</span>
+      <span>Tasa BoC 2.75%</span>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

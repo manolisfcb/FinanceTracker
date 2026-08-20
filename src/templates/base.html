@@ -49,15 +49,25 @@
     {% endblock %}
 </head>
 <body class="bg-paper text-ink font-sans">
+    {# This sits outside every overridable block on purpose: every full-page
+       view that extends base.html inherits the market ticker at the top. #}
     {% include 'partials/market_strip.html' %}
-    {% include 'nav.html' %}
 
+    {# Views such as login/register may remove the navigation, but not the
+       market ticker above. #}
+    {% block chrome %}
+    {% include 'nav.html' %}
+    {% endblock chrome %}
+
+    {% block body %}
     <div class="max-w-screen-xl mx-auto px-9 py-7">
         {% block content %}
         {% endblock content %}
     </div>
+    {% endblock body %}
 
     <script src="{{ url_for('static', filename='js/help_tips.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/row_links.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/market_strip.js') }}" defer></script>
 </body>
 </html>

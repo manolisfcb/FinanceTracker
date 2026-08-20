@@ -163,13 +163,43 @@ def test_strip_renders_on_every_authenticated_page(auth_client, db):
     assert "1.3642" in body
     assert "2.75%" in body
     assert "TSX" in body
+    assert 'role="region" aria-label="Resumen de mercados"' in body
+    assert 'class="tn-market-track"' in body
+    assert body.count('class="tn-market-group"') == 2
+    assert 'aria-hidden="true"' in body
+    assert "js/market_strip.js" in body
 
 
-def test_strip_is_absent_before_the_first_job_run(auth_client):
+def test_strip_shows_unavailable_values_before_the_first_job_run(auth_client):
     body = auth_client.get("/community").get_data(as_text=True)
-    assert "tn-market-strip" not in body
+    assert "tn-market-strip" in body
+    assert "S&amp;P/TSX" in body
+    assert "S&amp;P 500" in body
+    assert "NASDAQ" in body
+    assert "USD/CAD" in body
+    assert "Tasa BoC" in body
+    assert "—" in body
 
 
-def test_strip_is_not_rendered_for_anonymous_visitors(client):
-    body = client.get("/login").get_data(as_text=True)
-    assert "tn-market-strip" not in body
+def test_strip_renders_for_anonymous_visitors_too(client, db):
+    """The landing page leads with the strip: index levels are public
+    information, and it is the first signal that this is a markets tool."""
+    db.session.add(MarketIndicator(key="tsx", label="S&P/TSX", value=25000.0,
+                                   change_percent=0.62, updated_at=datetime.utcnow()))
+    db.session.commit()
+
+    body = client.get("/").get_data(as_text=True)
+
+    assert "tn-market-strip" in body
+    assert "S&amp;P/TSX" in body
+
+
+def test_auth_layout_cannot_override_the_site_wide_strip(app):
+    """The auth layout overrides chrome, while the ticker lives above it."""
+    with app.test_request_context("/login"):
+        context = {}
+        app.update_template_context(context)
+        body = app.jinja_env.get_template("auth_base.html").render(context)
+
+    assert "tn-market-strip" in body
+    assert "S&amp;P/TSX" in body

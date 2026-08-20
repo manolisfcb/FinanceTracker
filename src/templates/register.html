@@ -1,50 +1,113 @@
-{% extends "base.html" %}
+{% extends 'auth_base.html' %}
 
-{% block head_title %}
-    Registro | TrueNorth Analytics
-{% endblock %}
+{% block head_title %}Crear cuenta | TrueNorth Analytics{% endblock %}
 
-{% block content %}
-<div class="max-w-md mx-auto card p-8 mt-8">
-    {% include 'partials/flash_messages.html' %}
+{% block auth_form %}
+<h1 class="font-serif-display text-[34px] md:text-[38px] leading-tight">Creá tu cuenta</h1>
+<p class="mt-2.5 text-sm text-muted2">Tres campos y entrás directo. Sin confirmar nada por email.</p>
 
-    <h1 class="font-serif-display text-3xl text-ink mb-6">Crear cuenta</h1>
+<div class="flex flex-col gap-3.5 mt-7">
 
-    {% if name %}
-        <p class="text-[13.5px] text-muted2">Ya estás registrado como <strong class="text-ink">{{ name }}</strong>.</p>
-        <a href="{{ url_for('auth.login') }}" class="btn btn-primary mt-5">Iniciar sesión</a>
-    {% else %}
-        <form method="POST" class="space-y-4">
-            {{ form.hidden_tag() }}
+    {% if google_enabled %}
+    <a href="{{ url_for('auth.google_login', next=request.args.get('next')) }}" class="btn btn-auth btn-block">
+        {% include 'partials/google_mark.html' %}
+        Continuar con Google
+    </a>
 
-            <div class="space-y-1.5">
-                {{ form.name.label(class="lbl") }}
-                {{ form.name(class="tn-input") }}
-            </div>
-
-            <div class="space-y-1.5">
-                {{ form.email.label(class="lbl") }}
-                {{ form.email(class="tn-input") }}
-            </div>
-
-            <div class="space-y-1.5">
-                {{ form.password.label(class="lbl") }}
-                {{ form.password(class="tn-input") }}
-            </div>
-
-            <div class="space-y-1.5">
-                {{ form.confirm_password.label(class="lbl") }}
-                {{ form.confirm_password(class="tn-input") }}
-            </div>
-
-            <div class="pt-2">
-                {{ form.submit(class="btn btn-primary w-full justify-center") }}
-            </div>
-        </form>
-
-        <div class="mt-5 text-center text-[13px] text-muted2">
-            <p>¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}" class="font-semibold">Inicia sesión</a></p>
-        </div>
+    <div class="flex items-center gap-3">
+        <span class="flex-1 h-px bg-border block"></span>
+        <span class="text-[11.5px] text-faint">o con tu email</span>
+        <span class="flex-1 h-px bg-border block"></span>
+    </div>
     {% endif %}
+
+    <form method="POST" class="flex flex-col gap-3.5">
+        {{ form.hidden_tag() }}
+
+        <div class="flex flex-col gap-1.5">
+            {{ form.username.label(class="lbl") }}
+            {{ form.username(class="tn-input") }}
+            {% if form.username.errors %}
+                {% for error in form.username.errors %}
+                <span class="text-xs text-neg">{{ error }}</span>
+                {% endfor %}
+            {% else %}
+            <span class="text-[11.5px] text-faint">Así te ven en la comunidad.</span>
+            {% endif %}
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            {{ form.email.label(class="lbl") }}
+            {{ form.email(class="tn-input") }}
+            {% for error in form.email.errors %}
+            <span class="text-xs text-neg">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            {{ form.password.label(class="lbl") }}
+            <div class="tn-password">
+                {{ form.password(class="tn-input", id="register-password") }}
+                <button type="button" class="tn-password-toggle" data-password-toggle="register-password" aria-controls="register-password">Mostrar</button>
+            </div>
+            {% for error in form.password.errors %}
+            <span class="text-xs text-neg">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        {{ form.submit(class="btn btn-primary btn-auth btn-block mt-0.5") }}
+
+        <p class="text-[11.5px] leading-relaxed text-faint text-center">
+            TrueNorth es una herramienta de seguimiento y análisis. No damos asesoramiento
+            financiero ni fiscal.
+        </p>
+    </form>
+
 </div>
-{% endblock %}
+
+<div class="mt-5 text-center text-[13px] text-muted2">
+    ¿Ya tenés cuenta?
+    <a href="{{ url_for('auth.login', next=request.args.get('next')) }}" class="font-semibold">Iniciá sesión</a>
+</div>
+{% endblock auth_form %}
+
+{% block auth_aside %}
+<div>
+    <span class="tn-eyebrow">Después de crear la cuenta</span>
+    <h2 class="font-serif-display text-[42px] leading-[1.14] tracking-tight mt-3.5 text-pretty">
+        Tres pasos y ya tenés tu cartera viva.
+    </h2>
+</div>
+
+<ol class="flex flex-col gap-5 list-none p-0 m-0">
+    <li class="flex gap-4">
+        <span class="num w-[30px] h-[30px] shrink-0 rounded-full border border-[#4a4842] flex items-center justify-center text-[13px] font-semibold text-[#c9c4b8]">1</span>
+        <div>
+            <div class="text-[15px] font-semibold text-[#faf9f6]">Agregá tus cuentas</div>
+            <p class="mt-1 text-[13.5px] leading-relaxed text-muted">RRSP, TFSA, FHSA o no registrada, con el broker donde estén.</p>
+        </div>
+    </li>
+    <li class="flex gap-4">
+        <span class="num w-[30px] h-[30px] shrink-0 rounded-full border border-[#4a4842] flex items-center justify-center text-[13px] font-semibold text-[#c9c4b8]">2</span>
+        <div>
+            <div class="text-[15px] font-semibold text-[#faf9f6]">Importá o cargá tus órdenes</div>
+            <p class="mt-1 text-[13.5px] leading-relaxed text-muted">Un archivo de Questrade, Wealthsimple o IBKR — o una compra a mano.</p>
+        </div>
+    </li>
+    <li class="flex gap-4">
+        <span class="num w-[30px] h-[30px] shrink-0 rounded-full border border-[#4a4842] flex items-center justify-center text-[13px] font-semibold text-[#c9c4b8]">3</span>
+        <div>
+            <div class="text-[15px] font-semibold text-[#faf9f6]">Mirá el dashboard</div>
+            <p class="mt-1 text-[13.5px] leading-relaxed text-muted">Patrimonio, costo base, dividendos y hechos relevantes, ya calculados.</p>
+        </div>
+    </li>
+</ol>
+
+{# The rule belongs to the strip, not to the panel: before the first job
+   run there are no indicators, and a lone hairline reads as a mistake. #}
+{% if market_indices or market_usdcad or market_boc_rate %}
+<div class="border-t border-[#33312c] pt-6">
+    {% include 'partials/market_strip_compact.html' %}
+</div>
+{% endif %}
+{% endblock auth_aside %}

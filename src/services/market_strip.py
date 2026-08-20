@@ -163,12 +163,38 @@ def _next_open_label(today: date) -> str:
 
 
 def market_strip_context() -> dict:
-    """Indicators plus session status, in the order the strip renders them."""
+    """Indicators plus session status, in the order the strip renders them.
+
+    Keep every slot present before the first refresh (or during a partial
+    provider outage). A missing value is rendered as an em dash; it must never
+    be replaced with a made-up market figure.
+    """
     rows = {row.key: row for row in MarketIndicator.query.all()}
-    indices = [rows[key] for key, _, _ in INDEX_SYMBOLS if key in rows]
+    indices = [
+        rows.get(key)
+        or {
+            "key": key,
+            "label": label,
+            "value": None,
+            "change_percent": None,
+        }
+        for key, label, _ in INDEX_SYMBOLS
+    ]
     return {
         "market_indices": indices,
-        "market_usdcad": rows.get(USDCAD_KEY),
-        "market_boc_rate": rows.get(BOC_RATE_KEY),
+        "market_usdcad": rows.get(USDCAD_KEY)
+        or {
+            "key": USDCAD_KEY,
+            "label": "USD/CAD",
+            "value": None,
+            "change_percent": None,
+        },
+        "market_boc_rate": rows.get(BOC_RATE_KEY)
+        or {
+            "key": BOC_RATE_KEY,
+            "label": "Tasa BoC",
+            "value": None,
+            "change_percent": None,
+        },
         "market_session": tsx_session(),
     }

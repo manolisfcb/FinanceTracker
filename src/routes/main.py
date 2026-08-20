@@ -1,7 +1,17 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, redirect, render_template, url_for
+from flask_login import current_user
 
 main_bp = Blueprint('main', __name__, url_prefix='/')
 
+
 @main_bp.route('/', methods=['GET'])
 def home_page():
-    return render_template('index.html')
+    """The public landing page — or the dashboard, once you are signed in.
+
+    A logged-in user arriving at "/" wants their portfolio, not the sales
+    pitch; sending them through a welcome page they have to click past is
+    exactly the friction the landing exists to remove for everyone else.
+    """
+    if current_user.is_authenticated:
+        return redirect(url_for('portfolio.dash_page'))
+    return render_template('landing.html')

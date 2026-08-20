@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{# Auth screens remove only the navigation. The site-wide market ticker is
+   rendered by base.html outside this block and remains at the very top. #}
+{% block chrome %}{% endblock chrome %}
+
+{% block extra_head %}
+<script src="{{ url_for('static', filename='js/password_toggle.js') }}" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex">
+
+    <div class="w-full lg:w-1/2 flex flex-col px-6 py-7 md:px-9 md:py-8">
+        <a href="{{ url_for('main.home_page') }}" class="flex items-center gap-2.5 self-start">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#b3372b" aria-hidden="true"><path d="M12 2l1.8 3.4 2.6-1.2-.6 3 3.2-.4-1.4 2.6 3.4 1.6-3 1.8 1.6 2.8-3.4-.6.4 3.4-3-1.8L12 22l-1.6-4.4-3 1.8.4-3.4-3.4.6 1.6-2.8-3-1.8 3.4-1.6L5 7.8l3.2.4-.6-3 2.6 1.2L12 2z"/></svg>
+            <span class="font-serif-display text-xl text-ink">TrueNorth</span>
+        </a>
+
+        <div class="flex-1 flex flex-col justify-center py-10">
+            <div class="w-full max-w-[396px] mx-auto">
+                {% include 'partials/flash_messages.html' %}
+                {% block auth_form %}{% endblock auth_form %}
+            </div>
+        </div>
+
+        <div class="text-xs text-faint">
+            TrueNorth Analytics · Portafolio y análisis para inversores desde Canadá
+        </div>
+    </div>
+
+    <div class="hidden lg:flex w-1/2 bg-ink text-[#f2f0eb] px-[60px] py-14 flex-col justify-center gap-8">
+        {% block auth_aside %}{% endblock auth_aside %}
+    </div>
+
+</div>
+{% endblock body %}

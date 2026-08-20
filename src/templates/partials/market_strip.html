@@ -1,29 +1,38 @@
-{# Site-wide market strip. Values come from the inject_market_strip context
+{# Site-wide market ticker. Values come from the inject_market_strip context
    processor, refreshed by the refresh_market_strip job every 15 minutes. #}
-{% if market_indices or market_usdcad or market_boc_rate %}
-<div class="tn-market-strip num">
-    {% for indicator in market_indices %}
-    <span>{{ indicator.label }}
-        {% if indicator.change_percent is not none %}
-        <span class="{{ 'tn-market-pos' if indicator.change_percent >= 0 else 'tn-market-neg' }}">
-            {{ '+' if indicator.change_percent >= 0 }}{{ indicator.change_percent|ratio }}%
+{% macro market_feed_group(is_duplicate=false) -%}
+<div class="tn-market-group"{% if is_duplicate %} aria-hidden="true"{% endif %}>
+    <div class="tn-market-indicators">
+        {% for indicator in market_indices %}
+        <span class="tn-market-item">{{ indicator.label }}
+            {% if indicator.change_percent is not none %}
+            <span class="{{ 'tn-market-pos' if indicator.change_percent >= 0 else 'tn-market-neg' }}">
+                {{ '+' if indicator.change_percent >= 0 }}{{ indicator.change_percent|ratio }}%
+            </span>
+            {% else %}
+            <span class="text-[#8a857a]">—</span>
+            {% endif %}
         </span>
-        {% else %}
-        <span class="text-[#8a857a]">—</span>
-        {% endif %}
-    </span>
-    {% endfor %}
+        {% endfor %}
 
-    {% if market_usdcad %}
-    <span>USD/CAD {{ market_usdcad.value|fx }}</span>
-    {% endif %}
-    {% if market_boc_rate %}
-    <span>Tasa BoC {{ market_boc_rate.value|ratio }}%</span>
-    {% endif %}
+        <span class="tn-market-item">USD/CAD
+            {% if market_usdcad.value is not none %}{{ market_usdcad.value|fx }}{% else %}<span class="text-[#8a857a]">—</span>{% endif %}
+        </span>
+        <span class="tn-market-item">Tasa BoC
+            {% if market_boc_rate.value is not none %}{{ market_boc_rate.value|ratio }}%{% else %}<span class="text-[#8a857a]">—</span>{% endif %}
+        </span>
+    </div>
 
-    <span class="ml-auto flex items-center gap-2">
+    <span class="tn-market-session">
         <span class="tn-market-dot {{ '' if market_session.is_open else 'tn-market-dot-closed' }}"></span>
         {{ market_session.text }}
     </span>
 </div>
-{% endif %}
+{%- endmacro %}
+
+<div class="tn-market-strip num" role="region" aria-label="Resumen de mercados">
+    <div class="tn-market-track">
+        {{ market_feed_group() }}
+        {{ market_feed_group(true) }}
+    </div>
+</div>
