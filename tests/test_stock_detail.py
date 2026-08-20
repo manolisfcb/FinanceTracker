@@ -131,3 +131,57 @@ def test_asset_prices_endpoint_defaults_invalid_range_to_1y(auth_client, db):
 def test_asset_prices_endpoint_404_for_unknown_asset(auth_client, db):
     resp = auth_client.get('/api/assets/999999/prices')
     assert resp.status_code == 404
+
+
+@patch('src.services.fundamentals.get_provider')
+@patch('src.routes.stockViews.get_provider')
+def test_stock_detail_renders_indicators_with_their_explanations(
+    mock_view_provider, mock_fundamentals_provider, auth_client, db
+):
+    mock_view_provider.return_value.get_quote.return_value = None
+    mock_fundamentals_provider.return_value.get_statement_metrics.return_value = None
+    mock_fundamentals_provider.return_value.get_fundamentals.return_value = None
+    asset = _seed_asset(db)
+    db.session.add(Fundamentals(
+        asset_id=asset.id, as_of_date=date(2026, 8, 19),
+        market_cap=2400.0, ebit=200.0, total_assets=2000.0, total_liabilities=1200.0,
+        total_equity=800.0, net_debt=600.0, ebitda=300.0, revenue=1000.0,
+        total_debt=700.0, tax_rate=0.25, book_value_per_share=12.5,
+    ))
+    db.session.commit()
+
+    body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
+
+    # Suno-style indicators the page didn't have before.
+    assert 'P/EBIT' in body
+    assert 'Deuda neta/EBITDA' in body
+    assert 'Giro del activo' in body
+    assert 'ROIC' in body
+    assert 'VPA' in body
+    # ...each with its own "?" explanation.
+    assert 'class="tn-help"' in body
+    assert 'Cuántos años de EBITDA harían falta' in body
+    # Derived on the way in, not left blank: 2400 / 200 and 600 / 300.
+    assert '12.00' in body
+    assert '2.00' in body
+
+
+@patch('src.services.fundamentals.get_provider')
+@patch('src.routes.stockViews.get_provider')
+def test_cagr_label_states_the_span_it_measured(
+    mock_view_provider, mock_fundamentals_provider, auth_client, db
+):
+    mock_view_provider.return_value.get_quote.return_value = None
+    mock_fundamentals_provider.return_value.get_statement_metrics.return_value = None
+    mock_fundamentals_provider.return_value.get_fundamentals.return_value = None
+    asset = _seed_asset(db)
+    db.session.add(Fundamentals(
+        asset_id=asset.id, as_of_date=date(2026, 8, 19),
+        total_assets=2000.0, revenue_cagr=0.1, revenue_cagr_years=3,
+    ))
+    db.session.commit()
+
+    body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
+
+    assert 'CAGR ingresos (3A)' in body
+    assert 'CAGR ingresos (5A)' not in body

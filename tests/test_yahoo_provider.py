@@ -271,3 +271,112 @@ def test_get_price_history_falls_back_to_stale_cache_on_failure(mock_ticker_cls,
     yahoo_module._price_history_cache[('RY.TO', '1y')] = (0.0, data)  # force-expire
 
     assert provider.get_price_history('RY.TO', '1Y') == data
+
+
+def _statements(revenue_by_year, **rows):
+    """A yfinance-shaped statement frame: line items as the index, fiscal
+    year-ends as columns, newest first."""
+    columns = [pd.Timestamp(f'{year}-12-31') for year in sorted(revenue_by_year, reverse=True)]
+    data = {'Total Revenue': [revenue_by_year[c.year] for c in columns]}
+    for label, value in rows.items():
+        data[label.replace('_', ' ')] = [value] * len(columns)
+    return pd.DataFrame(data, index=columns).T
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_statement_metrics_maps_balance_and_income_lines(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.income_stmt = _statements(
+        {2022: 100.0, 2023: 110.0, 2024: 120.0, 2025: 133.1},
+        EBIT=40.0, EBITDA=55.0, **{'Tax Rate For Calcs': 0.26},
+    )
+    mock_ticker.balance_sheet = _statements(
+        {2025: 0.0},
+        **{
+            'Total Assets': 500.0,
+            'Total Liabilities Net Minority Interest': 300.0,
+            'Stockholders Equity': 200.0,
+        },
+    )
+    mock_ticker_cls.return_value = mock_ticker
+
+    metrics = _provider().get_statement_metrics('RY.TO')
+
+    assert metrics['revenue'] == 133.1
+    assert metrics['ebit'] == 40.0
+    assert metrics['ebitda'] == 55.0
+    assert metrics['total_assets'] == 500.0
+    assert metrics['total_liabilities'] == 300.0
+    assert metrics['total_equity'] == 200.0
+    assert metrics['tax_rate'] == 0.26
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_statement_metrics_falls_back_to_alias_line_names(mock_ticker_cls):
+    """Yahoo names the same line differently across companies."""
+    mock_ticker = MagicMock()
+    mock_ticker.income_stmt = _statements({2025: 90.0}, **{'Operating Income': 12.0})
+    mock_ticker.balance_sheet = _statements(
+        {2025: 0.0}, **{'Total Equity Gross Minority Interest': 45.0},
+    )
+    mock_ticker_cls.return_value = mock_ticker
+
+    metrics = _provider().get_statement_metrics('RY.TO')
+
+    assert metrics['ebit'] == 12.0
+    assert metrics['total_equity'] == 45.0
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_revenue_cagr_reports_the_span_it_actually_measured(mock_ticker_cls):
+    """Free Yahoo statements carry an empty oldest column for most companies,
+    so the CAGR covers fewer years than the frame suggests — the span is
+    returned so the label can't overstate it."""
+    mock_ticker = MagicMock()
+    mock_ticker.income_stmt = _statements(
+        {2021: float('nan'), 2022: 100.0, 2023: 110.0, 2024: 120.0, 2025: 133.1}
+    )
+    mock_ticker.balance_sheet = _statements({2025: 0.0}, **{'Total Assets': 1.0})
+    mock_ticker_cls.return_value = mock_ticker
+
+    metrics = _provider().get_statement_metrics('RY.TO')
+
+    assert metrics['revenue_cagr_years'] == 3
+    assert metrics['revenue_cagr'] == pytest.approx(0.1, abs=1e-3)
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_statement_metrics_returns_none_when_statements_are_empty(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.income_stmt = pd.DataFrame()
+    mock_ticker.balance_sheet = pd.DataFrame()
+    mock_ticker_cls.return_value = mock_ticker
+
+    assert _provider().get_statement_metrics('RY.TO') is None
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_get_fundamentals_derives_net_debt_from_debt_and_cash(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.get_info.return_value = {
+        'totalDebt': 900.0, 'totalCash': 250.0, 'bookValue': 12.5,
+        'enterpriseValue': 4000.0, 'ebitdaMargins': 0.31,
+    }
+    mock_ticker_cls.return_value = mock_ticker
+
+    data = _provider().get_fundamentals('RY.TO')
+
+    assert data['net_debt'] == 650.0
+    assert data['total_debt'] == 900.0
+    assert data['book_value_per_share'] == 12.5
+    assert data['enterprise_value'] == 4000.0
+    assert data['ebitda_margin'] == 0.31
+
+
+@patch('src.services.market_data.yahoo.yf.Ticker')
+def test_net_debt_is_none_when_yahoo_reports_no_debt_figure(mock_ticker_cls):
+    mock_ticker = MagicMock()
+    mock_ticker.get_info.return_value = {'totalCash': 250.0}
+    mock_ticker_cls.return_value = mock_ticker
+
+    assert _provider().get_fundamentals('RY.TO')['net_debt'] is None

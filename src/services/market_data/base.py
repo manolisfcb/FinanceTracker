@@ -23,6 +23,17 @@ class MarketDataProvider(ABC):
         Fundamentals model's columns (pe, pb, roe, debt_to_equity, ...)."""
 
     @abstractmethod
+    def get_statement_metrics(self, yahoo_symbol: str) -> dict | None:
+        """Annual balance-sheet and income-statement figures that `info`
+        doesn't carry: {revenue, ebit, ebitda, total_assets,
+        total_liabilities, total_equity, tax_rate, revenue_cagr,
+        revenue_cagr_years}.
+
+        Separate from get_fundamentals() because these come from different,
+        slower endpoints and only move once a quarter — callers fetch them on
+        demand rather than nightly for the whole universe."""
+
+    @abstractmethod
     def get_dividends(self, yahoo_symbol: str) -> list[dict]:
         """Dividend history: list of {ex_date, pay_date, amount, currency}."""
 

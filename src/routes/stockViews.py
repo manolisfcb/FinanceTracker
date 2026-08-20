@@ -10,6 +10,7 @@ from src.extensions import db
 from src.forms.StockForm import Stock
 from src.models import Asset, CompanyEvent, CompanyEventKind, DividendHistory, Fundamentals
 from src.services.company_data import backfill_asset, needs_backfill
+from src.services.fundamentals import ensure_statement_metrics
 from src.services.market_data import get_provider
 
 stocks_bp = Blueprint('stocks', __name__)
@@ -62,39 +63,158 @@ RANGE_FILTER_LABELS = {
     'market_cap': 'Mkt cap',
 }
 
-# Company page indicator grid: (Fundamentals column, label, format kind).
-# 'percent' vs 'ratio' picks which Jinja filter the template applies —
-# single source of truth so the grouping can't drift from what Fundamentals
-# actually stores.
+# Company page indicator grid: (Fundamentals column, label, format kind, help).
+#
+# `kind` picks which Jinja filter the template applies ('percent' for 0-1
+# fractions, 'compact_number' for absolute amounts, 'ratio' otherwise), and
+# `help` is the text behind the "?" next to each label. Single source of
+# truth, so the grouping, the formatting and the explanation can't drift from
+# what Fundamentals actually stores. '{span}' is replaced at render time with
+# the number of fiscal years the CAGR really covers.
 INDICATOR_GROUPS = [
     ('Valuación', [
-        ('pe', 'P/E', 'ratio'),
-        ('forward_pe', 'P/E forward', 'ratio'),
-        ('pb', 'P/B', 'ratio'),
-        ('ps', 'P/S', 'ratio'),
-        ('ev_ebitda', 'EV/EBITDA', 'ratio'),
-        ('market_cap', 'Market cap', 'compact_number'),
+        ('pe', 'P/L (P/E)', 'ratio',
+         'Precio sobre lucro: cuántas veces el precio de la acción contiene la ganancia '
+         'por acción de los últimos 12 meses. Un P/L de 15 significa que, al ritmo de '
+         'ganancias actual, harían falta 15 años para recuperar lo que pagás hoy. Más bajo '
+         'suele ser más barato, pero también puede avisar que el mercado espera que esas '
+         'ganancias caigan.'),
+        ('forward_pe', 'P/L proyectado', 'ratio',
+         'El mismo cálculo, pero contra la ganancia por acción que los analistas estiman '
+         'para el próximo ejercicio en lugar de la ya reportada.'),
+        ('pb', 'P/VP (P/B)', 'ratio',
+         'Precio sobre valor patrimonial: cuántas veces el precio de mercado supera al '
+         'patrimonio neto contable por acción. Por debajo de 1 la empresa cotiza por menos '
+         'de lo que dicen sus libros.'),
+        ('ps', 'PSR (P/Ventas)', 'ratio',
+         'Precio sobre los ingresos anuales. Útil para comparar empresas que todavía no dan '
+         'ganancias, donde el P/L directamente no existe.'),
+        ('p_ebit', 'P/EBIT', 'ratio',
+         'Capitalización de mercado sobre la ganancia operativa (antes de intereses e '
+         'impuestos). Aísla el desempeño del negocio de cómo está financiado y de la carga '
+         'impositiva.'),
+        ('price_to_assets', 'P/Activos', 'ratio',
+         'Capitalización de mercado sobre el activo total. Se usa sobre todo en bancos y '
+         'aseguradoras, donde el balance es el negocio.'),
+        ('ev_ebitda', 'EV/EBITDA', 'ratio',
+         'Valor de la firma (capitalización + deuda − caja) sobre el EBITDA. Al incluir la '
+         'deuda, compara mejor que el P/L a empresas con endeudamientos muy distintos.'),
+        ('ev_ebit', 'EV/EBIT', 'ratio',
+         'Igual que el EV/EBITDA pero contra la ganancia operativa, que sí descuenta '
+         'depreciación y amortización. Más exigente en negocios intensivos en capital.'),
+        ('book_value_per_share', 'VPA', 'ratio',
+         'Valor patrimonial por acción: el patrimonio neto contable dividido por la cantidad '
+         'de acciones. Es el denominador del P/VP.'),
+        ('eps', 'LPA (BPA)', 'ratio',
+         'Lucro por acción de los últimos 12 meses: la ganancia neta dividida por la cantidad '
+         'de acciones. Es el denominador del P/L.'),
+        ('market_cap', 'Capitalización', 'compact_number',
+         'Valor de mercado de toda la empresa: precio de la acción por la cantidad de '
+         'acciones en circulación.'),
     ]),
     ('Rentabilidad', [
-        ('roe', 'ROE', 'percent'),
-        ('roa', 'ROA', 'percent'),
-        ('gross_margin', 'Margen bruto', 'percent'),
-        ('operating_margin', 'Margen operativo', 'percent'),
-        ('net_margin', 'Margen neto', 'percent'),
+        ('roe', 'ROE', 'percent',
+         'Retorno sobre el patrimonio: cuánto gana la empresa por cada dólar aportado por '
+         'los accionistas. Es la medida más directa de qué tan bien usa el capital propio.'),
+        ('roa', 'ROA', 'percent',
+         'Retorno sobre los activos: cuánto gana por cada dólar de activo, sin importar si '
+         'ese activo se financió con deuda o con capital propio.'),
+        ('roic', 'ROIC', 'percent',
+         'Retorno sobre el capital invertido: ganancia operativa después de impuestos sobre '
+         'patrimonio más deuda bruta. Comparado con el costo de ese capital, dice si la '
+         'empresa crea o destruye valor. Calculado acá a partir del balance, porque Yahoo no '
+         'lo publica.'),
+        ('gross_margin', 'Margen bruto', 'percent',
+         'Qué porcentaje de los ingresos sobrevive al costo directo de lo vendido. Habla del '
+         'poder de la empresa para fijar precios.'),
+        ('operating_margin', 'Margen EBIT', 'percent',
+         'Qué porcentaje de los ingresos queda como ganancia operativa, ya descontados todos '
+         'los gastos de la operación.'),
+        ('ebitda_margin', 'Margen EBITDA', 'percent',
+         'Igual que el margen EBIT pero sumando de nuevo depreciación y amortización, que no '
+         'son salidas de caja. Se acerca a lo que la operación genera en efectivo.'),
+        ('net_margin', 'Margen neto', 'percent',
+         'Qué porcentaje de los ingresos termina como ganancia final, ya pagados intereses e '
+         'impuestos.'),
     ]),
     ('Endeudamiento', [
-        ('debt_to_equity', 'Deuda/Patrimonio', 'ratio'),
-        ('current_ratio', 'Current ratio', 'ratio'),
-        ('quick_ratio', 'Quick ratio', 'ratio'),
+        ('total_debt', 'Deuda bruta', 'compact_number',
+         'Todo lo que la empresa debe a bancos y tenedores de bonos, de corto y de largo '
+         'plazo, sin descontar la caja.'),
+        ('net_debt', 'Deuda neta', 'compact_number',
+         'Deuda bruta menos la caja e inversiones líquidas. En negativo significa que la '
+         'empresa tiene más caja que deuda.'),
+        ('net_debt_to_equity', 'Deuda neta/Patrimonio', 'ratio',
+         'Cuántas veces la deuda neta supera al patrimonio de los accionistas. Cuanto más '
+         'alto, más apalancada está la empresa y más sensible a una suba de tasas.'),
+        ('net_debt_to_ebitda', 'Deuda neta/EBITDA', 'ratio',
+         'Cuántos años de EBITDA harían falta para cancelar la deuda neta. Arriba de 3 suele '
+         'considerarse exigente, aunque el umbral depende del sector.'),
+        ('debt_to_equity', 'Deuda/Patrimonio', 'ratio',
+         'Deuda bruta sobre patrimonio, tal como la publica Yahoo: en puntos porcentuales, '
+         'así que 158,40 equivale a 1,58 veces el patrimonio.'),
+        ('liabilities_to_assets', 'Pasivo/Activos', 'ratio',
+         'Qué proporción del activo total está financiada por terceros y no por los '
+         'accionistas.'),
+        ('current_ratio', 'Liquidez corriente', 'ratio',
+         'Activo corriente sobre pasivo corriente: si lo que cobra en los próximos doce meses '
+         'alcanza para cubrir lo que tiene que pagar. Debajo de 1 hay tensión de caja.'),
+        ('quick_ratio', 'Liquidez seca', 'ratio',
+         'Lo mismo, pero sin contar los inventarios, que son lo más lento de convertir en '
+         'efectivo.'),
+    ]),
+    ('Eficiencia y crecimiento', [
+        ('asset_turnover', 'Giro del activo', 'ratio',
+         'Cuántos dólares de ingresos genera por cada dólar de activo. Alto en comercio '
+         'minorista, bajo en infraestructura: sólo compara bien dentro del mismo sector.'),
+        ('revenue_cagr', 'CAGR ingresos ({span})', 'percent',
+         'Crecimiento anual compuesto de los ingresos a lo largo de los últimos {span} de '
+         'estados contables disponibles. Suaviza los años buenos y malos en una sola tasa.'),
+        ('revenue_growth_5y', 'Crecimiento ingresos (a/a)', 'percent',
+         'Variación de los ingresos contra el mismo período del año anterior, según Yahoo.'),
+        ('eps_growth_5y', 'Crecimiento LPA (a/a)', 'percent',
+         'Variación de la ganancia por acción contra el mismo período del año anterior.'),
+        ('beta', 'Beta', 'ratio',
+         'Cuánto se mueve la acción frente al mercado. Beta 1 acompaña al índice; arriba de 1 '
+         'amplifica sus subas y sus bajas; debajo de 1 las amortigua.'),
     ]),
     ('Dividendos', [
-        ('dividend_yield', 'Div. yield', 'percent'),
-        ('payout_ratio', 'Payout', 'percent'),
-        ('dividend_rate', 'Div. rate/acción', 'ratio'),
+        ('dividend_yield', 'Dividend yield', 'percent',
+         'Dividendos de los últimos 12 meses sobre el precio actual: el retorno en efectivo '
+         'que paga la acción a este precio.'),
+        ('payout_ratio', 'Payout', 'percent',
+         'Qué porcentaje de la ganancia se reparte como dividendo. Sostenidamente arriba de '
+         '100% significa que la empresa paga más de lo que gana.'),
+        ('dividend_rate', 'Dividendo por acción', 'ratio',
+         'Monto anual estimado que paga cada acción, en la moneda del activo.'),
     ]),
 ]
 
 PRICE_HISTORY_RANGES = ('1M', '6M', '1Y', '5Y')
+
+# Span assumed for the revenue CAGR label when no statements were parsed.
+DEFAULT_CAGR_YEARS = 5
+
+
+def _indicator_groups_for(fundamentals):
+    """INDICATOR_GROUPS with '{span}' resolved to the number of fiscal years
+    the revenue CAGR actually covers — free Yahoo statements carry four
+    usable years for most companies, so a hardcoded "5A" in the label would
+    misstate what was measured. Abbreviated in the label, spelled out in the
+    explanation behind the "?"."""
+    years = getattr(fundamentals, 'revenue_cagr_years', None) or DEFAULT_CAGR_YEARS
+    return [
+        (group_name, [
+            (
+                key,
+                label.replace('{span}', f"{int(years)}A"),
+                kind,
+                help_text.replace('{span}', f"{int(years)} años"),
+            )
+            for key, label, kind, help_text in rows
+        ])
+        for group_name, rows in INDICATOR_GROUPS
+    ]
 
 
 def _parse_float(value):
@@ -292,7 +412,10 @@ def get_stock_detail(exchange, symbol):
     if needs_backfill(asset):
         backfill_asset(asset)
 
-    fundamentals = _latest_fundamentals_for(asset.id)
+    # Statement-derived indicators (P/EBIT, ROIC, deuda neta/EBITDA, giro del
+    # activo) aren't part of the nightly sweep — they're filled here, on the
+    # page that shows them. See src/services/fundamentals.py.
+    fundamentals = ensure_statement_metrics(asset, _latest_fundamentals_for(asset.id))
 
     # Best-effort live quote for price + day change. Capped to a single,
     # non-throttled attempt (unlike the batch jobs) so a slow/rate-limited
@@ -353,7 +476,7 @@ def get_stock_detail(exchange, symbol):
         'price': price,
         'change_amount': change_amount,
         'change_percent': change_percent,
-        'indicator_groups': INDICATOR_GROUPS,
+        'indicator_groups': _indicator_groups_for(fundamentals),
         'price_ranges': PRICE_HISTORY_RANGES,
         'dividends': dividends,
         'dividend_years': list(dividend_years),

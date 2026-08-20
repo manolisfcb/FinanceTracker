@@ -169,3 +169,66 @@ a:hover { color: var(--tn-maple-dark); }
   cursor: pointer;
 }
 .tn-dropdown-menu a:hover, .tn-dropdown-menu button:hover { background: var(--tn-input-bg); }
+
+/* Indicator help: a "?" next to a label, explained on hover, focus or tap.
+   The bubble is anchored to the whole row (.tn-help stays position:static so
+   the nearest positioned ancestor is .tn-help-row) rather than to the icon.
+   Anchoring to the icon puts the bubble wherever the label happens to end,
+   which pushes it past the card — and in the right-hand column, past the
+   viewport. Spanning the row instead keeps it inside the card at every
+   breakpoint. */
+.tn-help-row { position: relative; }
+
+.tn-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-left: 5px;
+  padding: 0;
+  border: 1px solid var(--tn-border);
+  border-radius: 50%;
+  background: var(--tn-input-bg);
+  color: var(--tn-muted);
+  font-family: inherit;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+  vertical-align: middle;
+}
+.tn-help:hover, .tn-help.is-open, .tn-help:focus-visible {
+  color: var(--tn-maple);
+  border-color: var(--tn-maple);
+  outline: none;
+}
+
+.tn-help-bubble {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 7px);
+  /* Above the cards that come later in the grid, which would otherwise paint
+     over a bubble escaping an earlier card. */
+  z-index: 60;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: var(--tn-ink);
+  color: #f2f0eb;
+  box-shadow: 0 8px 24px rgba(28, 27, 24, 0.18);
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+  white-space: normal;
+  cursor: auto;
+}
+.tn-help:hover .tn-help-bubble,
+.tn-help:focus-visible .tn-help-bubble,
+.tn-help.is-open .tn-help-bubble { display: block; }

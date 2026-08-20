@@ -24,6 +24,81 @@ def _as_fraction(percent_value):
     return percent_value / 100 if percent_value is not None else None
 
 
+def _float(value):
+    """Statement cells arrive as numpy scalars, and missing ones as NaN —
+    both need flattening to a plain float or None before they hit the ORM."""
+    if value is None:
+        return None
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return None
+    return None if result != result else result  # NaN
+
+
+def _net_debt(total_debt, total_cash):
+    """Deuda neta = deuda bruta − caja. A company with more cash than debt
+    legitimately lands below zero, so no clamping."""
+    if total_debt is None:
+        return None
+    return total_debt - (total_cash or 0)
+
+
+def _statement_row(frame, *labels):
+    """First matching row of a yfinance statement frame, by label priority —
+    Yahoo names the same line differently across companies (EBIT vs Operating
+    Income), so callers pass the acceptable aliases in order."""
+    if frame is None or getattr(frame, "empty", True):
+        return None
+    for label in labels:
+        if label in frame.index:
+            row = frame.loc[label]
+            # A duplicated index label makes .loc return a frame, not a row.
+            return row.iloc[0] if hasattr(row, "columns") else row
+    return None
+
+
+def _statement_value(frame, *labels):
+    """Most recent non-null value of the first matching statement row."""
+    row = _statement_row(frame, *labels)
+    if row is None:
+        return None
+    for column in sorted(row.index, reverse=True):
+        value = _float(row[column])
+        if value is not None:
+            return value
+    return None
+
+
+def _revenue_cagr(income, max_periods: int = 6):
+    """Compound annual revenue growth across up to `max_periods` reported
+    fiscal years, as (cagr, years spanned).
+
+    The span is returned alongside the number because free Yahoo statements
+    usually carry five fiscal years but sometimes fewer — labelling a
+    three-year figure "CAGR 5A" would misstate it, so the UI shows the span
+    that was actually measured.
+    """
+    row = _statement_row(income, "Total Revenue")
+    if row is None:
+        return None, None
+
+    points = []
+    for column in sorted(row.index, reverse=True)[:max_periods]:
+        value = _float(row[column])
+        # A non-positive base makes the growth rate meaningless, not negative.
+        if value is not None and value > 0:
+            points.append((column, value))
+    if len(points) < 2:
+        return None, None
+
+    (newest_date, newest), (oldest_date, oldest) = points[0], points[-1]
+    years = (newest_date - oldest_date).days / 365.25
+    if years < 0.9:
+        return None, None
+    return (newest / oldest) ** (1 / years) - 1, round(years)
+
+
 def _as_date(value):
     """yfinance's calendar mixes date, datetime and pandas Timestamp."""
     if value is None:
@@ -145,7 +220,49 @@ class YahooProvider(MarketDataProvider):
             "beta": info.get("beta"),
             "fifty_two_week_high": info.get("fiftyTwoWeekHigh"),
             "fifty_two_week_low": info.get("fiftyTwoWeekLow"),
+            # VPA: patrimonio neto por acción, as reported by Yahoo.
+            "book_value_per_share": info.get("bookValue"),
+            "ebitda_margin": info.get("ebitdaMargins"),
+            "total_debt": info.get("totalDebt"),
+            "enterprise_value": info.get("enterpriseValue"),
+            # Deuda neta = deuda bruta − caja. Yahoo has no netDebt field, but
+            # both sides live in `info`, so this costs no extra request.
+            "net_debt": _net_debt(info.get("totalDebt"), info.get("totalCash")),
         }
+
+    def get_statement_metrics(self, yahoo_symbol: str) -> dict | None:
+        """Annual figures pulled from the balance sheet and income statement.
+
+        Two extra Yahoo endpoints on top of `info`, which is why this isn't
+        folded into get_fundamentals(): the nightly job sweeps ~1100 assets
+        and these figures only change when a company reports.
+        """
+        def _fetch():
+            ticker = self._ticker(yahoo_symbol)
+            balance = ticker.balance_sheet
+            income = ticker.income_stmt
+
+            metrics = {
+                "revenue": _statement_value(income, "Total Revenue"),
+                "ebit": _statement_value(income, "EBIT", "Operating Income"),
+                "ebitda": _statement_value(income, "EBITDA", "Normalized EBITDA"),
+                "total_assets": _statement_value(balance, "Total Assets"),
+                "total_liabilities": _statement_value(
+                    balance, "Total Liabilities Net Minority Interest"
+                ),
+                "total_equity": _statement_value(
+                    balance, "Stockholders Equity", "Total Equity Gross Minority Interest"
+                ),
+                "tax_rate": _statement_value(income, "Tax Rate For Calcs"),
+            }
+            cagr, years = _revenue_cagr(income)
+            metrics["revenue_cagr"] = cagr
+            metrics["revenue_cagr_years"] = years
+            if all(value is None for value in metrics.values()):
+                return None
+            return metrics
+
+        return self._with_retries(_fetch)
 
     def get_dividends(self, yahoo_symbol: str) -> list[dict]:
         def _fetch():

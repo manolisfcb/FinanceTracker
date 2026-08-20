@@ -1,0 +1,9 @@
+{#- "?" icon that reveals an explanation on hover, on keyboard focus and on
+    click/tap. The click path (src/static/js/help_tips.js) is what makes it
+    usable on touch, where there is no hover. -#}
+{% macro help_tip(text, label='') -%}
+<button type="button" class="tn-help" aria-label="Qué significa {{ label or 'este indicador' }}">
+    <span aria-hidden="true">?</span>
+    <span class="tn-help-bubble" role="tooltip">{{ text }}</span>
+</button>
+{%- endmacro %}
