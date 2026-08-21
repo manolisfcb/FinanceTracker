@@ -53,6 +53,7 @@ class DividendsService:
         self.warnings: list[str] = []
         self._fx_cache: dict[str, float | None] = {}
         self._received_rows_cache: list[DividendReceived] | None = None
+        self._calendar_cache: dict[date, list[dict]] = {}
 
     # -- helpers ------------------------------------------------------------
 
@@ -214,7 +215,16 @@ class DividendsService:
         return total
 
     def upcoming_calendar(self, limit: int = 8, today: date | None = None) -> list[dict]:
+        """kpis() asks for limit=1, the page asks for limit=8 — cache per
+        `today` so the second call doesn't re-run the same three queries."""
         today = today or date.today()
+        cached = self._calendar_cache.get(today)
+        if cached is None or len(cached) < limit:
+            cached = self._compute_upcoming_calendar(limit, today)
+            self._calendar_cache[today] = cached
+        return cached[:limit]
+
+    def _compute_upcoming_calendar(self, limit: int, today: date) -> list[dict]:
         positions = self._positions()
         if not positions:
             return []
