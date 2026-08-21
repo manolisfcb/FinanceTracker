@@ -312,4 +312,5 @@ def test_expense_control_links_live_in_profile_menu(auth_client):
     assert profile_menu.find("a", href="/inbox") is not None
     assert profile_menu.find("a", href="/tools/rankings") is not None
     assert profile_menu.find("a", href="/tools/comparator") is not None
+    assert profile_menu.find("a", href="/tools/buy-prices") is not None
     assert profile_menu.find("a", href="/logout") is not None

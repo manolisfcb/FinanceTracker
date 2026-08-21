@@ -38,6 +38,7 @@ google-api-python-client==2.156.0
 google-auth==2.37.0
 google-auth-httplib2==0.2.0
 googleapis-common-protos==1.66.0
+gunicorn==23.0.0
 html5lib==1.1
 httplib2==0.22.0
 idna==3.10
@@ -60,6 +61,7 @@ plotly==5.24.1
 propcache==0.2.1
 proto-plus==1.25.0
 protobuf==5.29.2
+psycopg[binary]==3.2.3
 pyasn1==0.6.1
 pyasn1_modules==0.4.1
 pycparser==3.0

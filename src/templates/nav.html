@@ -74,6 +74,10 @@
                                    class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.value_methods' else 'text-ink' }}">
                                     Métodos de valuación
                                 </a>
+                                <a href="{{ url_for('tools.buy_prices') }}"
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.buy_prices' else 'text-ink' }}">
+                                    Precios máximos de compra
+                                </a>
                             </div>
                             <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2.5 text-sm text-ink hover:bg-[#fbfaf8]">Cerrar sesión</a>
                         </div>

@@ -1,0 +1,74 @@
+# Pila local equivalente a producción: Postgres + migrate + web + worker.
+# Levantar con:  docker compose up --build
+# Los secretos salen de .env (que nunca entra en la imagen).
+
+# Configuración común a los tres servicios de la app. Repetirla invita a que
+# web y worker terminen apuntando a bases distintas.
+x-app-env: &app-env
+  ENV: production
+  DATABASE_URL: postgresql+psycopg://truenorth:${POSTGRES_PASSWORD:-truenorth-local}@db:5432/truenorth
+  SECRET_KEY: ${SECRET_KEY:?falta SECRET_KEY en .env}
+  JWT_SECRET_KEY: ${JWT_SECRET_KEY:?falta JWT_SECRET_KEY en .env}
+  SEC_EDGAR_USER_AGENT: ${SEC_EDGAR_USER_AGENT:-TrueNorth Analytics contacto@example.com}
+  NEWS_PROVIDERS: ${NEWS_PROVIDERS:-yahoo,google}
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: truenorth
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-truenorth-local}
+      POSTGRES_DB: truenorth
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Sin puertos publicados: solo la red interna de compose la alcanza.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U truenorth -d truenorth"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Un solo uso: prepara el esquema y termina. Que web y worker esperen a que
+  # este servicio salga con éxito es lo que evita que el scheduler dispare un
+  # job contra tablas que todavía no existen.
+  migrate:
+    build: .
+    command: ["migrate"]
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  web:
+    build: .
+    command: ["web"]
+    environment:
+      <<: *app-env
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      # Cloudflare termina el TLS; sin esto la redirect_uri de Google sale mal.
+      TRUST_PROXY_HEADERS: "true"
+      RUN_SCHEDULER: "false"
+      # Ya migró el servicio de arriba.
+      MIGRATE_ON_START: "false"
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  worker:
+    build: .
+    command: ["worker"]
+    environment:
+      <<: *app-env
+      RUN_SCHEDULER: "true"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  pgdata:

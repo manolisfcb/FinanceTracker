@@ -1,0 +1,34 @@
+# Secretos — que nunca entren en una capa de la imagen.
+.env
+.env.*
+!.env.example
+client_secret*.json
+*.pem
+*.key
+
+# Entorno local y basura de build
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+**/.DS_Store
+
+# La base de dev: 2.7 MB de datos locales que no van a producción.
+instance/
+*.db
+
+# Git, docs, diseño, tests: no los necesita el runtime.
+.git/
+.github/
+.claude/
+.vscode/
+tests/
+scripts/
+design-qa.md
+README.md
+Dockerfile
+docker-compose.yml
+.dockerignore

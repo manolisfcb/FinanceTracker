@@ -6,6 +6,19 @@ if os.path.exists('.env'):
     load_dotenv(find_dotenv())
 
 
+def _flag(name, default=False):
+    """Read a boolean from the environment.
+
+    Containers pass everything as strings, and `bool("false")` is True — the
+    kind of bug that only shows up as "why are the jobs running twice in
+    production".
+    """
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 class Config(object):
     DEBUG = False
     TESTING = False
@@ -33,6 +46,18 @@ class Config(object):
     # News sources to aggregate (comma-separated): yahoo, google. Both are
     # free and keyless. Reuters has no free API — deliberately not included.
     NEWS_PROVIDERS = os.getenv("NEWS_PROVIDERS", "yahoo,google")
+    # Honour X-Forwarded-* from the reverse proxy. Behind Cloudflare (or any
+    # TLS terminator) Flask otherwise sees a plain HTTP request to an
+    # internal host, and every url_for(_external=True) — the Google OAuth
+    # redirect_uri above all — comes out wrong. Off by default: with no proxy
+    # in front, trusting these headers lets any client forge its own scheme
+    # and host.
+    TRUST_PROXY_HEADERS = _flag("TRUST_PROXY_HEADERS")
+    # Which process owns the APScheduler jobs. Every gunicorn worker runs the
+    # app factory, so leaving this on everywhere means N workers hitting
+    # Yahoo N times and writing N duplicate JobRun rows. Exactly one process
+    # should have it.
+    RUN_SCHEDULER = _flag("RUN_SCHEDULER", default=True)
     # Google sign-in. Optional: without both values the button is hidden and
     # /auth/google says the feature is off, so a checkout with no Google
     # project still runs with password login.
@@ -63,6 +88,12 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     DEVELOPMENT = False
     DEBUG = False
+    # Opt-in in production: the web containers must not schedule anything,
+    # only the dedicated worker does.
+    RUN_SCHEDULER = _flag("RUN_SCHEDULER", default=False)
+    # url_for(_external=True) builds https:// links even before ProxyFix has
+    # a request to inspect (CLI commands, error pages).
+    PREFERRED_URL_SCHEME = "https"
     HOST = os.getenv("HOST")
     PORT = os.getenv("PORT")
     ENV = os.getenv("ENV")

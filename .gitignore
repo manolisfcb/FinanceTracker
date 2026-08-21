@@ -6,3 +6,13 @@ __pycache__/
 instance/
 .DS_Store
 *.db
+
+# Secretos: nada de esto se sube nunca.
+.env.*
+!.env.example
+client_secret*.json
+*client_secret*.json
+*.pem
+*.key
+credentials.json
+token.json

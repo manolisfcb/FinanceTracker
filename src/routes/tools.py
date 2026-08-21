@@ -1,13 +1,21 @@
+from math import ceil
+
 from flask import Blueprint, jsonify, render_template, request, url_for
 from flask_login import login_required
-from sqlalchemy import and_, func
+from sqlalchemy import and_, func, or_
 
 from src.extensions import db
-from src.models import Asset, DividendHistory, Fundamentals
+from src.models import Asset, AssetCategory, DividendHistory, Fundamentals
 from src.services.comparator import build_comparison, normalize_price_history
 from src.services.market_data import get_provider
 from src.services.rankings import best_roe_by_sector, dividend_aristocrats, top_dividend_yield
-from src.services.value_methods import METHODS, rank_companies
+from src.services.value_methods import (
+    BUFFETT_GOOD_SCORE,
+    METHODS,
+    build_buy_price_rows,
+    filter_and_sort_buy_price_rows,
+    rank_companies,
+)
 
 
 tools_bp = Blueprint("tools", __name__)
@@ -15,9 +23,63 @@ tools_bp = Blueprint("tools", __name__)
 
 COMPARATOR_RANGES = ("1M", "6M", "1Y", "5Y")
 COMPARATOR_COLORS = ("#b3372b", "#293b49", "#4f98a1", "#d27a5e")
+BUY_PRICE_METHODS = {
+    "graham": "Graham",
+    "bazin": "Bazin",
+    "lynch": "Lynch",
+    "buffett": "Buffett/Munger",
+}
 
 
-def _latest_fundamentals_rows(equities_only=True, include_without_fundamentals=False):
+class _ListPagination:
+    """Small pagination adapter for lists sorted by calculated values."""
+
+    def __init__(self, items, page, per_page):
+        self.total = len(items)
+        self.per_page = per_page
+        self.pages = ceil(self.total / per_page) if self.total else 0
+        self.page = min(max(page, 1), max(self.pages, 1))
+        start = (self.page - 1) * per_page
+        self.items = items[start:start + per_page]
+
+    @property
+    def has_prev(self):
+        return self.page > 1
+
+    @property
+    def prev_num(self):
+        return self.page - 1 if self.has_prev else None
+
+    @property
+    def has_next(self):
+        return self.page < self.pages
+
+    @property
+    def next_num(self):
+        return self.page + 1 if self.has_next else None
+
+    def iter_pages(self, *, left_edge=2, left_current=2, right_current=4, right_edge=2):
+        pages_end = self.pages + 1
+        if pages_end == 1:
+            return
+        left_end = min(1 + left_edge, pages_end)
+        yield from range(1, left_end)
+        if left_end == pages_end:
+            return
+        mid_start = max(left_end, self.page - left_current)
+        mid_end = min(self.page + right_current + 1, pages_end)
+        if mid_start > left_end:
+            yield None
+        yield from range(mid_start, mid_end)
+        if mid_end == pages_end:
+            return
+        right_start = max(mid_end, pages_end - right_edge)
+        if right_start > mid_end:
+            yield None
+        yield from range(right_start, pages_end)
+
+
+def _latest_fundamentals_query(equities_only=True, include_without_fundamentals=False):
     latest = (
         db.session.query(
             Fundamentals.asset_id.label("asset_id"),
@@ -42,7 +104,11 @@ def _latest_fundamentals_rows(equities_only=True, include_without_fundamentals=F
             Asset.sector.isnot(None),
             ~Asset.sector.in_(("ETFs", "Cryptoassets")),
         )
-    return query.all()
+    return query
+
+
+def _latest_fundamentals_rows(equities_only=True, include_without_fundamentals=False):
+    return _latest_fundamentals_query(equities_only, include_without_fundamentals).all()
 
 
 @tools_bp.route("/tools/value-methods", methods=["GET"])
@@ -99,6 +165,133 @@ def value_methods():
         eligible_count=eligible_count,
         last_update=last_update,
         method_urls=method_urls,
+    )
+
+
+@tools_bp.route("/tools/buy-prices", methods=["GET"])
+@login_required
+def buy_prices():
+    search = request.args.get("q", "").strip()
+    selected_sector = request.args.get("sector", "").strip()
+    selected_exchange = request.args.get("exchange", "").strip().upper()
+    selected_method = request.args.get("method", "graham").strip().lower()
+    if selected_method not in BUY_PRICE_METHODS:
+        selected_method = "graham"
+    selected_status = request.args.get("status", "all").strip().lower()
+    if selected_status not in ("all", "favorable", "unfavorable", "missing"):
+        selected_status = "all"
+    selected_order = request.args.get("order", "best").strip().lower()
+    if selected_order not in ("best", "worst", "symbol"):
+        selected_order = "best"
+    view = request.args.get("view", "table").strip().lower()
+    if view not in ("table", "cards"):
+        view = "table"
+    page = max(request.args.get("page", 1, type=int), 1)
+
+    universe_filter = (
+        Asset.is_active.is_(True),
+        Asset.category.in_((AssetCategory.EQUITY, AssetCategory.REIT)),
+        or_(Asset.sector.is_(None), Asset.sector != "ETFs"),
+    )
+    exchanges = [
+        value for value, in
+        db.session.query(Asset.exchange).filter(*universe_filter).distinct().order_by(Asset.exchange).all()
+    ]
+    sectors = [
+        value for value, in
+        db.session.query(Asset.sector)
+        .filter(*universe_filter, Asset.sector.isnot(None))
+        .distinct()
+        .order_by(Asset.sector)
+        .all()
+    ]
+
+    query = _latest_fundamentals_query(
+        equities_only=False,
+        include_without_fundamentals=True,
+    ).filter(*universe_filter)
+    if search:
+        pattern = f"%{search}%"
+        query = query.filter(or_(Asset.symbol.ilike(pattern), Asset.name.ilike(pattern)))
+    if selected_exchange in exchanges:
+        query = query.filter(Asset.exchange == selected_exchange)
+    else:
+        selected_exchange = ""
+    if selected_sector in sectors:
+        query = query.filter(Asset.sector == selected_sector)
+    else:
+        selected_sector = ""
+
+    last_update = query.with_entities(func.max(Fundamentals.as_of_date)).scalar()
+    calculated_rows = build_buy_price_rows(query.order_by(Asset.symbol, Asset.exchange).all())
+    filtered_rows = filter_and_sort_buy_price_rows(
+        calculated_rows,
+        method=selected_method,
+        status=selected_status,
+        order=selected_order,
+    )
+    pagination = _ListPagination(filtered_rows, page=page, per_page=48)
+
+    current_params = {
+        "q": search,
+        "sector": selected_sector,
+        "exchange": selected_exchange,
+        "method": selected_method,
+        "status": selected_status,
+        "order": selected_order,
+        "view": view,
+    }
+
+    def page_url(**updates):
+        params = {**current_params, **updates}
+        params.pop("page", None)
+        return url_for("tools.buy_prices", **{
+            key: value for key, value in params.items() if value
+        })
+
+    page_url_base = page_url()
+    page_url_prefix = page_url_base + ("&" if "?" in page_url_base else "?") + "page="
+    status_options = (
+        (("all", "Todos"), ("favorable", "Puntuación ≥ 70"),
+         ("unfavorable", "Puntuación < 70"), ("missing", "Sin puntuación"))
+        if selected_method == "buffett" else
+        (("all", "Todos"), ("favorable", "Con descuento"),
+         ("unfavorable", "Sobre el precio techo"), ("missing", "Sin cálculo"))
+    )
+    order_options = (
+        (("best", "Mayor puntuación"), ("worst", "Menor puntuación"), ("symbol", "Ticker A–Z"))
+        if selected_method == "buffett" else
+        (("best", "Mayor descuento"), ("worst", "Más cara"), ("symbol", "Ticker A–Z"))
+    )
+    reset_filters = {
+        "method": selected_method,
+        "status": selected_status,
+        "order": selected_order,
+        "view": view,
+    }
+
+    return render_template(
+        "tools/buy_prices.html",
+        rows=pagination.items,
+        pagination=pagination,
+        page_url_prefix=page_url_prefix,
+        view=view,
+        view_urls={name: page_url(view=name) for name in ("table", "cards")},
+        search=search,
+        sectors=sectors,
+        selected_sector=selected_sector,
+        exchanges=exchanges,
+        selected_exchange=selected_exchange,
+        methods=BUY_PRICE_METHODS,
+        selected_method=selected_method,
+        selected_method_label=BUY_PRICE_METHODS[selected_method],
+        status_options=status_options,
+        selected_status=selected_status,
+        order_options=order_options,
+        selected_order=selected_order,
+        reset_url=url_for("tools.buy_prices", **reset_filters),
+        last_update=last_update,
+        buffett_good_score=BUFFETT_GOOD_SCORE,
     )
 
 

@@ -14,6 +14,7 @@ from math import sqrt
 
 
 BAZIN_REQUIRED_YIELD = 0.06
+BUFFETT_GOOD_SCORE = 70.0
 LYNCH_MAX_GROWTH_PE = 25.0
 
 # Yahoo and the static catalogs use a mix of GICS-style and plain-English
@@ -377,6 +378,92 @@ def _buffett(asset, fundamentals):
         metric_a=return_metric,
         metric_b=("P/L", fundamentals.pe, "ratio"),
     )
+
+
+def build_buy_price_rows(rows):
+    """Calculate price methods and the Buffett score without dropping assets."""
+    calculators = {
+        "graham": _graham,
+        "bazin": _bazin,
+        "lynch": _lynch,
+    }
+    results = []
+    for asset, fundamentals in rows:
+        method_results = {
+            slug: calculator(asset, fundamentals) if fundamentals else None
+            for slug, calculator in calculators.items()
+        }
+        fair_values = {
+            slug: result["fair_value"] if result else None
+            for slug, result in method_results.items()
+        }
+        current_price = fundamentals.price if fundamentals else None
+        margins = {
+            slug: (value - current_price) / value
+            if _positive(value) and _positive(current_price) else None
+            for slug, value in fair_values.items()
+        }
+        available = [value for value in fair_values.values() if value is not None]
+        within_price = [
+            value for value in available
+            if _positive(current_price) and current_price <= value
+        ]
+        buffett_result = _buffett(asset, fundamentals) if fundamentals else None
+        buffett_score = buffett_result["result"] if buffett_result else None
+        results.append({
+            "asset": asset,
+            "fundamentals": fundamentals,
+            "fair_values": fair_values,
+            "margins": margins,
+            "available_count": len(available),
+            "within_price_count": len(within_price),
+            "buffett_score": buffett_score,
+            "buffett_is_good": buffett_score is not None and buffett_score >= BUFFETT_GOOD_SCORE,
+        })
+    return results
+
+
+def filter_and_sort_buy_price_rows(rows, method="graham", status="all", order="best"):
+    """Filter and order the full buy-price universe by one selected method."""
+    method = method if method in ("graham", "bazin", "lynch", "buffett") else "graham"
+    status = status if status in ("all", "favorable", "unfavorable", "missing") else "all"
+    order = order if order in ("best", "worst", "symbol") else "best"
+
+    def metric(row):
+        if method == "buffett":
+            return row["buffett_score"]
+        return row["margins"][method]
+
+    def favorable(row):
+        value = metric(row)
+        if value is None:
+            return None
+        return row["buffett_is_good"] if method == "buffett" else value >= 0
+
+    if status == "missing":
+        selected = [row for row in rows if metric(row) is None]
+    elif status == "favorable":
+        selected = [row for row in rows if favorable(row) is True]
+    elif status == "unfavorable":
+        selected = [row for row in rows if favorable(row) is False]
+    else:
+        selected = list(rows)
+
+    if order == "symbol":
+        selected.sort(key=lambda row: (row["asset"].symbol, row["asset"].exchange))
+    elif order == "worst":
+        selected.sort(key=lambda row: (
+            metric(row) is None,
+            metric(row) if metric(row) is not None else 0,
+            row["asset"].symbol,
+        ))
+    else:
+        selected.sort(key=lambda row: (
+            metric(row) is None,
+            -(metric(row) if metric(row) is not None else 0),
+            row["asset"].symbol,
+        ))
+    return selected
 
 
 def rank_companies(rows, method_slug):

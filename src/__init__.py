@@ -57,6 +57,15 @@ def create_app(config_name=None):
             "SECRET_KEY and JWT_SECRET_KEY must be set in the environment when ENV=production."
         )
 
+    if app.config.get("TRUST_PROXY_HEADERS"):
+        # One proxy hop (Cloudflare -> this container). x_for/x_proto/x_host
+        # are what url_for(_external=True) needs to rebuild the public URL;
+        # without them the Google OAuth redirect_uri is the container's
+        # internal address and Google answers redirect_uri_mismatch.
+        from werkzeug.middleware.proxy_fix import ProxyFix
+
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
     app.template_folder = app.config["TEMPLATES_PATH"]
     app.static_folder = app.config["STATICS_PATH"]
     app.config["PROPAGATE_EXCEPTIONS"] = True
@@ -157,6 +166,10 @@ def create_app(config_name=None):
         from src.services.market_strip import market_strip_context
 
         return market_strip_context()
+
+    from src.cli import register_cli
+
+    register_cli(app)
 
     api = Api(app)
     from src.routes import stockResources
@@ -292,8 +305,9 @@ def create_app(config_name=None):
     # The scheduler hits market data providers on an interval — keep it out
     # of tests so test runs stay hermetic and fast, and so repeated
     # create_app("testing") calls don't fail trying to start an
-    # already-running APScheduler.
-    if not app.testing and not _is_reloader_parent(app):
+    # already-running APScheduler. RUN_SCHEDULER is what keeps it to a single
+    # process once gunicorn is forking workers off the same factory.
+    if app.config.get("RUN_SCHEDULER") and not app.testing and not _is_reloader_parent(app):
         scheduler.init_app(app)
         from src.resources.jobs import refresh_fundamentals  # noqa: F401
         from src.resources.jobs import refresh_quotes  # noqa: F401

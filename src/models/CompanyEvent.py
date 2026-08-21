@@ -23,7 +23,10 @@ class CompanyEvent(db.Model):
     external_id = db.Column(db.String(64), nullable=True)
     title = db.Column(db.String(255), nullable=False)
     summary = db.Column(db.Text, nullable=True)
-    url = db.Column(db.String(512), nullable=True)
+    # Aggregator redirect URLs (notably Google News RSS) can exceed 512
+    # characters. PostgreSQL enforces VARCHAR lengths even though SQLite does
+    # not, so keep the complete source URL as unbounded text.
+    url = db.Column(db.Text, nullable=True)
     published_at = db.Column(db.DateTime, nullable=False, index=True)
     # When the event itself happens, for events announced ahead of time (a
     # dividend's ex-date, the next earnings date). `published_at` orders the
