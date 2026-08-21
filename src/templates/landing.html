@@ -1,29 +1,29 @@
 {% extends 'base.html' %}
 
-{% block head_title %}TrueNorth Analytics · Portafolio y análisis para el inversor canadiense{% endblock %}
-{% block meta_description %}Reuní tus cuentas RRSP, TFSA, FHSA y no registradas en una sola cartera, con costo base para la CRA, dividendos y fundamentales de TSX, NYSE y Nasdaq.{% endblock %}
+{% block head_title %}TrueNorth Analytics · Portafolio y análisis para cualquier inversor{% endblock %}
+{% block meta_description %}Reuní todas tus cuentas de inversión en una sola cartera, con costo base promedio, dividendos y fundamentales de TSX, NYSE y Nasdaq.{% endblock %}
 {% block meta_robots %}index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1{% endblock %}
 
 {% block extra_head %}
 <link rel="canonical" href="{{ url_for('main.home_page', _external=True) }}">
-<link rel="alternate" hreflang="es-CA" href="{{ url_for('main.home_page', _external=True) }}">
+<link rel="alternate" hreflang="es" href="{{ url_for('main.home_page', _external=True) }}">
 <meta property="og:type" content="website">
-<meta property="og:locale" content="es_CA">
+<meta property="og:locale" content="es_LA">
 <meta property="og:site_name" content="TrueNorth Analytics">
-<meta property="og:title" content="TrueNorth Analytics · Tu portafolio canadiense, mejor analizado">
-<meta property="og:description" content="Unificá tus cuentas, seguí el costo base para la CRA, dividendos y fundamentales de TSX, NYSE y Nasdaq.">
+<meta property="og:title" content="TrueNorth Analytics · Tu portafolio, mejor analizado">
+<meta property="og:description" content="Unificá tus cuentas, seguí el costo base promedio, dividendos y fundamentales de TSX, NYSE y Nasdaq.">
 <meta property="og:url" content="{{ url_for('main.home_page', _external=True) }}">
 <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}">
 <meta property="og:image:secure_url" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="TrueNorth Analytics, portafolio y análisis para inversores desde Canadá">
+<meta property="og:image:alt" content="TrueNorth Analytics, portafolio y análisis para inversores">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="TrueNorth Analytics · Tu portafolio canadiense, mejor analizado">
-<meta name="twitter:description" content="Costo base para la CRA, dividendos y análisis fundamental en una sola cartera.">
+<meta name="twitter:title" content="TrueNorth Analytics · Tu portafolio, mejor analizado">
+<meta name="twitter:description" content="Costo base promedio, dividendos y análisis fundamental en una sola cartera.">
 <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}">
-<meta name="twitter:image:alt" content="TrueNorth Analytics, portafolio y análisis para inversores desde Canadá">
+<meta name="twitter:image:alt" content="TrueNorth Analytics, portafolio y análisis para inversores">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -33,8 +33,8 @@
       "@id": "{{ url_for('main.home_page', _external=True) }}#website",
       "url": "{{ url_for('main.home_page', _external=True) }}",
       "name": "TrueNorth Analytics",
-      "description": "Portafolio y análisis para inversores desde Canadá",
-      "inLanguage": "es-CA"
+      "description": "Portafolio y análisis para cualquier inversor",
+      "inLanguage": "es"
     },
     {
       "@type": "WebApplication",
@@ -42,16 +42,16 @@
       "url": "{{ url_for('main.home_page', _external=True) }}",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
-      "inLanguage": "es-CA",
+      "inLanguage": "es",
       "image": "{{ url_for('static', filename='images/og-image.png', _external=True) }}",
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "CAD"
+        "priceCurrency": "USD"
       },
       "featureList": [
-        "Portafolio consolidado en CAD",
-        "Costo base promedio para la CRA",
+        "Portafolio consolidado multi-moneda",
+        "Costo base promedio por posición",
         "Seguimiento de dividendos",
         "Análisis fundamental de TSX, NYSE y Nasdaq"
       ]
@@ -73,17 +73,15 @@
         <div class="w-full lg:w-[556px] lg:shrink-0">
             <div class="flex items-center gap-2.5 mb-5">
                 <span class="tn-eyebrow">TSX · NYSE · NASDAQ</span>
-                <span class="hidden sm:block w-[22px] h-px bg-[#d9d5cb]"></span>
-                <span class="tn-eyebrow hidden sm:block text-maple">Hecho para Canadá</span>
             </div>
 
             <h1 class="font-serif-display text-[36px] sm:text-5xl lg:text-[57px] leading-[1.06] tracking-tight text-pretty">
-                Tu portafolio canadiense, con el análisis que le falta.
+                Tu portafolio, con el análisis que le falta.
             </h1>
 
             <p class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-muted2 max-w-[510px] text-pretty">
-                Reuní tus cuentas RRSP, TFSA, FHSA y no registradas en una sola cartera.
-                TrueNorth calcula el costo base promedio como lo pide la CRA, sigue tus
+                Reuní todas tus cuentas de inversión en una sola cartera.
+                TrueNorth calcula el costo base promedio de cada posición, sigue tus
                 dividendos y te da los fundamentales de cada empresa que tenés.
             </p>
 
@@ -103,7 +101,7 @@
             <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 text-[12.5px] text-faint">
                 <span>Gratis, sin tarjeta</span>
                 <span class="w-[3px] h-[3px] rounded-full bg-[#d9d5cb]"></span>
-                <span>CAD y USD con FX diario</span>
+                <span>Multi-moneda, con FX diario</span>
                 <span class="w-[3px] h-[3px] rounded-full bg-[#d9d5cb]"></span>
                 <span>Tus datos son solo tuyos</span>
             </div>
@@ -115,10 +113,10 @@
                 <div class="flex items-end justify-between mb-4">
                     <div>
                         <div class="lbl">Patrimonio total</div>
-                        <div class="num text-[26px] md:text-[30px] font-semibold tracking-tight mt-1">C$ 184,920.55</div>
+                        <div class="num text-[26px] md:text-[30px] font-semibold tracking-tight mt-1">$ 184,920.55</div>
                     </div>
                     <div class="text-right">
-                        <div class="num pos text-[15px] font-semibold">+C$ 21,438.10</div>
+                        <div class="num pos text-[15px] font-semibold">+$ 21,438.10</div>
                         <div class="num pos text-[12.5px]">+13.11% total</div>
                     </div>
                 </div>
@@ -126,11 +124,11 @@
                 <div class="grid grid-cols-3 gap-2.5 mb-4">
                     <div class="rounded-lg border border-[#efede7] bg-[#fbfaf8] px-3 py-2.5">
                         <div class="lbl text-[10.5px]">Aportado</div>
-                        <div class="num text-[15px] font-semibold mt-1">C$ 163,482</div>
+                        <div class="num text-[15px] font-semibold mt-1">$ 163,482</div>
                     </div>
                     <div class="rounded-lg border border-[#efede7] bg-[#fbfaf8] px-3 py-2.5">
                         <div class="lbl text-[10.5px]">Dividendos 12m</div>
-                        <div class="num text-[15px] font-semibold mt-1">C$ 6,204</div>
+                        <div class="num text-[15px] font-semibold mt-1">$ 6,204</div>
                     </div>
                     <div class="rounded-lg border border-[#efede7] bg-[#fbfaf8] px-3 py-2.5">
                         <div class="lbl text-[10.5px]">Yield on cost</div>
@@ -178,25 +176,25 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span class="num font-semibold">RY.TO</span><div class="text-[11.5px] text-muted mt-0.5">Royal Bank of Canada</div></td>
+                                <td><span class="num font-semibold">AAPL</span><div class="text-[11.5px] text-muted mt-0.5">Apple Inc.</div></td>
                                 <td class="num text-right">138.59</td>
                                 <td class="num text-right hidden sm:table-cell">27,392.00</td>
                                 <td class="num pos text-right font-semibold">+23.5%</td>
                             </tr>
                             <tr>
-                                <td><span class="num font-semibold">ENB.TO</span><div class="text-[11.5px] text-muted mt-0.5">Enbridge</div></td>
+                                <td><span class="num font-semibold">MSFT</span><div class="text-[11.5px] text-muted mt-0.5">Microsoft</div></td>
                                 <td class="num text-right">49.02</td>
                                 <td class="num text-right hidden sm:table-cell">18,640.00</td>
                                 <td class="num pos text-right font-semibold">+9.1%</td>
                             </tr>
                             <tr>
-                                <td><span class="num font-semibold">CNR.TO</span><div class="text-[11.5px] text-muted mt-0.5">Canadian National Railway</div></td>
+                                <td><span class="num font-semibold">JNJ</span><div class="text-[11.5px] text-muted mt-0.5">Johnson &amp; Johnson</div></td>
                                 <td class="num text-right">156.40</td>
                                 <td class="num text-right hidden sm:table-cell">14,088.00</td>
                                 <td class="num neg text-right font-semibold">-4.6%</td>
                             </tr>
                             <tr>
-                                <td class="border-b-0"><span class="num font-semibold">VFV.TO</span><div class="text-[11.5px] text-muted mt-0.5">Vanguard S&amp;P 500 Index ETF</div></td>
+                                <td class="border-b-0"><span class="num font-semibold">VOO</span><div class="text-[11.5px] text-muted mt-0.5">Vanguard S&amp;P 500 ETF</div></td>
                                 <td class="num text-right border-b-0">112.75</td>
                                 <td class="num text-right border-b-0 hidden sm:table-cell">31,204.00</td>
                                 <td class="num pos text-right font-semibold border-b-0">+18.2%</td>
@@ -242,14 +240,14 @@
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b98a2e" stroke-width="2" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M3 12h18"></path></svg>
             </div>
             <div class="text-[15px] font-semibold mb-1.5">Portafolio consolidado</div>
-            <p class="text-[13.5px] leading-relaxed text-muted2">Todas tus cuentas en una sola cartera, o filtradas de a una. Posiciones, costo, valor de mercado y P&amp;L, siempre en CAD.</p>
+            <p class="text-[13.5px] leading-relaxed text-muted2">Todas tus cuentas en una sola cartera, o filtradas de a una. Posiciones, costo, valor de mercado y P&amp;L, siempre en tu moneda base.</p>
         </div>
 
         <div class="card p-[22px]">
             <div class="w-9 h-9 rounded-[9px] bg-[#e9efe9] flex items-center justify-center mb-3.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M8 6h8"></path><path d="M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h4"></path></svg>
             </div>
-            <div class="text-[15px] font-semibold mb-1.5">Costo base según la CRA</div>
+            <div class="text-[15px] font-semibold mb-1.5">Costo base promedio (ACB)</div>
             <p class="text-[13.5px] leading-relaxed text-muted2">Costo promedio ponderado recalculado en cada compra, para que la ganancia de capital de una venta no sea una estimación.</p>
         </div>
 
@@ -282,7 +280,7 @@
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2" aria-hidden="true"><path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 20v-2a4 4 0 0 0-3-3.9"></path><path d="M16 3.1a4 4 0 0 1 0 7.8"></path></svg>
             </div>
             <div class="text-[15px] font-semibold mb-1.5">Comunidad por ticker</div>
-            <p class="text-[13.5px] leading-relaxed text-muted2">Tesis y preguntas de otros inversores. Una mención <span class="tick">$RY</span> enlaza directo a la ficha de la empresa.</p>
+            <p class="text-[13.5px] leading-relaxed text-muted2">Tesis y preguntas de otros inversores. Una mención <span class="tick">$AAPL</span> enlaza directo a la ficha de la empresa.</p>
         </div>
 
     </div>
@@ -297,22 +295,23 @@
                 Lo que tu broker no te dice cuando vendés
             </h2>
             <p class="mt-4 text-[15px] leading-relaxed text-muted2">
-                La CRA no acepta FIFO: la ganancia de capital se calcula contra el costo
-                promedio de todas tus compras de ese activo. Si comprás la misma acción en
-                tres momentos y en dos cuentas distintas, ese promedio se mueve cada vez.
+                Muchas jurisdicciones no aceptan FIFO: la ganancia de capital se calcula
+                contra el costo promedio de todas tus compras de ese activo. Si comprás la
+                misma acción en tres momentos y en dos cuentas distintas, ese promedio se
+                mueve cada vez.
             </p>
             <p class="mt-3.5 text-[15px] leading-relaxed text-muted2">
                 TrueNorth lo recalcula solo, orden por orden, y guarda el número que vas a
-                necesitar en abril.
+                necesitar para tu declaración de impuestos.
             </p>
             <ul class="flex flex-col gap-2.5 mt-6 list-none p-0">
                 <li class="flex items-start gap-2.5">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2.4" class="shrink-0 mt-0.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
-                    <span class="text-sm">Compras, ventas, splits y órdenes en USD convertidas al FX del día</span>
+                    <span class="text-sm">Compras, ventas, splits y órdenes en otra moneda convertidas al FX del día</span>
                 </li>
                 <li class="flex items-start gap-2.5">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2.4" class="shrink-0 mt-0.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
-                    <span class="text-sm">Un costo promedio por activo, aunque esté repartido en RRSP y TFSA</span>
+                    <span class="text-sm">Un costo promedio por activo, aunque esté repartido en varias cuentas</span>
                 </li>
                 <li class="flex items-start gap-2.5">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2.4" class="shrink-0 mt-0.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
@@ -324,7 +323,7 @@
         <div class="w-full lg:flex-1 lg:min-w-0">
             <div class="card p-[22px] shadow-[0_16px_40px_rgba(28,27,24,.07)]">
                 <div class="flex items-baseline justify-between mb-4">
-                    <span class="text-[14.5px] font-semibold">Historial de RY.TO</span>
+                    <span class="text-[14.5px] font-semibold">Historial de AAPL</span>
                     <span class="num text-xs text-muted">160 unidades</span>
                 </div>
                 <div class="overflow-x-auto">
@@ -364,7 +363,7 @@
                         <div class="lbl text-pos">Ganancia de capital realizada</div>
                         <div class="num text-xs text-muted2 mt-1">40 × (171.20 − 138.59)</div>
                     </div>
-                    <span class="num text-[21px] font-semibold text-pos">C$ 1,304.50</span>
+                    <span class="num text-[21px] font-semibold text-pos">$ 1,304.50</span>
                 </div>
             </div>
         </div>
@@ -388,10 +387,10 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span class="tick">$BAM</span>
+                                <span class="tick">$AAPL</span>
                                 <span class="text-[11px] text-faint">SEC EDGAR · hace 2 h</span>
                             </div>
-                            <div class="text-[13.5px] mt-1.5 leading-snug">Form 6-K — Resultados del tercer trimestre</div>
+                            <div class="text-[13.5px] mt-1.5 leading-snug">Form 10-Q — Resultados del tercer trimestre</div>
                         </div>
                     </div>
                     <div class="flex gap-3 px-3.5 py-3 border border-[#efede7] rounded-[9px] bg-[#fbfaf8]">
@@ -400,10 +399,10 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span class="tick">$ENB</span>
+                                <span class="tick">$JNJ</span>
                                 <span class="text-[11px] text-faint">Dividendo · ex-date 15 nov</span>
                             </div>
-                            <div class="text-[13.5px] mt-1.5 leading-snug">C$ 0.9425 por acción — te tocan <span class="num font-semibold">C$ 358.15</span></div>
+                            <div class="text-[13.5px] mt-1.5 leading-snug">$ 1.19 por acción — te tocan <span class="num font-semibold">$ 358.15</span></div>
                         </div>
                     </div>
                     <div class="flex gap-3 px-3.5 py-3 border border-[#efede7] rounded-[9px] bg-[#fbfaf8]">
@@ -412,10 +411,10 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span class="tick">$CNR</span>
+                                <span class="tick">$MSFT</span>
                                 <span class="text-[11px] text-faint">Noticia · hace 6 h</span>
                             </div>
-                            <div class="text-[13.5px] mt-1.5 leading-snug">CN recorta su guidance de volumen para el cuarto trimestre</div>
+                            <div class="text-[13.5px] mt-1.5 leading-snug">Microsoft recorta su guidance de nube para el cuarto trimestre</div>
                         </div>
                     </div>
                 </div>

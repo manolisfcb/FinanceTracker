@@ -19,6 +19,7 @@ would let this command go away; until then this is what makes a fresh
 container able to start.
 """
 
+import importlib
 import signal
 import threading
 
@@ -30,10 +31,25 @@ from sqlalchemy import inspect
 
 from src.extensions import db
 
+# Cloud Run Jobs entrypoint (see `run_job_once` below): module + private impl
+# name for each `@scheduler.task` in src/resources/jobs, so a one-shot
+# invocation runs the exact same job body the APScheduler-based worker does,
+# without needing APScheduler or a long-lived process at all.
+_JOBS = {
+    "daily_market_refresh": ("src.resources.jobs.daily_market_refresh", "_daily_market_refresh"),
+    "daily_asset_data_refresh": (
+        "src.resources.jobs.daily_asset_data_refresh", "_daily_asset_data_refresh",
+    ),
+    "daily_portfolio_snapshots": (
+        "src.resources.jobs.daily_portfolio_snapshots", "_daily_portfolio_snapshots",
+    ),
+}
+
 
 def register_cli(app):
     app.cli.add_command(bootstrap_db)
     app.cli.add_command(run_scheduler)
+    app.cli.add_command(run_job_once)
 
 
 @click.command("bootstrap-db")
@@ -106,3 +122,20 @@ def run_scheduler():
     stop.wait()
     scheduler.shutdown(wait=True)
     click.echo("Scheduler detenido limpiamente.")
+
+
+@click.command("run-job")
+@click.argument("job_name", type=click.Choice(sorted(_JOBS)))
+@with_appcontext
+def run_job_once(job_name):
+    """Run a single job body once and exit — the Cloud Run Jobs entrypoint.
+
+    Replaces the always-on APScheduler worker for Cloud Run: Cloud Scheduler
+    calls this once per cron line instead of a process holding those crons
+    in memory, so there is no container that has to stay alive between runs.
+    """
+    from src.resources.jobs._common import run_job
+
+    module_path, fn_name = _JOBS[job_name]
+    fn = getattr(importlib.import_module(module_path), fn_name)
+    run_job(job_name, fn)

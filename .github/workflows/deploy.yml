@@ -1,0 +1,70 @@
+name: Deploy
+
+# Solo en push a main, y solo después de que CI (lint + tests) haya pasado
+# para ese mismo commit — un merge con tests rotos no debe llegar a Cloud
+# Run. `workflow_run` es lo que engancha esto al resultado real de CI en vez
+# de re-correr los tests acá.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+env:
+  PROJECT_ID: truenorth-506204
+  REGION: us-east1
+  REPOSITORY: truenorth
+  IMAGE: us-east1-docker.pkg.dev/truenorth-506204/truenorth/web
+  RUN_SA: truenorth-run@truenorth-506204.iam.gserviceaccount.com
+
+permissions:
+  contents: read
+  id-token: write  # Workload Identity Federation — sin esto no hay token OIDC que intercambiar.
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/714088302069/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: truenorth-deployer@truenorth-506204.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configurar Docker para Artifact Registry
+        run: gcloud auth configure-docker us-east1-docker.pkg.dev --quiet
+
+      - name: Build y push de la imagen
+        run: |
+          IMAGE_TAG="${IMAGE}:${{ github.event.workflow_run.head_sha }}"
+          gcloud builds submit --tag "$IMAGE_TAG" --project="$PROJECT_ID" --timeout=1200
+          gcloud artifacts docker tags add "$IMAGE_TAG" "${IMAGE}:latest" --project="$PROJECT_ID"
+
+      # Un solo uso, y bloqueante: si las migraciones fallan, el deploy del
+      # servicio web se corta acá — nunca sirve tráfico contra un esquema a
+      # medio migrar. Mismo motivo por el que `migrate` es un job separado
+      # del propio arranque de gunicorn (ver docker/entrypoint.sh).
+      - name: Migraciones
+        run: |
+          IMAGE_TAG="${IMAGE}:${{ github.event.workflow_run.head_sha }}"
+          gcloud run jobs update truenorth-migrate --image="$IMAGE_TAG" --region="$REGION" --project="$PROJECT_ID"
+          gcloud run jobs execute truenorth-migrate --region="$REGION" --project="$PROJECT_ID" --wait
+
+      - name: Deploy del servicio web
+        run: |
+          IMAGE_TAG="${IMAGE}:${{ github.event.workflow_run.head_sha }}"
+          gcloud run deploy truenorth-web --image="$IMAGE_TAG" --region="$REGION" --project="$PROJECT_ID" --quiet
+
+      - name: Actualizar imagen de los Cloud Run Jobs
+        run: |
+          IMAGE_TAG="${IMAGE}:${{ github.event.workflow_run.head_sha }}"
+          for JOB in truenorth-daily-market-refresh truenorth-daily-asset-data-refresh truenorth-daily-portfolio-snapshots; do
+            gcloud run jobs update "$JOB" --image="$IMAGE_TAG" --region="$REGION" --project="$PROJECT_ID"
+          done
