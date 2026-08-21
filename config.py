@@ -32,8 +32,8 @@ class Config(object):
     # yahoo (yfinance, free/MVP) today; swappable to eodhd|fmp later without
     # touching the domain — see src/services/market_data.
     MARKET_DATA_PROVIDER = os.getenv("MARKET_DATA_PROVIDER", "yahoo")
-    # A new holding should have a value on its first portfolio view rather
-    # than wait for the next 15-minute quote job.
+    # A new holding should have a value immediately rather than wait for the
+    # next daily market refresh. This path uses the same per-asset cooldown.
     REFRESH_QUOTE_ON_ORDER_CREATE = True
     # The static universe is a fast search cache. Exact North American stock
     # and ETF tickers missing from it may be validated and added on demand.

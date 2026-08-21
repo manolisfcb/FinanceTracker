@@ -21,6 +21,17 @@
         </div>
     </div>
     <div class="flex flex-wrap gap-2.5">
+        <div class="flex flex-col items-end gap-1">
+            <form method="POST" action="{{ url_for('portfolio.refresh_prices') }}">
+                <button type="submit" class="btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6v6h-6"></path><path d="M4 18v-6h6"></path><path d="M18.5 9A7 7 0 0 0 6.2 6.2L4 9"></path><path d="M5.5 15A7 7 0 0 0 17.8 17.8L20 15"></path></svg>
+                    Actualizar precios
+                </button>
+            </form>
+            <span class="text-[11px] text-faint">
+                Precios actualizados: {{ prices_updated_at|datetime_short_es if prices_updated_at else 'todavía no disponibles' }}
+            </span>
+        </div>
         <a href="{{ url_for('portfolio.import_orders') }}" class="btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9"></path><path d="M7 14l5 5 5-5"></path><path d="M4 3h16"></path></svg>
             Importar broker

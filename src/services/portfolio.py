@@ -20,6 +20,7 @@ from datetime import date
 from src.models import (
     Account,
     Asset,
+    AssetPrice,
     DividendHistory,
     DividendReceived,
     Fundamentals,
@@ -181,12 +182,25 @@ class PortfolioService:
     def _latest_prices(asset_ids) -> dict:
         if not asset_ids:
             return {}
-        rows = (
-            Fundamentals.query.filter(Fundamentals.asset_id.in_(asset_ids))
-            .order_by(Fundamentals.asset_id.asc(), Fundamentals.as_of_date.desc())
+        price_rows = (
+            AssetPrice.query.filter(AssetPrice.asset_id.in_(asset_ids))
+            .order_by(AssetPrice.asset_id.asc(), AssetPrice.price_date.desc())
             .all()
         )
         prices: dict[int, float | None] = {}
+        for row in price_rows:
+            prices.setdefault(row.asset_id, row.close)
+
+        # Compatibility for databases/tests that have not migrated their old
+        # Fundamentals.price rows yet. New writes always use AssetPrice.
+        missing_ids = set(asset_ids) - prices.keys()
+        if not missing_ids:
+            return prices
+        rows = (
+            Fundamentals.query.filter(Fundamentals.asset_id.in_(missing_ids))
+            .order_by(Fundamentals.asset_id.asc(), Fundamentals.as_of_date.desc())
+            .all()
+        )
         for row in rows:
             prices.setdefault(row.asset_id, row.price)
         return prices
@@ -383,7 +397,35 @@ def _write_snapshot(user_id: int, day: date, account_id: int | None, totals: dic
     row.patrimony_cad = totals["patrimony_cad"]
     row.total_invested_cad = totals["total_invested_cad"]
     row.dividends_accum_cad = totals["dividends_accum_cad"]
+    row.unrealized_pnl_cad = totals["unrealized_pnl_cad"]
+    row.realized_pnl_cad = totals["realized_pnl_cad"]
+    row.total_return_percent = totals["total_return_percent"]
+    row.allocation = totals["allocation"]
     return row
+
+
+def _snapshot_totals(service: PortfolioService, account_id: int | None) -> dict:
+    totals = service.get_totals(account_id=account_id)
+    invested = totals["total_invested_cad"]
+    total_gain = (
+        totals["unrealized_pnl_cad"]
+        + totals["realized_pnl_cad"]
+        + totals["dividends_accum_cad"]
+    )
+    totals["total_return_percent"] = (total_gain / invested * 100) if invested else None
+
+    values = {}
+    for lot in service.get_positions():
+        quantity = lot.quantity if account_id is None else lot.quantity_by_account.get(account_id, 0)
+        if quantity <= 0 or lot.current_price_cad is None:
+            continue
+        values[str(lot.asset_id)] = values.get(str(lot.asset_id), 0.0) + quantity * lot.current_price_cad
+    allocation_total = sum(values.values())
+    totals["allocation"] = {
+        asset_id: value / allocation_total * 100
+        for asset_id, value in values.items()
+    } if allocation_total else {}
+    return totals
 
 
 def write_snapshots(user_id: int, day: date | None = None) -> PortfolioService:
@@ -397,7 +439,7 @@ def write_snapshots(user_id: int, day: date | None = None) -> PortfolioService:
     day = day or date.today()
     service = PortfolioService(user_id)
     service.sync_suggested_dividends()
-    _write_snapshot(user_id, day, None, service.get_totals())
+    _write_snapshot(user_id, day, None, _snapshot_totals(service, None))
     for account in Account.query.filter_by(user_id=user_id).all():
-        _write_snapshot(user_id, day, account.id, service.get_totals(account_id=account.id))
+        _write_snapshot(user_id, day, account.id, _snapshot_totals(service, account.id))
     return service

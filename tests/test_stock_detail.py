@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from unittest.mock import patch
 
-from src.models import Asset, CompanyEvent, CompanyEventKind, DividendHistory, Fundamentals
+from src.models import Asset, AssetPrice, CompanyEvent, CompanyEventKind, DividendHistory, Fundamentals
 
 
 def _seed_asset(db, **overrides):
@@ -55,11 +55,13 @@ def test_stock_detail_uses_company_icon_with_initial_fallback(mock_get_provider,
 
 
 @patch('src.routes.stockViews.get_provider')
-def test_stock_detail_shows_day_change_from_live_quote(mock_get_provider, auth_client, db):
-    mock_get_provider.return_value.get_quote.return_value = {
-        'price': 150.0, 'previous_close': 145.0, 'currency': 'CAD',
-    }
-    _seed_asset(db)
+def test_stock_detail_shows_day_change_from_stored_daily_price(mock_get_provider, auth_client, db):
+    asset = _seed_asset(db)
+    db.session.add(AssetPrice(
+        asset_id=asset.id, price_date=date(2026, 8, 21), close=150.0,
+        previous_close=145.0, updated_at=datetime(2026, 8, 21, 18, 3),
+    ))
+    db.session.commit()
 
     body = auth_client.get('/stocks/TSX/RY').get_data(as_text=True)
 

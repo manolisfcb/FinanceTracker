@@ -15,6 +15,31 @@ class AssetCategory:
     VALUES = (EQUITY, REIT, FIXED_INCOME, CRYPTO, CASH)
 
 
+class AssetType:
+    """What the instrument is, independently from its portfolio category."""
+
+    STOCK = 'STOCK'
+    ETF = 'ETF'
+    CRYPTO = 'CRYPTO'
+    INDEX = 'INDEX'
+    FX = 'FX'
+    MUTUAL_FUND = 'MUTUAL_FUND'
+    CASH = 'CASH'
+
+    VALUES = (STOCK, ETF, CRYPTO, INDEX, FX, MUTUAL_FUND, CASH)
+
+
+class ListingStatus:
+    """Provider/listing state. UNKNOWN is deliberately not DELISTED."""
+
+    ACTIVE = 'ACTIVE'
+    DELISTED = 'DELISTED'
+    SUSPENDED = 'SUSPENDED'
+    UNKNOWN = 'UNKNOWN'
+
+    VALUES = (ACTIVE, DELISTED, SUSPENDED, UNKNOWN)
+
+
 ASSET_CATEGORY_LABELS = {
     AssetCategory.EQUITY: 'Acciones',
     AssetCategory.REIT: 'REITs',
@@ -60,6 +85,24 @@ def infer_asset_category(*, symbol='', exchange='', name='', sector='', industry
     return AssetCategory.EQUITY
 
 
+def infer_asset_type(*, exchange='', sector='', industry=''):
+    """Best-effort classification for legacy and newly discovered assets."""
+    exchange = (exchange or '').lower()
+    sector = (sector or '').lower()
+    industry = (industry or '').lower()
+    if exchange == 'crypto' or sector == 'cryptoassets' or industry == 'cryptocurrency':
+        return AssetType.CRYPTO
+    if sector == 'etfs' or 'exchange-traded fund' in industry:
+        return AssetType.ETF
+    if exchange == 'index':
+        return AssetType.INDEX
+    if exchange == 'fx':
+        return AssetType.FX
+    if exchange == 'cash' or sector == 'cash' or industry == 'cash':
+        return AssetType.CASH
+    return AssetType.STOCK
+
+
 class Asset(db.Model):
     __tablename__ = 'assets'
     __table_args__ = (
@@ -67,6 +110,14 @@ class Asset(db.Model):
         db.CheckConstraint(
             "category IN ('EQUITY', 'REIT', 'FIXED_INCOME', 'CRYPTO', 'CASH')",
             name='ck_assets_category',
+        ),
+        db.CheckConstraint(
+            "asset_type IN ('STOCK', 'ETF', 'CRYPTO', 'INDEX', 'FX', 'MUTUAL_FUND', 'CASH')",
+            name='ck_assets_asset_type',
+        ),
+        db.CheckConstraint(
+            "listing_status IN ('ACTIVE', 'DELISTED', 'SUSPENDED', 'UNKNOWN')",
+            name='ck_assets_listing_status',
         ),
     )
 
@@ -88,6 +139,17 @@ class Asset(db.Model):
     # company-events job for held US assets only, not for the whole universe.
     cik = db.Column(db.String(10), nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
+    asset_type = db.Column(db.String(20), nullable=False, default=AssetType.STOCK)
+    listing_status = db.Column(db.String(20), nullable=False, default=ListingStatus.ACTIVE)
+    fundamentals_enabled = db.Column(db.Boolean, nullable=False, default=True)
+    market_data_failures = db.Column(db.Integer, nullable=False, default=0)
+    last_market_data_success_at = db.Column(db.DateTime, nullable=True)
+    last_market_data_failure_at = db.Column(db.DateTime, nullable=True)
+    last_viewed_at = db.Column(db.DateTime, nullable=True, index=True)
+    last_fundamentals_refresh_at = db.Column(db.DateTime, nullable=True)
+    last_dividend_refresh_at = db.Column(db.DateTime, nullable=True)
+    last_filings_refresh_at = db.Column(db.DateTime, nullable=True)
+    last_news_refresh_at = db.Column(db.DateTime, nullable=True)
 
     def __init__(self, **kwargs):
         if not kwargs.get('category'):
@@ -98,6 +160,20 @@ class Asset(db.Model):
                 sector=kwargs.get('sector'),
                 industry=kwargs.get('industry'),
             )
+        if not kwargs.get('asset_type'):
+            kwargs['asset_type'] = infer_asset_type(
+                exchange=kwargs.get('exchange'),
+                sector=kwargs.get('sector'),
+                industry=kwargs.get('industry'),
+            )
+        if not kwargs.get('listing_status'):
+            kwargs['listing_status'] = (
+                ListingStatus.UNKNOWN if kwargs.get('is_active') is False else ListingStatus.ACTIVE
+            )
+        if 'fundamentals_enabled' not in kwargs:
+            kwargs['fundamentals_enabled'] = kwargs['asset_type'] in {
+                AssetType.STOCK, AssetType.ETF,
+            }
         super().__init__(**kwargs)
 
     def __repr__(self):
@@ -121,4 +197,10 @@ class Asset(db.Model):
             "description": self.description,
             "cik": self.cik,
             "is_active": self.is_active,
+            "asset_type": self.asset_type,
+            "listing_status": self.listing_status,
+            "fundamentals_enabled": self.fundamentals_enabled,
+            "market_data_failures": self.market_data_failures,
+            "last_market_data_success_at": self.last_market_data_success_at,
+            "last_viewed_at": self.last_viewed_at,
         }

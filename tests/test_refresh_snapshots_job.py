@@ -1,7 +1,7 @@
 from datetime import date, datetime
 
 from src.models import Account, AccountType, Asset, Fundamentals, OrderModel, OrderType, PortfolioSnapshotModel
-from src.resources.jobs.refresh_snapshots import _snapshot_all_users
+from src.resources.jobs.daily_portfolio_snapshots import _snapshot_all_users
 
 
 def test_snapshot_writes_total_and_per_account_rows(app, db, user):
@@ -34,6 +34,10 @@ def test_snapshot_writes_total_and_per_account_rows(app, db, user):
     account_row = next(s for s in snapshots if s.account_id == account.id)
     assert total_row.patrimony_cad == 1100.0
     assert account_row.patrimony_cad == 1100.0
+    assert total_row.unrealized_pnl_cad == 100.0
+    assert total_row.realized_pnl_cad == 0.0
+    assert total_row.total_return_percent == 10.0
+    assert total_row.allocation == {str(asset.id): 100.0}
 
 
 def test_snapshot_rerun_same_day_updates_instead_of_duplicating(app, db, user):

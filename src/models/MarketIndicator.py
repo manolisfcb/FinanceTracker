@@ -4,7 +4,7 @@ from src.extensions import db
 class MarketIndicator(db.Model):
     """Latest value of one figure on the site-wide market strip.
 
-    One row per indicator, overwritten in place by the 15-minute job: the
+    One row per indicator, overwritten in place by the daily market job: the
     strip only ever shows "now", and a history of index levels is not
     something any screen reads.
     """

@@ -11,8 +11,7 @@ from src.models import (
     OrderModel,
     OrderType,
 )
-from src.resources.jobs.refresh_filings import _refresh_filings
-from src.resources.jobs.refresh_dividends import _refresh_held_dividends
+from src.resources.jobs.daily_asset_data_refresh import _refresh_filings, _refresh_held_dividends
 
 
 def _held_asset(db, user, symbol='RY', exchange='TSX'):
@@ -44,7 +43,7 @@ def _provider(dividends=None, calendar=None):
     return provider
 
 
-@patch('src.resources.jobs.refresh_dividends.get_provider')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_provider')
 def test_refresh_dividends_only_touches_held_assets(mock_get_provider, app, db, user):
     held = _held_asset(db, user, symbol='RY')
     db.session.add(Asset(
@@ -67,7 +66,7 @@ def test_refresh_dividends_only_touches_held_assets(mock_get_provider, app, db, 
     assert rows[0].amount == 1.42
 
 
-@patch('src.resources.jobs.refresh_dividends.get_provider')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_provider')
 def test_refresh_dividends_rerun_updates_instead_of_duplicating(mock_get_provider, app, db, user):
     _held_asset(db, user)
     mock_get_provider.return_value = _provider(dividends=[
@@ -90,7 +89,7 @@ def test_refresh_dividends_rerun_updates_instead_of_duplicating(mock_get_provide
     assert row.pay_date == date(2026, 6, 15)
 
 
-@patch('src.resources.jobs.refresh_dividends.get_provider')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_provider')
 def test_upcoming_dividend_event_is_a_single_row_per_asset(mock_get_provider, app, db, user):
     asset = _held_asset(db, user)
     future = date.today() + timedelta(days=8)
@@ -115,7 +114,7 @@ def test_upcoming_dividend_event_is_a_single_row_per_asset(mock_get_provider, ap
     assert event.event_date == later
 
 
-@patch('src.resources.jobs.refresh_dividends.get_provider')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_provider')
 def test_past_ex_date_creates_no_upcoming_event(mock_get_provider, app, db, user):
     _held_asset(db, user)
     mock_get_provider.return_value = _provider(calendar={
@@ -174,7 +173,7 @@ def test_filings_are_not_duplicated_on_rerun(mock_edgar, app, db, user):
     assert CompanyEvent.query.filter_by(kind=CompanyEventKind.FILING).count() == 1
 
 
-@patch('src.resources.jobs.refresh_dividends.get_provider')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_provider')
 def test_next_earnings_row_updates_in_place(mock_get_provider, app, db, user):
     asset = _held_asset(db, user)
     first = date.today() + timedelta(days=20)

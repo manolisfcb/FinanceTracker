@@ -257,6 +257,36 @@ class YahooProvider(MarketDataProvider):
             }
         return self._with_retries(_fetch)
 
+    def get_daily_price(self, yahoo_symbol: str) -> dict | None:
+        """Latest Yahoo daily candle from one chart request."""
+        def _fetch():
+            ticker = self._ticker(yahoo_symbol)
+            history = ticker.history(period="5d", interval="1d", auto_adjust=False)
+            if history is None or history.empty:
+                return None
+            usable = history.dropna(subset=["Close"])
+            if usable.empty:
+                return None
+            timestamp = usable.index[-1]
+            row = usable.iloc[-1]
+            previous_close = _float(usable.iloc[-2]["Close"]) if len(usable) > 1 else None
+            try:
+                currency = ticker.fast_info.get("currency")
+            except Exception:
+                currency = None
+            return {
+                "date": timestamp.date() if hasattr(timestamp, "date") else timestamp,
+                "open": _float(row.get("Open")),
+                "close": _float(row.get("Close")),
+                "previous_close": previous_close,
+                "high": _float(row.get("High")),
+                "low": _float(row.get("Low")),
+                "volume": _float(row.get("Volume")),
+                "currency": currency,
+            }
+
+        return self._with_retries(_fetch)
+
     def get_fundamentals(self, yahoo_symbol: str) -> dict | None:
         info = self._with_retries(lambda: self._ticker(yahoo_symbol).get_info())
         return self._map_fundamentals(info) if info else None
@@ -335,8 +365,8 @@ class YahooProvider(MarketDataProvider):
         """Annual figures pulled from the balance sheet and income statement.
 
         Two extra Yahoo endpoints on top of `info`, which is why this isn't
-        folded into get_fundamentals(): the nightly job sweeps ~1100 assets
-        and these figures only change when a company reports.
+        folded into get_fundamentals(): these figures only change when a
+        company reports and should be fetched sparingly.
         """
         def _fetch():
             ticker = self._ticker(yahoo_symbol)

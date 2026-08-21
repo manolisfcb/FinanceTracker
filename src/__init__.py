@@ -158,7 +158,7 @@ def create_app(config_name=None):
     def inject_market_strip():
         """The strip sits above the nav on every page, so it has to be a
         context processor rather than a per-view context. It reads only the
-        cached MarketIndicator rows the 15-minute job writes.
+        cached MarketIndicator rows the daily market job writes.
 
         Anonymous visitors get it too: the landing page and the auth screens
         lead with it, and index levels are public information — one cached
@@ -213,6 +213,12 @@ def create_app(config_name=None):
             f"{WEEKDAYS_ES[value.weekday()]}, {value.day} de "
             f"{MONTHS_ES[value.month - 1]} {value.year}"
         )
+
+    @app.template_filter("datetime_short_es")
+    def format_datetime_short_es_filter(value):
+        if value is None:
+            return "—"
+        return f"{value.day} {MONTHS_ES[value.month - 1][:3]} {value.year}, {value:%H:%M}"
 
     @app.template_filter("month_abbr_es")
     def format_month_abbr_es_filter(value):
@@ -302,21 +308,16 @@ def create_app(config_name=None):
                 return f"{value / threshold:,.2f}{suffix}"
         return f"{value:,.2f}"
 
-    # The scheduler hits market data providers on an interval — keep it out
+    # The scheduler hits market data providers — keep it out
     # of tests so test runs stay hermetic and fast, and so repeated
     # create_app("testing") calls don't fail trying to start an
     # already-running APScheduler. RUN_SCHEDULER is what keeps it to a single
     # process once gunicorn is forking workers off the same factory.
     if app.config.get("RUN_SCHEDULER") and not app.testing and not _is_reloader_parent(app):
         scheduler.init_app(app)
-        from src.resources.jobs import refresh_fundamentals  # noqa: F401
-        from src.resources.jobs import refresh_quotes  # noqa: F401
-        from src.resources.jobs import refresh_fx  # noqa: F401
-        from src.resources.jobs import refresh_snapshots  # noqa: F401
-        from src.resources.jobs import refresh_dividends  # noqa: F401
-        from src.resources.jobs import refresh_filings  # noqa: F401
-        from src.resources.jobs import refresh_news  # noqa: F401
-        from src.resources.jobs import refresh_market_strip  # noqa: F401
+        from src.resources.jobs import daily_market_refresh  # noqa: F401
+        from src.resources.jobs import daily_asset_data_refresh  # noqa: F401
+        from src.resources.jobs import daily_portfolio_snapshots  # noqa: F401
 
         if not scheduler.running:
             scheduler.start()

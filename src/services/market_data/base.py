@@ -18,6 +18,10 @@ class MarketDataProvider(ABC):
         """Latest price snapshot: {price, previous_close, currency}."""
 
     @abstractmethod
+    def get_daily_price(self, yahoo_symbol: str) -> dict | None:
+        """Latest daily OHLCV row plus previous_close, date and currency."""
+
+    @abstractmethod
     def get_fundamentals(self, yahoo_symbol: str) -> dict | None:
         """Valuation/profitability/leverage/dividend metrics, keyed like the
         Fundamentals model's columns (pe, pb, roe, debt_to_equity, ...)."""

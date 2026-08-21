@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from src.extensions import db
@@ -12,6 +12,8 @@ from src.models import (
 )
 from src.services.portfolio import PortfolioService, fx_rate_to_cad_today
 from src.services.portfolio_analytics import PortfolioAnalyticsService
+from src.services.market_data import get_provider
+from src.services.market_prices import latest_price_updated_at, refresh_asset_price
 
 portfolio_bp = Blueprint('portfolio', __name__)
 
@@ -119,6 +121,8 @@ def portfolio():
     dividend_chart = analytics.dividends_by_asset(assets_by_id)
     performance_chart = analytics.performance()
 
+    portfolio_asset_ids = [row['asset_id'] for row in positions]
+
     asset_labels = [row["symbol"] for row in portfolio_rows]
     asset_values = [row["market_value"] or 0.0 for row in portfolio_rows]
 
@@ -142,9 +146,49 @@ def portfolio():
         "dividend_chart": dividend_chart,
         "performance_chart": performance_chart,
         "warnings": service.warnings,
+        "prices_updated_at": latest_price_updated_at(portfolio_asset_ids),
     }
 
     return render_template('portfolio.html', **context)
+
+
+@portfolio_bp.route('/portfolio/refresh-prices', methods=['POST'])
+@login_required
+def refresh_prices():
+    """Refresh only stale global prices used by the current user's holdings."""
+    service = PortfolioService(current_user.id)
+    asset_ids = [row['asset_id'] for row in service.get_positions_by_asset()]
+    assets = Asset.query.filter(Asset.id.in_(asset_ids)).order_by(Asset.id.asc()).all() if asset_ids else []
+    provider = get_provider()
+    refreshed = reused = failed = 0
+
+    for asset in assets:
+        try:
+            result = refresh_asset_price(asset, provider)
+            db.session.commit()
+        except Exception as exc:
+            db.session.rollback()
+            failed += 1
+            current_app.logger.warning(
+                'Manual price refresh failed for asset %s (%s): %s',
+                asset.id, asset.symbol, exc,
+            )
+            continue
+        if result.status == 'refreshed':
+            refreshed += 1
+        elif result.status == 'fresh':
+            reused += 1
+        else:
+            failed += 1
+
+    if failed:
+        flash(
+            f'Precios actualizados: {refreshed}; reutilizados: {reused}; sin datos: {failed}.',
+            'info',
+        )
+    else:
+        flash(f'Precios actualizados: {refreshed}; reutilizados por cooldown: {reused}.', 'success')
+    return redirect(url_for('portfolio.portfolio'))
 
 
 @portfolio_bp.route('/portfolio/plan', methods=['POST'])

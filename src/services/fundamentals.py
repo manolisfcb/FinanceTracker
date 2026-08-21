@@ -1,8 +1,7 @@
 """Statement-derived indicators for the company page.
 
-`refresh_fundamentals` fills each day's Fundamentals snapshot from Yahoo's
-`info` payload — one request per asset, cheap enough to sweep the whole
-universe nightly. The balance-sheet and income-statement figures behind
+`daily_asset_data_refresh` fills Fundamentals snapshots from Yahoo's `info`
+payload only when the selected asset is stale. The statement figures behind
 P/EBIT, ROIC, deuda neta/EBITDA and giro del activo sit behind two slower
 endpoints and only move when a company reports, so they're filled here
 instead: carried forward from the last snapshot that has them, and fetched
@@ -106,7 +105,7 @@ def carry_forward_statements(asset, snapshot) -> bool:
     them. Returns whether anything was copied — a caller that needs the
     figures can fall back to fetching when this comes back False.
 
-    Doesn't commit, so the nightly job stays one all-or-nothing transaction.
+    Doesn't commit; the caller owns the isolated per-asset transaction.
     """
     if snapshot.total_assets is not None:
         return True
@@ -136,8 +135,7 @@ def _fetch_statement_metrics(asset):
 
 def _needs_info_refresh(snapshot) -> bool:
     """Whether the snapshot is missing the `info` figures the new indicators
-    need. True for rows written before this feature existed, and for rows
-    created by the intraday quote job, which only writes price."""
+    need. True for rows written before this feature existed."""
     return snapshot.book_value_per_share is None and snapshot.enterprise_value is None
 
 
@@ -147,8 +145,7 @@ def ensure_statement_metrics(asset, snapshot=None, allow_fetch: bool = True):
     Returns the snapshot that was filled, creating today's if `snapshot` is
     None. Never raises: a company with no statement data still renders, it
     just shows em dashes. Pass `allow_fetch=False` to carry forward without
-    ever hitting the network — what the nightly job wants, since it sweeps
-    the whole universe.
+    ever hitting the network.
     """
     target = snapshot if snapshot is not None else get_or_create_snapshot(asset.id)
 
@@ -172,7 +169,7 @@ def ensure_statement_metrics(asset, snapshot=None, allow_fetch: bool = True):
 
 def _refresh_info_figures(asset, snapshot) -> None:
     """Top up the `info`-sourced figures (market cap, EV, deuda, VPA) on a
-    snapshot the nightly job hasn't written yet — several derived ratios have
+    snapshot the daily asset-data job hasn't written yet — several derived ratios have
     a market-side input that lives there, not in the statements."""
     provider = get_provider(max_retries=1, min_interval_seconds=0)
     try:

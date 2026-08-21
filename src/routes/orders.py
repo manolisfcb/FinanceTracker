@@ -10,7 +10,6 @@ from src.extensions import db
 from src.forms.ManualOrderForm import ManualOrderForm
 from src.forms.OrdersImportForm import OrdersImportForm
 from src.models import Account, Asset, OrderModel, OrderType
-from src.resources.jobs.refresh_quotes import refresh_asset_quote
 from src.resources.orders_import.registry import (
     get_importer,
     resolve_asset_id,
@@ -18,6 +17,7 @@ from src.resources.orders_import.registry import (
 )
 from src.routes.portfolio import portfolio_bp
 from src.services.fx import fx_rate_to_cad_on
+from src.services.market_prices import refresh_asset_price
 
 
 def _account_choices():
@@ -113,12 +113,13 @@ def _populate_manual_order_form(form, order):
 
 
 def _refresh_order_asset_quote(asset_id):
-    """Best-effort quote refresh shared by order creation and editing."""
+    """Best-effort daily-price refresh shared by order creation and editing."""
     if not current_app.config.get('REFRESH_QUOTE_ON_ORDER_CREATE', True):
         return
     asset = db.session.get(Asset, asset_id)
     try:
-        if asset is not None and refresh_asset_quote(asset):
+        if asset is not None:
+            refresh_asset_price(asset)
             db.session.commit()
     except Exception as exc:
         db.session.rollback()

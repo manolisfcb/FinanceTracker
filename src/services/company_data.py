@@ -2,7 +2,7 @@
 
 Two callers write through here, so both produce identical rows:
 
-* the nightly jobs, which sweep every held asset;
+* the freshness-driven daily asset-data job;
 * the company page, which backfills an asset the first time someone opens
   it — otherwise the ~1100 universe assets nobody owns would stay blank.
 """
@@ -13,11 +13,9 @@ from datetime import date, datetime, timedelta
 
 from src.extensions import db
 from src.models import (
-    Asset,
     CompanyEvent,
     CompanyEventKind,
     DividendHistory,
-    OrderModel,
 )
 from src.services import edgar
 from src.services.market_data import get_provider
@@ -44,16 +42,6 @@ _NAME_STOPWORDS = {
 }
 
 _backfill_attempts: dict[int, float] = {}
-
-
-def held_assets():
-    """Assets any user has ever ordered — what the nightly jobs sweep."""
-    asset_ids = {
-        row[0] for row in OrderModel.query.with_entities(OrderModel.asset_id).distinct().all()
-    }
-    if not asset_ids:
-        return []
-    return Asset.query.filter(Asset.id.in_(asset_ids)).all()
 
 
 # -- dividends --------------------------------------------------------------
@@ -283,11 +271,15 @@ def backfill_asset(asset) -> bool:
     _backfill_attempts[asset.id] = time.monotonic()
 
     try:
+        now = datetime.utcnow()
         provider = get_provider(max_retries=1, min_interval_seconds=0)
         ingest_dividends(asset, provider)
         ingest_calendar(asset, provider)
+        asset.last_dividend_refresh_at = now
         ingest_filings(asset)
+        asset.last_filings_refresh_at = now
         ingest_news(asset, get_news_providers())
+        asset.last_news_refresh_at = now
         db.session.commit()
     except Exception as exc:
         db.session.rollback()

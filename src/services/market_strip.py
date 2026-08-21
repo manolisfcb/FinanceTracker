@@ -1,6 +1,6 @@
 """The site-wide market strip: index levels, USD/CAD, BoC rate, TSX status.
 
-Values are refreshed by a 15-minute job and read from `MarketIndicator`, so
+Values are refreshed by the daily market job and read from `MarketIndicator`, so
 rendering the strip on every page costs one small query and never a provider
 call.
 """

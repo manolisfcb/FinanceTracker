@@ -1,5 +1,6 @@
 import csv
 import io
+from datetime import datetime
 from urllib.parse import quote_plus, urlencode
 
 from flask import Blueprint, Response, abort, jsonify, make_response, render_template, request
@@ -13,6 +14,7 @@ from src.services.company_data import backfill_asset, needs_backfill
 from src.services.fundamentals import ensure_statement_metrics
 from src.services.insights import build_company_insight
 from src.services.market_data import get_provider
+from src.services.market_prices import latest_asset_price
 
 stocks_bp = Blueprint('stocks', __name__)
 
@@ -704,9 +706,11 @@ def get_stock_detail(exchange, symbol):
     if asset is None:
         abort(404)
 
-    # The nightly jobs only sweep assets someone holds, so the rest of the
-    # universe would show empty dividends/filings/news forever. Fill this one
-    # in on first view instead of fetching all ~1100 every night.
+    asset.last_viewed_at = datetime.utcnow()
+    db.session.commit()
+
+    # The daily job selects held/recent assets, so the rest of the universe
+    # would show empty company data. Fill this one lazily on first view.
     if needs_backfill(asset):
         backfill_asset(asset)
 
@@ -715,18 +719,11 @@ def get_stock_detail(exchange, symbol):
     # page that shows them. See src/services/fundamentals.py.
     fundamentals = ensure_statement_metrics(asset, _latest_fundamentals_for(asset.id))
 
-    # Best-effort live quote for price + day change. Capped to a single,
-    # non-throttled attempt (unlike the batch jobs) so a slow/rate-limited
-    # Yahoo response can't stall the page — falls back to the latest stored
-    # snapshot when it fails or returns nothing.
-    quote = None
-    try:
-        quote = get_provider(max_retries=1, min_interval_seconds=0).get_quote(asset.yahoo_symbol)
-    except Exception:
-        quote = None
-
-    price = (quote or {}).get('price')
-    previous_close = (quote or {}).get('previous_close')
+    # Company views use the persisted daily price; opening a page must not
+    # turn into an implicit real-time quote request.
+    daily_price = latest_asset_price(asset.id)
+    price = daily_price.close if daily_price else None
+    previous_close = daily_price.previous_close if daily_price else None
     if price is None and fundamentals:
         price = fundamentals.price
     change_amount = change_percent = None

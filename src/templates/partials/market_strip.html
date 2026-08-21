@@ -1,5 +1,5 @@
 {# Site-wide market ticker. Values come from the inject_market_strip context
-   processor, refreshed by the refresh_market_strip job every 15 minutes. #}
+   processor, refreshed by daily_market_refresh. #}
 {% macro market_feed_group(is_duplicate=false) -%}
 <div class="tn-market-group"{% if is_duplicate %} aria-hidden="true"{% endif %}>
     <div class="tn-market-indicators">

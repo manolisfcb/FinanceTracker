@@ -10,7 +10,7 @@ from src.models import (
     OrderModel,
     OrderType,
 )
-from src.resources.jobs.refresh_news import _refresh_all_news
+from src.resources.jobs.daily_asset_data_refresh import _refresh_all_news
 
 
 def _held_asset(db, user, symbol='RY'):
@@ -52,7 +52,7 @@ def _story(title='RY beats expectations', url='https://news.example/1', source='
     }
 
 
-@patch('src.resources.jobs.refresh_news.get_news_providers')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_news_providers')
 def test_news_are_stored_per_asset_with_source_and_url(mock_providers, app, db, user):
     asset = _held_asset(db, user)
     mock_providers.return_value = [_provider('YAHOO', [_story()])]
@@ -70,7 +70,7 @@ def test_news_are_stored_per_asset_with_source_and_url(mock_providers, app, db, 
     assert event.url == 'https://news.example/1'
 
 
-@patch('src.resources.jobs.refresh_news.get_news_providers')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_news_providers')
 def test_rerun_does_not_duplicate_the_same_url(mock_providers, app, db, user):
     _held_asset(db, user)
     mock_providers.return_value = [_provider('YAHOO', [_story()])]
@@ -85,7 +85,7 @@ def test_rerun_does_not_duplicate_the_same_url(mock_providers, app, db, user):
     assert CompanyEvent.query.filter_by(kind=CompanyEventKind.NEWS).count() == 1
 
 
-@patch('src.resources.jobs.refresh_news.get_news_providers')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_news_providers')
 def test_same_headline_from_two_sources_is_stored_once(mock_providers, app, db, user):
     _held_asset(db, user)
     mock_providers.return_value = [
@@ -101,7 +101,7 @@ def test_same_headline_from_two_sources_is_stored_once(mock_providers, app, db, 
     assert CompanyEvent.query.filter_by(kind=CompanyEventKind.NEWS).count() == 1
 
 
-@patch('src.resources.jobs.refresh_news.get_news_providers')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_news_providers')
 def test_an_old_duplicate_headline_is_allowed_again(mock_providers, app, db, user):
     asset = _held_asset(db, user)
     db.session.add(CompanyEvent(
@@ -118,7 +118,7 @@ def test_an_old_duplicate_headline_is_allowed_again(mock_providers, app, db, use
     assert items == 1
 
 
-@patch('src.resources.jobs.refresh_news.get_news_providers')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_news_providers')
 def test_unheld_assets_are_skipped(mock_providers, app, db, user):
     _held_asset(db, user, symbol='RY')
     db.session.add(Asset(
@@ -135,7 +135,7 @@ def test_unheld_assets_are_skipped(mock_providers, app, db, user):
     assert provider.get_news.call_count == 1
 
 
-@patch('src.resources.jobs.refresh_news.get_news_providers')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_news_providers')
 def test_stories_about_other_companies_are_dropped(mock_providers, app, db, user):
     # Yahoo's feed for RY really does return Rayonier and Citizens & Northern.
     _held_asset(db, user, symbol='RY')
@@ -153,7 +153,7 @@ def test_stories_about_other_companies_are_dropped(mock_providers, app, db, user
     assert CompanyEvent.query.filter_by(kind=CompanyEventKind.NEWS).one().title.startswith('Why RY')
 
 
-@patch('src.resources.jobs.refresh_news.get_news_providers')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_news_providers')
 def test_company_name_in_the_summary_counts_as_relevant(mock_providers, app, db, user):
     asset = _held_asset(db, user, symbol='RY')
     asset.name = 'Royal Bank of Canada'
@@ -166,7 +166,7 @@ def test_company_name_in_the_summary_counts_as_relevant(mock_providers, app, db,
         assert _refresh_all_news() == 1
 
 
-@patch('src.resources.jobs.refresh_news.get_news_providers')
+@patch('src.resources.jobs.daily_asset_data_refresh.get_news_providers')
 def test_no_providers_configured_is_a_noop(mock_providers, app, db, user):
     _held_asset(db, user)
     mock_providers.return_value = []
