@@ -1,3 +1,54 @@
+[project]
+name = "truenorth-analytics"
+version = "0.1.0"
+description = "Portafolio y análisis fundamental para el inversor canadiense"
+# Acotado por arriba a propósito: la imagen corre 3.13, y sin el tope uv
+# elige 3.14 para el entorno local — donde psycopg-binary todavía no tiene
+# wheels. Local y contenedor tienen que resolver el mismo grafo.
+requires-python = ">=3.13,<3.14"
+
+# Solo las dependencias DIRECTAS: las que la app importa de verdad. El resto
+# del grafo lo resuelve uv y queda congelado en uv.lock, que es lo que instala
+# el contenedor con `uv sync --frozen`.
+dependencies = [
+    "Authlib==1.6.5",
+    "Flask==3.1.0",
+    "Flask-APScheduler==1.13.1",
+    "flask-htmx==0.4.0",
+    "Flask-JWT-Extended==4.7.1",
+    "Flask-Login==0.6.3",
+    "Flask-Migrate==4.0.7",
+    "Flask-RESTful==0.3.10",
+    "Flask-SQLAlchemy==3.1.1",
+    "Flask-WTF==1.2.2",
+    "WTForms==3.2.1",
+    "SQLAlchemy==2.0.36",
+    # WTForms lo exige en runtime para el validador Email()
+    "email-validator==2.2.0",
+    "python-dotenv==1.0.1",
+    "requests==2.32.3",
+    # Fuente de datos de mercado. Arrastra pandas/numpy/peewee.
+    "yfinance==1.6.0",
+    # Driver de Postgres (Neon). SQLAlchemy lo carga por dialecto, no por import.
+    "psycopg[binary]==3.2.3",
+    # Servidor WSGI de producción
+    "gunicorn==23.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.16.3",
+    "Pillow==12.3.0",
+    # Solo los generadores de datos en scripts/
+    "Faker==33.1.0",
+]
+
+[tool.uv]
+# Esto es una aplicación, no una librería: no hay nada que empaquetar ni
+# instalar en modo editable.
+package = false
+
 [tool.ruff]
 line-length = 120
 exclude = ["migrations", "scripts", ".venv"]

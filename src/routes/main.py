@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, Response, redirect, render_template, request, url_for
 from flask_login import current_user
 from sqlalchemy import text
 
@@ -20,14 +20,71 @@ def home_page():
     return render_template('landing.html')
 
 
+@main_bp.route('/robots.txt', methods=['GET'])
+def robots_txt():
+    """Crawler policy: index the public landing, never treat the API as pages."""
+    body = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /api/\n"
+        f"Sitemap: {url_for('main.sitemap_xml', _external=True)}\n"
+    )
+    response = Response(body, content_type='text/plain; charset=utf-8')
+    response.cache_control.public = True
+    response.cache_control.max_age = 86400
+    return response
+
+
+@main_bp.route('/sitemap.xml', methods=['GET'])
+def sitemap_xml():
+    """The landing page is the sole public, indexable product URL today."""
+    home_url = url_for('main.home_page', _external=True)
+    body = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f'  <url><loc>{home_url}</loc><changefreq>weekly</changefreq></url>\n'
+        '</urlset>\n'
+    )
+    response = Response(body, content_type='application/xml; charset=utf-8')
+    response.cache_control.public = True
+    response.cache_control.max_age = 86400
+    return response
+
+
+@main_bp.after_app_request
+def protect_non_public_routes_from_indexing(response):
+    """Keep account, portfolio, health and API responses out of search results."""
+    public_endpoints = {
+        'main.home_page',
+        'main.robots_txt',
+        'main.sitemap_xml',
+        'static',
+    }
+    if request.endpoint not in public_endpoints:
+        response.headers.setdefault('X-Robots-Tag', 'noindex, nofollow, noarchive')
+    return response
+
+
 @main_bp.route('/healthz', methods=['GET'])
 def healthz():
-    """Liveness/readiness probe for the container orchestrator.
+    """Liveness: is this process alive and serving?
 
-    Touches the database because a web process that cannot reach Postgres is
-    not actually ready, and returning 200 anyway just means the orchestrator
-    sends it traffic it will fail to serve. Deliberately unauthenticated and
-    free of any user data.
+    Deliberately does NOT touch the database. The container healthcheck polls
+    this every 30s, and Neon suspends its compute after a few idle minutes —
+    a probe that queried the database would keep the compute awake around the
+    clock and quietly burn the plan's compute hours. Restarting the container
+    would not fix a database outage anyway, so liveness is the wrong place to
+    ask about it.
+    """
+    return {'status': 'ok'}, 200
+
+
+@main_bp.route('/readyz', methods=['GET'])
+def readyz():
+    """Readiness: can this process actually serve a request end to end?
+
+    This one does hit the database, so point a load balancer at it — not the
+    container healthcheck. Unauthenticated and free of user data.
     """
     try:
         db.session.execute(text('SELECT 1'))

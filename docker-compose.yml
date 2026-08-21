@@ -1,56 +1,44 @@
-# Pila local equivalente a producción: Postgres + migrate + web + worker.
-# Levantar con:  docker compose up --build
-# Los secretos salen de .env (que nunca entra en la imagen).
+# Pila local equivalente a producción, contra la MISMA base de Neon que va a
+# usar producción.  Levantar con:  docker compose up --build
+#
+# Los valores salen de .env, que compose lee solo para sustituir estas
+# variables — el archivo nunca entra en la imagen (ver .dockerignore).
+#
+# Ojo: .env trae ENV=development y PORT=5001 para correr la app a mano. Acá se
+# pisan a propósito; si se colaran, el contenedor arrancaría en modo debug y
+# gunicorn escucharía en el puerto equivocado.
 
-# Configuración común a los tres servicios de la app. Repetirla invita a que
-# web y worker terminen apuntando a bases distintas.
 x-app-env: &app-env
   ENV: production
-  DATABASE_URL: postgresql+psycopg://truenorth:${POSTGRES_PASSWORD:-truenorth-local}@db:5432/truenorth
+  DATABASE_URL: ${DATABASE_URL:?falta DATABASE_URL en .env}
   SECRET_KEY: ${SECRET_KEY:?falta SECRET_KEY en .env}
   JWT_SECRET_KEY: ${JWT_SECRET_KEY:?falta JWT_SECRET_KEY en .env}
   SEC_EDGAR_USER_AGENT: ${SEC_EDGAR_USER_AGENT:-TrueNorth Analytics contacto@example.com}
   NEWS_PROVIDERS: ${NEWS_PROVIDERS:-yahoo,google}
 
 services:
-  db:
-    image: postgres:17-alpine
-    environment:
-      POSTGRES_USER: truenorth
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-truenorth-local}
-      POSTGRES_DB: truenorth
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    # Sin puertos publicados: solo la red interna de compose la alcanza.
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U truenorth -d truenorth"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  # Un solo uso: prepara el esquema y termina. Que web y worker esperen a que
-  # este servicio salga con éxito es lo que evita que el scheduler dispare un
-  # job contra tablas que todavía no existen.
+  # Un solo uso: deja el esquema al día y termina. Que web y worker esperen a
+  # que salga con éxito es lo que evita que el scheduler dispare un job contra
+  # tablas a medio crear — pasó de verdad en la primera prueba.
   migrate:
     build: .
+    image: truenorth:slim
     command: ["migrate"]
     environment: *app-env
-    depends_on:
-      db:
-        condition: service_healthy
     restart: "no"
 
   web:
     build: .
+    image: truenorth:slim
     command: ["web"]
     environment:
       <<: *app-env
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
-      # Cloudflare termina el TLS; sin esto la redirect_uri de Google sale mal.
+      # Cloudflare termina el TLS; sin esto la redirect_uri de Google sale con
+      # la dirección interna del contenedor y Google responde mismatch.
       TRUST_PROXY_HEADERS: "true"
       RUN_SCHEDULER: "false"
-      # Ya migró el servicio de arriba.
       MIGRATE_ON_START: "false"
     ports:
       - "8000:8000"
@@ -59,8 +47,11 @@ services:
         condition: service_completed_successfully
     restart: unless-stopped
 
+  # El dueño único de los jobs. Si algún día corrés varias réplicas de web,
+  # este sigue siendo uno solo: RUN_SCHEDULER está apagado en todas las demás.
   worker:
     build: .
+    image: truenorth:slim
     command: ["worker"]
     environment:
       <<: *app-env
@@ -69,6 +60,3 @@ services:
       migrate:
         condition: service_completed_successfully
     restart: unless-stopped
-
-volumes:
-  pgdata:

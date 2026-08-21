@@ -1,9 +1,64 @@
 {% extends 'base.html' %}
 
 {% block head_title %}TrueNorth Analytics · Portafolio y análisis para el inversor canadiense{% endblock %}
+{% block meta_description %}Reuní tus cuentas RRSP, TFSA, FHSA y no registradas en una sola cartera, con costo base para la CRA, dividendos y fundamentales de TSX, NYSE y Nasdaq.{% endblock %}
+{% block meta_robots %}index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1{% endblock %}
 
 {% block extra_head %}
-<meta name="description" content="Reuní tus cuentas RRSP, TFSA, FHSA y no registradas en una sola cartera, con el costo base promedio que pide la CRA, dividendos y fundamentales de empresas de TSX, NYSE y Nasdaq.">
+<link rel="canonical" href="{{ url_for('main.home_page', _external=True) }}">
+<link rel="alternate" hreflang="es-CA" href="{{ url_for('main.home_page', _external=True) }}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CA">
+<meta property="og:site_name" content="TrueNorth Analytics">
+<meta property="og:title" content="TrueNorth Analytics · Tu portafolio canadiense, mejor analizado">
+<meta property="og:description" content="Unificá tus cuentas, seguí el costo base para la CRA, dividendos y fundamentales de TSX, NYSE y Nasdaq.">
+<meta property="og:url" content="{{ url_for('main.home_page', _external=True) }}">
+<meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}">
+<meta property="og:image:secure_url" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="TrueNorth Analytics, portafolio y análisis para inversores desde Canadá">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TrueNorth Analytics · Tu portafolio canadiense, mejor analizado">
+<meta name="twitter:description" content="Costo base para la CRA, dividendos y análisis fundamental en una sola cartera.">
+<meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}">
+<meta name="twitter:image:alt" content="TrueNorth Analytics, portafolio y análisis para inversores desde Canadá">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "{{ url_for('main.home_page', _external=True) }}#website",
+      "url": "{{ url_for('main.home_page', _external=True) }}",
+      "name": "TrueNorth Analytics",
+      "description": "Portafolio y análisis para inversores desde Canadá",
+      "inLanguage": "es-CA"
+    },
+    {
+      "@type": "WebApplication",
+      "name": "TrueNorth Analytics",
+      "url": "{{ url_for('main.home_page', _external=True) }}",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "es-CA",
+      "image": "{{ url_for('static', filename='images/og-image.png', _external=True) }}",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CAD"
+      },
+      "featureList": [
+        "Portafolio consolidado en CAD",
+        "Costo base promedio para la CRA",
+        "Seguimiento de dividendos",
+        "Análisis fundamental de TSX, NYSE y Nasdaq"
+      ]
+    }
+  ]
+}
+</script>
 {% endblock %}
 
 {% block body %}
@@ -417,7 +472,7 @@
     <div class="max-w-screen-xl mx-auto px-6 md:px-9 py-8 flex flex-col md:flex-row md:items-start justify-between gap-8 md:gap-10">
         <div class="max-w-[400px]">
             <div class="flex items-center gap-2.5 mb-2.5">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#b3372b" aria-hidden="true"><path d="M12 2l1.8 3.4 2.6-1.2-.6 3 3.2-.4-1.4 2.6 3.4 1.6-3 1.8 1.6 2.8-3.4-.6.4 3.4-3-1.8L12 22l-1.6-4.4-3 1.8.4-3.4-3.4.6 1.6-2.8-3-1.8 3.4-1.6L5 7.8l3.2.4-.6-3 2.6 1.2L12 2z"/></svg>
+                <img src="{{ url_for('static', filename='images/brand-mark.svg') }}" width="18" height="18" alt="" aria-hidden="true">
                 <span class="font-serif-display text-lg">TrueNorth Analytics</span>
             </div>
             <p class="text-[12.5px] leading-relaxed text-faint">

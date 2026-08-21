@@ -1,9 +1,11 @@
 from flask import render_template, request
-from .personal_finance import personal_finance_bp
-from flask_login import login_required, current_user
-from src.models.Transaction import TransactionModel, Category
+from flask_login import current_user, login_required
+from sqlalchemy import func
+
+from src.models.Transaction import Category, TransactionModel
 from src.utils.filter import filter_by_columns_ilike, get_totals
-import pandas as pd
+
+from .personal_finance import personal_finance_bp
 
 
 @personal_finance_bp.route('/transactions_charts', methods=['GET'])
@@ -13,7 +15,7 @@ def transactions_charts():
     category = request.args.getlist('categories')
     date = request.args.get('date', '').strip()
     transaction_type = request.args.get('type', '').strip()
-    
+
     # Construir la consulta
     query = TransactionModel.query.join(Category)
 
@@ -25,26 +27,41 @@ def transactions_charts():
         {'column': 'type', 'value': [transaction_type], 'model': TransactionModel},
     ]
     query = query.filter(*filter_by_columns_ilike(filters))
-    
-    # Serializar las transacciones y convertir a DataFrame
-    transactions = [transaction.serialize() for transaction in query.all()]
-    df = pd.DataFrame(transactions, columns=['type', 'amount', 'category_id'])
 
-    # Preparar datos para el gráfico de ingresos vs gastos
-    income_expense_group = df.groupby('type')['amount'].sum().reset_index()
-    income_expense_labels = income_expense_group['type'].tolist()
-    income_expense_data = income_expense_group['amount'].tolist()
+    # Los dos agregados los hace la base. Antes esto traía cada transacción a
+    # memoria para que pandas hiciera dos groupby — 150 MB de pandas+numpy en
+    # la imagen para sumar dos columnas que Postgres ya sabe sumar.
+    # `with_entities` deriva una consulta nueva, así que `query` sigue intacta
+    # para el get_totals de más abajo.
+    income_expense_rows = (
+        query.with_entities(TransactionModel.type, func.sum(TransactionModel.amount))
+        .group_by(TransactionModel.type)
+        .order_by(TransactionModel.type)
+        .all()
+    )
+    income_expense_labels = [row[0] for row in income_expense_rows]
+    income_expense_data = [float(row[1] or 0) for row in income_expense_rows]
 
-    # Preparar datos para el gráfico de composición por categorías
-    category_group = df.groupby('category_id')['amount'].sum().reset_index()
-    category_labels = category_group['category_id'].tolist()
-    category_data = category_group['amount'].tolist()
+    category_rows = (
+        query.with_entities(TransactionModel.category_id, func.sum(TransactionModel.amount))
+        .group_by(TransactionModel.category_id)
+        .order_by(TransactionModel.category_id)
+        .all()
+    )
+    category_labels = [row[0] for row in category_rows]
+    category_data = [float(row[1] or 0) for row in category_rows]
 
     # Preparar contexto
     context = {
         'income_expense_labels': income_expense_labels,
-        'income_data': [amount if type == 'income' else 0 for type, amount in zip(income_expense_labels, income_expense_data)],
-        'expense_data': [abs(amount) if type == 'expense' else 0 for type, amount in zip(income_expense_labels, income_expense_data)],
+        'income_data': [
+            amount if kind == 'income' else 0
+            for kind, amount in zip(income_expense_labels, income_expense_data)
+        ],
+        'expense_data': [
+            abs(amount) if kind == 'expense' else 0
+            for kind, amount in zip(income_expense_labels, income_expense_data)
+        ],
         'category_labels': category_labels,
         'category_data': category_data,
         'categories': Category.query.all(),

@@ -106,6 +106,22 @@ class ProductionConfig(Config):
     # since Python evaluates all class bodies when the module is imported.)
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
     SECRET_KEY = os.environ.get('SECRET_KEY')
+    # Neon suspende el compute tras unos minutos sin actividad y corta las
+    # conexiones abiertas. Sin pool_pre_ping, la primera visita después de un
+    # rato de silencio recibe un 500 ("server closed the connection
+    # unexpectedly") porque SQLAlchemy entrega una conexión ya muerta del
+    # pool. pre_ping paga un SELECT 1 por checkout a cambio de que eso no
+    # pase; recycle descarta las que el pooler ya dio por vencidas.
+    #
+    # El pool es POR WORKER de gunicorn: con 4 workers, size 2 y overflow 3
+    # son hasta 20 conexiones contra el pooler de Neon, no 20 por proceso.
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': int(os.getenv('DB_POOL_RECYCLE', 300)),
+        'pool_size': int(os.getenv('DB_POOL_SIZE', 2)),
+        'max_overflow': int(os.getenv('DB_MAX_OVERFLOW', 3)),
+        'pool_timeout': 30,
+    }
 
 class TestingConfig(Config):
     TESTING = True
