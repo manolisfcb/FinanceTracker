@@ -52,6 +52,7 @@ class DividendsService:
         self.portfolio = PortfolioService(user_id)
         self.warnings: list[str] = []
         self._fx_cache: dict[str, float | None] = {}
+        self._received_rows_cache: list[DividendReceived] | None = None
 
     # -- helpers ------------------------------------------------------------
 
@@ -67,12 +68,18 @@ class DividendsService:
         return amount * rate if rate is not None else None
 
     def _received_rows(self) -> list[DividendReceived]:
-        """Confirmed plus still-pending suggestions — dismissed ones are out."""
-        return (
-            DividendReceived.query.filter_by(user_id=self.user_id, dismissed=False)
-            .order_by(DividendReceived.pay_date.asc())
-            .all()
-        )
+        """Confirmed plus still-pending suggestions — dismissed ones are out.
+
+        Cached per instance: kpis()/monthly_received()/by_position() each
+        call this with the same filter within a single request.
+        """
+        if self._received_rows_cache is None:
+            self._received_rows_cache = (
+                DividendReceived.query.filter_by(user_id=self.user_id, dismissed=False)
+                .order_by(DividendReceived.pay_date.asc())
+                .all()
+            )
+        return self._received_rows_cache
 
     @staticmethod
     def _latest_fundamentals(asset_ids) -> dict[int, Fundamentals]:

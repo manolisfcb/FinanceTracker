@@ -385,7 +385,8 @@ def _current_sort():
 
 def _apply_sort(query, sort, direction):
     column = SORTABLE_COLUMNS[sort]
-    return query.order_by(column.asc() if direction == 'asc' else column.desc())
+    ordering = column.asc() if direction == 'asc' else column.desc()
+    return query.order_by(ordering.nulls_last())
 
 
 def _url_with(**overrides):

@@ -14,6 +14,7 @@ ACB-in-CAD figure), while current market value uses today's `FxRate` row.
 Cost is FX-locked at trade date, value floats with today's rate — that's
 correct, not a bug to reconcile.
 """
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 
@@ -347,34 +348,59 @@ class PortfolioService:
         if not asset_ids:
             return 0
 
+        # Batched instead of one quantity_held_as_of()/existing-row query per
+        # DividendHistory row: that was O(rows) round trips against an
+        # unindexed orders table and made /dividends painfully slow to load.
+        orders_by_asset: dict[int, list[OrderModel]] = defaultdict(list)
+        for order in (
+            OrderModel.query.filter_by(user_id=self.user_id)
+            .filter(OrderModel.asset_id.in_(asset_ids))
+            .order_by(OrderModel.executed_at.asc())
+            .all()
+        ):
+            orders_by_asset[order.asset_id].append(order)
+
+        def quantity_held(asset_id: int, as_of: date) -> float:
+            quantity = 0.0
+            for order in orders_by_asset.get(asset_id, []):
+                if order.executed_at.date() > as_of:
+                    break
+                quantity += order.quantity if order.type == OrderType.BUY else -order.quantity
+            return quantity
+
+        existing_by_key = {
+            (row.asset_id, row.pay_date): row
+            for row in DividendReceived.query.filter_by(user_id=self.user_id)
+            .filter(DividendReceived.asset_id.in_(asset_ids))
+            .all()
+        }
+
         touched = 0
         for dh in DividendHistory.query.filter(DividendHistory.asset_id.in_(asset_ids)).all():
             pay_date = dh.pay_date or dh.ex_date
-            quantity_held = self.quantity_held_as_of(dh.asset_id, dh.ex_date)
-            if quantity_held <= 0:
+            quantity = quantity_held(dh.asset_id, dh.ex_date)
+            if quantity <= 0:
                 continue
 
-            existing = DividendReceived.query.filter_by(
-                user_id=self.user_id, asset_id=dh.asset_id, pay_date=pay_date
-            ).first()
+            existing = existing_by_key.get((dh.asset_id, pay_date))
             if existing is not None and (existing.confirmed or existing.dismissed):
                 continue
 
-            total_amount = quantity_held * dh.amount
+            total_amount = quantity * dh.amount
             if existing is None:
-                db.session.add(
-                    DividendReceived(
-                        user_id=self.user_id,
-                        asset_id=dh.asset_id,
-                        pay_date=pay_date,
-                        quantity_held=quantity_held,
-                        total_amount=total_amount,
-                        currency=dh.currency,
-                        confirmed=False,
-                    )
+                existing = DividendReceived(
+                    user_id=self.user_id,
+                    asset_id=dh.asset_id,
+                    pay_date=pay_date,
+                    quantity_held=quantity,
+                    total_amount=total_amount,
+                    currency=dh.currency,
+                    confirmed=False,
                 )
+                db.session.add(existing)
+                existing_by_key[(dh.asset_id, pay_date)] = existing
             else:
-                existing.quantity_held = quantity_held
+                existing.quantity_held = quantity
                 existing.total_amount = total_amount
                 existing.currency = dh.currency
             touched += 1
