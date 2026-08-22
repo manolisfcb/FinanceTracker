@@ -10,14 +10,14 @@
 <!-- Header -->
 <div class="flex flex-wrap items-end justify-between gap-4 mb-5">
     <div>
-        <h1 class="font-serif-display text-3xl text-ink mb-1">Portafolio</h1>
+        <h1 class="font-serif-display text-3xl text-ink mb-1" data-i18n="portfolio.title">Portafolio</h1>
         <div class="flex flex-wrap items-center gap-2">
-            <a href="{{ url_for('portfolio.portfolio') }}" class="chip {{ 'chip-on' if not selected_account_id }}">Todas</a>
+            <a href="{{ url_for('portfolio.portfolio') }}" class="chip {{ 'chip-on' if not selected_account_id }}" data-i18n="portfolio.filter.all">Todas</a>
             {% for account in accounts %}
             <a href="{{ url_for('portfolio.portfolio', account_id=account.id) }}"
                class="chip {{ 'chip-on' if selected_account_id == account.id }}">{{ account.name }}</a>
             {% endfor %}
-            <a href="{{ url_for('portfolio.list_accounts') }}" class="chip">Gestionar cuentas</a>
+            <a href="{{ url_for('portfolio.list_accounts') }}" class="chip" data-i18n="portfolio.nav.manage_accounts">Gestionar cuentas</a>
         </div>
     </div>
     <div class="flex flex-wrap gap-2.5">
@@ -25,50 +25,51 @@
             <form method="POST" action="{{ url_for('portfolio.refresh_prices') }}">
                 <button type="submit" class="btn">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6v6h-6"></path><path d="M4 18v-6h6"></path><path d="M18.5 9A7 7 0 0 0 6.2 6.2L4 9"></path><path d="M5.5 15A7 7 0 0 0 17.8 17.8L20 15"></path></svg>
-                    Actualizar precios
+                    <span data-i18n="portfolio.actions.refresh_prices">Actualizar precios</span>
                 </button>
             </form>
             <span class="text-[11px] text-faint">
-                Precios actualizados: {{ prices_updated_at|datetime_short_es if prices_updated_at else 'todavía no disponibles' }}
+                <span data-i18n="portfolio.prices.updated_label">Precios actualizados:</span>
+                {% if prices_updated_at %}{{ prices_updated_at|datetime_short_es }}{% else %}<span data-i18n="portfolio.prices.not_available">todavía no disponibles</span>{% endif %}
             </span>
         </div>
         <a href="{{ url_for('portfolio.import_orders') }}" class="btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9"></path><path d="M7 14l5 5 5-5"></path><path d="M4 3h16"></path></svg>
-            Importar broker
+            <span data-i18n="portfolio.actions.import_broker">Importar broker</span>
         </a>
         <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
-            Nueva orden
+            <span data-i18n="portfolio.actions.new_order">Nueva orden</span>
         </a>
     </div>
 </div>
 
 {% if warnings %}
 <div class="tn-alert tn-alert-info mb-4">
-    <span>{{ warnings|length }} advertencia(s) en el cálculo del portafolio — {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
+    <span>{{ warnings|length }} <span data-i18n="portfolio.warnings.label">advertencia(s) en el cálculo del portafolio</span> — {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
 </div>
 {% endif %}
 
 <!-- Totals strip -->
 <div class="card tn-totals mb-4">
     <div class="tn-total">
-        <div class="lbl mb-1.5">Costo</div>
+        <div class="lbl mb-1.5" data-i18n="portfolio.totals.cost">Costo</div>
         <div class="num text-xl font-semibold">C$ {{ total_invested|currency }}</div>
     </div>
     <div class="tn-total">
-        <div class="lbl mb-1.5">Valor</div>
+        <div class="lbl mb-1.5" data-i18n="portfolio.totals.value">Valor</div>
         <div class="num text-xl font-semibold">C$ {{ patrimony|currency }}</div>
     </div>
     <div class="tn-total">
-        <div class="lbl mb-1.5">Proventos</div>
+        <div class="lbl mb-1.5" data-i18n="portfolio.totals.dividends">Proventos</div>
         <div class="num text-xl font-semibold">C$ {{ dividends_accum|currency }}</div>
     </div>
     <div class="tn-total">
-        <div class="lbl mb-1.5">Lucro trade</div>
+        <div class="lbl mb-1.5" data-i18n="portfolio.totals.realized_pnl">Lucro trade</div>
         <div class="num text-xl font-semibold">C$ {{ realized_pnl|currency }}</div>
     </div>
     <div class="tn-total">
-        <div class="lbl mb-1.5">Rentabilidad</div>
+        <div class="lbl mb-1.5" data-i18n="portfolio.totals.return">Rentabilidad</div>
         <div class="num text-xl font-semibold {{ 'pos' if (total_return_percent or 0) >= 0 else 'neg' }}">
             {% if total_return_percent is not none %}{{ '+' if total_return_percent >= 0 }}{{ total_return_percent|ratio }}%{% else %}—{% endif %}
         </div>
@@ -79,11 +80,11 @@
 <section id="portfolio-ideal" class="card p-5 mb-4 scroll-mt-4">
     <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
         <div>
-            <div class="text-[15px] font-semibold">Tu portafolio ideal</div>
-            <p class="text-[12.5px] text-muted2 mt-1">Definí la mezcla estratégica y comparala con el valor actual de tu cartera.</p>
+            <div class="text-[15px] font-semibold" data-i18n="portfolio.ideal.title">Tu portafolio ideal</div>
+            <p class="text-[12.5px] text-muted2 mt-1" data-i18n="portfolio.ideal.subtitle">Definí la mezcla estratégica y comparala con el valor actual de tu cartera.</p>
         </div>
         <details class="tn-plan-editor">
-            <summary class="btn cursor-pointer list-none">{{ 'Configurar plan' if not plan_is_saved else 'Editar plan' }}</summary>
+            <summary class="btn cursor-pointer list-none">{% if not plan_is_saved %}<span data-i18n="portfolio.ideal.configure_plan">Configurar plan</span>{% else %}<span data-i18n="portfolio.ideal.edit_plan">Editar plan</span>{% endif %}</summary>
             <div class="tn-plan-popover">
                 <form method="POST" action="{{ url_for('portfolio.set_portfolio_plan') }}">
                     {{ plan_form.hidden_tag() }}
@@ -114,8 +115,8 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap items-center justify-between gap-3 mt-3">
-                        <span class="text-[12px] text-muted2">Total objetivo: <span id="planPercentTotal" class="num font-semibold text-ink">{{ '100.0%' if plan_is_saved else '0.0%' }}</span></span>
-                        <button type="submit" id="savePortfolioPlan" class="btn btn-primary">Guardar portafolio ideal</button>
+                        <span class="text-[12px] text-muted2"><span data-i18n="portfolio.ideal.target_total_label">Total objetivo:</span> <span id="planPercentTotal" class="num font-semibold text-ink">{{ '100.0%' if plan_is_saved else '0.0%' }}</span></span>
+                        <button type="submit" id="savePortfolioPlan" class="btn btn-primary" data-i18n="portfolio.ideal.save_button">Guardar portafolio ideal</button>
                     </div>
                 </form>
             </div>
@@ -123,21 +124,21 @@
     </div>
 
     {% if strategic_allocation.has_plan %}
-    <div class="tn-allocation-view-switch mb-4" role="tablist" aria-label="Vista de comparación del portafolio">
+    <div class="tn-allocation-view-switch mb-4" role="tablist" aria-label="Vista de comparación del portafolio" data-i18n-aria-label="portfolio.allocation.view_switch_aria">
         <button type="button" class="tn-allocation-view-tab is-active" role="tab"
                 id="allocationViewGroupedTab" aria-selected="true" aria-controls="allocationViewGrouped"
                 data-allocation-view-target="grouped">
-            Barras agrupadas
+            <span data-i18n="portfolio.allocation.tab_grouped">Barras agrupadas</span>
         </button>
         <button type="button" class="tn-allocation-view-tab" role="tab" tabindex="-1"
                 id="allocationViewRingsTab" aria-selected="false" aria-controls="allocationViewRings"
                 data-allocation-view-target="rings">
-            Anillos comparativos
+            <span data-i18n="portfolio.allocation.tab_rings">Anillos comparativos</span>
         </button>
         <button type="button" class="tn-allocation-view-tab" role="tab" tabindex="-1"
                 id="allocationViewStackedTab" aria-selected="false" aria-controls="allocationViewStacked"
                 data-allocation-view-target="stacked">
-            Barras 100%
+            <span data-i18n="portfolio.allocation.tab_stacked">Barras 100%</span>
         </button>
     </div>
 
@@ -146,8 +147,8 @@
             <div id="allocationViewGrouped" role="tabpanel" aria-labelledby="allocationViewGroupedTab"
                  data-allocation-view="grouped" class="tn-chart-panel tn-allocation-comparison-panel">
                 <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <span class="text-[12px] font-semibold text-muted2">IDEAL VS. ACTUAL</span>
-                    <span class="text-[11.5px] text-faint">Comparación por clase de activo</span>
+                    <span class="text-[12px] font-semibold text-muted2" data-i18n="portfolio.allocation.grouped_heading">IDEAL VS. ACTUAL</span>
+                    <span class="text-[11.5px] text-faint" data-i18n="portfolio.allocation.grouped_subheading">Comparación por clase de activo</span>
                 </div>
                 <div class="h-64"><canvas id="groupedAllocationChart"></canvas></div>
             </div>
@@ -156,15 +157,15 @@
                  data-allocation-view="rings" hidden>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
                     <div class="tn-chart-panel">
-                        <div class="text-center text-[12px] font-semibold text-muted2 mb-2">OBJETIVO</div>
+                        <div class="text-center text-[12px] font-semibold text-muted2 mb-2" data-i18n="portfolio.allocation.target_heading">OBJETIVO</div>
                         <div class="h-52"><canvas id="targetAllocationChart"></canvas></div>
                     </div>
                     <div class="tn-chart-panel">
-                        <div class="text-center text-[12px] font-semibold text-muted2 mb-2">ACTUAL</div>
+                        <div class="text-center text-[12px] font-semibold text-muted2 mb-2" data-i18n="portfolio.allocation.current_heading">ACTUAL</div>
                         {% if strategic_allocation.has_holdings %}
                         <div class="h-52"><canvas id="currentAllocationChart"></canvas></div>
                         {% else %}
-                        <div class="h-52 flex items-center justify-center text-center text-[12.5px] text-faint px-4">Agregá posiciones o indicá tu cash actual para comparar.</div>
+                        <div class="h-52 flex items-center justify-center text-center text-[12.5px] text-faint px-4" data-i18n="portfolio.allocation.no_holdings_message">Agregá posiciones o indicá tu cash actual para comparar.</div>
                         {% endif %}
                     </div>
                 </div>
@@ -173,8 +174,8 @@
             <div id="allocationViewStacked" role="tabpanel" aria-labelledby="allocationViewStackedTab"
                  data-allocation-view="stacked" class="tn-chart-panel tn-allocation-comparison-panel" hidden>
                 <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <span class="text-[12px] font-semibold text-muted2">COMPOSICIÓN 100%</span>
-                    <span class="text-[11.5px] text-faint">Cada barra representa el portafolio completo</span>
+                    <span class="text-[12px] font-semibold text-muted2" data-i18n="portfolio.allocation.stacked_heading">COMPOSICIÓN 100%</span>
+                    <span class="text-[11.5px] text-faint" data-i18n="portfolio.allocation.stacked_subheading">Cada barra representa el portafolio completo</span>
                 </div>
                 <div class="h-64"><canvas id="stackedAllocationChart"></canvas></div>
             </div>
@@ -182,7 +183,7 @@
 
         <div class="tn-chart-panel">
             <div class="flex items-center justify-between gap-3 mb-3">
-                <span class="text-[12px] font-semibold text-muted2">REBALANCEO ESTIMADO</span>
+                <span class="text-[12px] font-semibold text-muted2" data-i18n="portfolio.rebalance.heading">REBALANCEO ESTIMADO</span>
                 <span class="num text-[11.5px] text-faint">C$ {{ strategic_allocation.total_cad|currency }}</span>
             </div>
             <div class="flex flex-col gap-2.5">
@@ -196,12 +197,12 @@
                         </div>
                         <div class="text-[11.5px] mt-0.5 {{ 'pos' if row.amount_to_trade_cad > 0 else ('neg' if row.amount_to_trade_cad < 0 else 'text-faint') }}">
                             {% if not strategic_allocation.has_holdings %}
-                            Esperando valor actual
+                            <span data-i18n="portfolio.rebalance.waiting_for_value">Esperando valor actual</span>
                             {% elif row.amount_to_trade_cad > 0 %}
-                            {{ 'Reservar' if row.key == 'CASH' else 'Aumentar' }} C$ {{ row.amount_to_trade_abs_cad|currency }}
+                            {% if row.key == 'CASH' %}<span data-i18n="portfolio.rebalance.reserve">Reservar</span>{% else %}<span data-i18n="portfolio.rebalance.increase">Aumentar</span>{% endif %} C$ {{ row.amount_to_trade_abs_cad|currency }}
                             {% elif row.amount_to_trade_cad < 0 %}
-                            {{ 'Invertir' if row.key == 'CASH' else 'Reducir' }} C$ {{ row.amount_to_trade_abs_cad|currency }}
-                            {% else %}En objetivo{% endif %}
+                            {% if row.key == 'CASH' %}<span data-i18n="portfolio.rebalance.invest">Invertir</span>{% else %}<span data-i18n="portfolio.rebalance.reduce">Reducir</span>{% endif %} C$ {{ row.amount_to_trade_abs_cad|currency }}
+                            {% else %}<span data-i18n="portfolio.rebalance.on_target">En objetivo</span>{% endif %}
                         </div>
                     </div>
                 </div>
@@ -211,8 +212,8 @@
     </div>
     {% else %}
     <div class="tn-chart-panel py-12 text-center">
-        <div class="text-[13px] font-semibold text-muted2">Todavía no configuraste un portafolio ideal.</div>
-        <p class="text-[12px] text-faint mt-1">Definí tus porcentajes para comparar el objetivo con tus posiciones reales.</p>
+        <div class="text-[13px] font-semibold text-muted2" data-i18n="portfolio.ideal.empty_title">Todavía no configuraste un portafolio ideal.</div>
+        <p class="text-[12px] text-faint mt-1" data-i18n="portfolio.ideal.empty_subtitle">Definí tus porcentajes para comparar el objetivo con tus posiciones reales.</p>
     </div>
     {% endif %}
 </section>
@@ -226,16 +227,16 @@
             <table class="tn-positions">
                 <thead>
                     <tr>
-                        <th class="l tn-edge-l">Activo</th>
-                        <th class="l">Cuenta</th>
-                        <th>Precio C$</th>
-                        <th>Qtd</th>
-                        <th>Valor</th>
-                        <th>P.M. C$</th>
-                        <th>Proventos</th>
-                        <th>YoC</th>
-                        <th>Lucro</th>
-                        <th class="tn-edge-r">R.%</th>
+                        <th class="l tn-edge-l" data-i18n="portfolio.table.th_asset">Activo</th>
+                        <th class="l" data-i18n="portfolio.table.th_account">Cuenta</th>
+                        <th data-i18n="portfolio.table.th_price">Precio C$</th>
+                        <th data-i18n="portfolio.table.th_qty">Qtd</th>
+                        <th data-i18n="portfolio.table.th_value">Valor</th>
+                        <th data-i18n="portfolio.table.th_avg_price">P.M. C$</th>
+                        <th data-i18n="portfolio.table.th_dividends">Proventos</th>
+                        <th data-i18n="portfolio.table.th_yoc">YoC</th>
+                        <th data-i18n="portfolio.table.th_profit">Lucro</th>
+                        <th class="tn-edge-r" data-i18n="portfolio.table.th_return">R.%</th>
                     </tr>
                 </thead>
                 <tbody class="num text-[12.5px]">
@@ -269,7 +270,7 @@
                 </tbody>
                 <tbody class="text-[12.5px]">
                     <tr class="tn-total-row">
-                        <td class="l tn-edge-l font-sans font-bold">Total</td>
+                        <td class="l tn-edge-l font-sans font-bold" data-i18n="portfolio.table.total_label">Total</td>
                         <td></td><td></td><td></td>
                         <td class="num font-bold">{{ patrimony|currency }}</td>
                         <td></td>
@@ -284,16 +285,16 @@
             </table>
         </div>
         <div class="px-5 py-3 text-[11.5px] text-faint">
-            Valores en CAD{% if usd_cad_rate %} · USD convertido a <span class="num">{{ usd_cad_rate|fx }}</span>{% endif %}
-            · precios del último snapshot diario, no en tiempo real
+            <span data-i18n="portfolio.footer.values_cad">Valores en CAD</span>{% if usd_cad_rate %} · <span data-i18n="portfolio.footer.usd_converted">USD convertido a</span> <span class="num">{{ usd_cad_rate|fx }}</span>{% endif %}
+            · <span data-i18n="portfolio.footer.snapshot_note">precios del último snapshot diario, no en tiempo real</span>
         </div>
         {% else %}
         <div class="text-center py-12 px-5">
-            <p class="text-lg text-muted2">Todavía no tienes activos en tu portafolio.</p>
-            <p class="text-faint text-sm mt-1">Agrega tu primera orden o importa tu historial.</p>
+            <p class="text-lg text-muted2" data-i18n="portfolio.empty.title">Todavía no tienes activos en tu portafolio.</p>
+            <p class="text-faint text-sm mt-1" data-i18n="portfolio.empty.subtitle">Agrega tu primera orden o importa tu historial.</p>
             <div class="flex items-center justify-center gap-2.5 mt-5">
-                <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">Agregar primera orden</a>
-                <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Importar broker</a>
+                <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary" data-i18n="portfolio.empty.add_first_order">Agregar primera orden</a>
+                <a href="{{ url_for('portfolio.import_orders') }}" class="btn" data-i18n="portfolio.actions.import_broker">Importar broker</a>
             </div>
         </div>
         {% endif %}
@@ -302,23 +303,23 @@
     <!-- Supporting portfolio charts -->
     <div class="flex flex-col gap-3.5">
         <div class="card p-5">
-            <div class="text-sm font-semibold mb-3">Alocación por activo</div>
+            <div class="text-sm font-semibold mb-3" data-i18n="portfolio.charts.allocation_by_asset_title">Alocación por activo</div>
             {% if portfolio %}
             <div class="h-52">
                 <canvas id="assetAllocationChart"></canvas>
             </div>
             {% else %}
-            <p class="text-faint text-[13px]">Sin posiciones para graficar.</p>
+            <p class="text-faint text-[13px]" data-i18n="portfolio.charts.no_positions">Sin posiciones para graficar.</p>
             {% endif %}
         </div>
 
         <div class="card p-5">
-            <div class="text-sm font-semibold">Dividendos por activo</div>
-            <p class="text-[11.5px] text-muted mt-1 mb-3">Total confirmado y acumulado por acción, convertidos a CAD.</p>
+            <div class="text-sm font-semibold" data-i18n="portfolio.charts.dividends_by_asset_title">Dividendos por activo</div>
+            <p class="text-[11.5px] text-muted mt-1 mb-3" data-i18n="portfolio.charts.dividends_by_asset_subtitle">Total confirmado y acumulado por acción, convertidos a CAD.</p>
             {% if dividend_chart %}
             <div class="h-60"><canvas id="dividendsByAssetChart"></canvas></div>
             {% else %}
-            <p class="text-faint text-[13px] py-6">Todavía no hay dividendos confirmados para graficar.</p>
+            <p class="text-faint text-[13px] py-6" data-i18n="portfolio.charts.no_dividends">Todavía no hay dividendos confirmados para graficar.</p>
             {% endif %}
         </div>
     </div>
@@ -328,24 +329,24 @@
 <section class="card p-5 mt-4">
     <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
         <div>
-            <div class="text-[15px] font-semibold">Rentabilidad comparada</div>
-            <p class="text-[12px] text-muted mt-1">Cartera vs. Canadá, S&amp;P 500, Nasdaq-100 y el retorno teórico acumulado de la tasa del Banco de Canadá.</p>
+            <div class="text-[15px] font-semibold" data-i18n="portfolio.performance.title">Rentabilidad comparada</div>
+            <p class="text-[12px] text-muted mt-1" data-i18n="portfolio.performance.subtitle">Cartera vs. Canadá, S&amp;P 500, Nasdaq-100 y el retorno teórico acumulado de la tasa del Banco de Canadá.</p>
         </div>
         {% if performance_chart.has_data %}
         <div class="flex gap-1.5" id="performanceRanges">
             {% for range in ['1M', '6M', '1A', 'TODO'] %}
-            <button type="button" class="tn-range performance-range-btn{{ ' tn-range-active' if range == '1A' }}" data-range="{{ range }}">{{ range }}</button>
+            <button type="button" class="tn-range performance-range-btn{{ ' tn-range-active' if range == '1A' }}" data-range="{{ range }}">{% if range == '1M' %}<span data-i18n="portfolio.performance.range_1m">1M</span>{% elif range == '6M' %}<span data-i18n="portfolio.performance.range_6m">6M</span>{% elif range == '1A' %}<span data-i18n="portfolio.performance.range_1y">1A</span>{% else %}<span data-i18n="portfolio.performance.range_all">TODO</span>{% endif %}</button>
             {% endfor %}
         </div>
         {% endif %}
     </div>
     {% if performance_chart.has_data %}
     <div class="h-[330px]"><canvas id="performanceComparisonChart"></canvas></div>
-    <p class="text-[11px] text-faint mt-3">La cartera se normaliza desde el primer snapshot disponible usando valor, costo acumulado y dividendos. Los benchmarks muestran retorno de precio y no incluyen comisiones.</p>
+    <p class="text-[11px] text-faint mt-3" data-i18n="portfolio.performance.footnote">La cartera se normaliza desde el primer snapshot disponible usando valor, costo acumulado y dividendos. Los benchmarks muestran retorno de precio y no incluyen comisiones.</p>
     {% else %}
     <div class="h-44 flex flex-col items-center justify-center text-center px-5">
-        <p class="text-[13px] text-muted2">Se necesitan al menos dos snapshots diarios para comparar la rentabilidad.</p>
-        <a href="{{ url_for('portfolio.dash_page') }}" class="text-[12px] font-semibold mt-2">Ir al dashboard para tomar un snapshot →</a>
+        <p class="text-[13px] text-muted2" data-i18n="portfolio.performance.empty_message">Se necesitan al menos dos snapshots diarios para comparar la rentabilidad.</p>
+        <a href="{{ url_for('portfolio.dash_page') }}" class="text-[12px] font-semibold mt-2" data-i18n="portfolio.performance.dashboard_link">Ir al dashboard para tomar un snapshot →</a>
     </div>
     {% endif %}
 </section>
@@ -354,15 +355,15 @@
 <section class="card p-5 mt-4">
     <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
         <div>
-            <div class="text-[15px] font-semibold">Composición por tipo y segmento</div>
-            <p class="text-[12px] text-muted mt-1">El flujo parte de la cartera, pasa por la clase de activo y termina en su sector o segmento.</p>
+            <div class="text-[15px] font-semibold" data-i18n="portfolio.composition.title">Composición por tipo y segmento</div>
+            <p class="text-[12px] text-muted mt-1" data-i18n="portfolio.composition.subtitle">El flujo parte de la cartera, pasa por la clase de activo y termina en su sector o segmento.</p>
         </div>
-        <span class="num text-[11.5px] text-faint">Valores en CAD</span>
+        <span class="num text-[11.5px] text-faint" data-i18n="portfolio.footer.values_cad">Valores en CAD</span>
     </div>
     {% if strategic_allocation.flows %}
     <div class="h-[380px]"><canvas id="portfolioCompositionChart"></canvas></div>
     {% else %}
-    <div class="h-44 flex items-center justify-center text-[13px] text-faint">Sin posiciones para construir la composición.</div>
+    <div class="h-44 flex items-center justify-center text-[13px] text-faint" data-i18n="portfolio.composition.empty_message">Sin posiciones para construir la composición.</div>
     {% endif %}
 </section>
 

@@ -12,10 +12,17 @@
 <div class="min-h-screen flex">
 
     <div class="w-full lg:w-1/2 flex flex-col px-6 py-7 md:px-9 md:py-8">
-        <a href="{{ url_for('main.home_page') }}" class="flex items-center gap-2.5 self-start">
-            <img src="{{ url_for('static', filename='images/brand-mark.svg') }}" width="20" height="20" alt="" aria-hidden="true">
-            <span class="font-serif-display text-xl text-ink">TrueNorth</span>
-        </a>
+        <div class="flex items-center justify-between gap-3">
+            <a href="{{ url_for('main.home_page') }}" class="flex items-center gap-2.5 self-start">
+                <img src="{{ url_for('static', filename='images/brand-mark.svg') }}" width="20" height="20" alt="" aria-hidden="true">
+                <span class="font-serif-display text-xl text-ink">TrueNorth</span>
+            </a>
+            <div class="flex items-center gap-0.5 border border-border rounded-lg p-0.5 bg-[#fbfaf8]" role="group" aria-label="Idioma / Language / Idioma">
+                <button type="button" data-lang-btn="es" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">ES</button>
+                <button type="button" data-lang-btn="en" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">EN</button>
+                <button type="button" data-lang-btn="pt" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">PT</button>
+            </div>
+        </div>
 
         <div class="flex-1 flex flex-col justify-center py-10">
             <div class="w-full max-w-[396px] mx-auto">
@@ -24,7 +31,7 @@
             </div>
         </div>
 
-        <div class="text-xs text-faint">
+        <div class="text-xs text-faint" data-i18n="auth.tagline">
             TrueNorth Analytics · Portafolio y análisis para inversores desde Canadá
         </div>
     </div>

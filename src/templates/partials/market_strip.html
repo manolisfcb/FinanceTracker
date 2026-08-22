@@ -18,7 +18,7 @@
         <span class="tn-market-item">USD/CAD
             {% if market_usdcad.value is not none %}{{ market_usdcad.value|fx }}{% else %}<span class="text-[#8a857a]">—</span>{% endif %}
         </span>
-        <span class="tn-market-item">Tasa BoC
+        <span class="tn-market-item"><span data-i18n="common.boc_rate">Tasa BoC</span>
             {% if market_boc_rate.value is not none %}{{ market_boc_rate.value|ratio }}%{% else %}<span class="text-[#8a857a]">—</span>{% endif %}
         </span>
     </div>
@@ -30,7 +30,7 @@
 </div>
 {%- endmacro %}
 
-<div class="tn-market-strip num" role="region" aria-label="Resumen de mercados">
+<div class="tn-market-strip num" role="region" aria-label="Resumen de mercados" data-i18n-aria-label="common.market_summary_aria">
     <div class="tn-market-track">
         {{ market_feed_group() }}
         {{ market_feed_group(true) }}

@@ -11,7 +11,7 @@
 
 <!-- Breadcrumbs -->
 <div class="flex items-center gap-1.5 text-[13px] text-muted2 mb-4">
-    <a href="{{ url_for('stocks.get_stocks') }}" class="hover:text-ink">Acciones</a>
+    <a href="{{ url_for('stocks.get_stocks') }}" class="hover:text-ink" data-i18n="company.breadcrumb_stocks">Acciones</a>
     <span>/</span>
     <a href="{{ url_for('stocks.get_stocks', exchange=[asset.exchange]) }}" class="hover:text-ink">{{ asset.exchange }}</a>
     <span>/</span>
@@ -30,7 +30,7 @@
                     <span class="text-xs font-semibold border border-border rounded-md px-2 py-0.5 bg-[#fbfaf8]">{{ asset.exchange }}</span>
                 </div>
                 <div class="text-[13px] text-muted2 mt-1">
-                    {{ asset.sector or 'Sector no disponible' }}{% if asset.industry %} · {{ asset.industry }}{% endif %}
+                    {% if asset.sector %}{{ asset.sector }}{% else %}<span data-i18n="company.sector_unavailable">Sector no disponible</span>{% endif %}{% if asset.industry %} · {{ asset.industry }}{% endif %}
                 </div>
             </div>
         </div>
@@ -44,7 +44,7 @@
                 {{ '+' if change_amount >= 0 }}{{ change_amount|ratio }} ({{ '+' if change_percent >= 0 }}{{ change_percent|ratio }}%)
             </div>
             {% else %}
-            <div class="text-sm text-faint">Variación no disponible</div>
+            <div class="text-sm text-faint" data-i18n="company.change_unavailable">Variación no disponible</div>
             {% endif %}
         </div>
     </div>
@@ -52,16 +52,16 @@
     <div class="flex flex-wrap gap-2 mt-4">
         <a href="#ADD_TO_PORTFOLIO" class="btn btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
-            Agregar a portafolio
+            <span data-i18n="company.add_to_portfolio">Agregar a portafolio</span>
         </a>
         <a href="{{ url_for('tools.comparator', asset=asset.id) }}" class="btn">
-            Comparar
+            <span data-i18n="company.compare">Comparar</span>
         </a>
         {% if asset.website %}
-        <a href="{{ asset.website }}" target="_blank" rel="noopener noreferrer" class="btn">Website</a>
+        <a href="{{ asset.website }}" target="_blank" rel="noopener noreferrer" class="btn" data-i18n="company.website">Website</a>
         {% endif %}
         {% if asset.ir_website %}
-        <a href="{{ asset.ir_website }}" target="_blank" rel="noopener noreferrer" class="btn">IR site</a>
+        <a href="{{ asset.ir_website }}" target="_blank" rel="noopener noreferrer" class="btn" data-i18n="company.ir_site">IR site</a>
         {% endif %}
     </div>
 </div>
@@ -70,7 +70,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 mb-4">
     <div class="card p-5 lg:col-span-2">
         <div class="flex justify-between items-center mb-3">
-            <div class="text-sm font-semibold">Precio</div>
+            <div class="text-sm font-semibold" data-i18n="company.price_heading">Precio</div>
             <div class="flex gap-1.5" id="rangeButtons">
                 {% for range_key in price_ranges %}
                 <button type="button" class="tn-range range-btn{{ ' tn-range-active' if range_key == '1Y' }}" data-range="{{ range_key }}">{{ range_key }}</button>
@@ -78,21 +78,21 @@
             </div>
         </div>
         <div class="h-[230px] relative">
-            <div id="priceChartLoading" class="absolute inset-0 flex items-center justify-center text-[13px] text-faint">Cargando…</div>
-            <div id="priceChartEmpty" class="absolute inset-0 hidden items-center justify-center text-[13px] text-faint">No hay datos de precio disponibles.</div>
+            <div id="priceChartLoading" class="absolute inset-0 flex items-center justify-center text-[13px] text-faint" data-i18n="company.loading">Cargando…</div>
+            <div id="priceChartEmpty" class="absolute inset-0 hidden items-center justify-center text-[13px] text-faint" data-i18n="company.no_price_data">No hay datos de precio disponibles.</div>
             <canvas id="priceHistoryChart"></canvas>
         </div>
     </div>
 
     <div class="card p-5">
-        <div class="text-sm font-semibold mb-3">Datos clave</div>
+        <div class="text-sm font-semibold mb-3" data-i18n="company.key_stats_heading">Datos clave</div>
         <div class="text-[13px]">
             <div class="tn-help-row tn-keystat">
-                <span class="text-muted2 flex items-center">Market cap {{ help_tip(key_stat_help.market_cap, 'Market cap') }}</span>
+                <span class="text-muted2 flex items-center"><span data-i18n="company.market_cap">Market cap</span> {{ help_tip(key_stat_help.market_cap, 'Market cap') }}</span>
                 <span class="num font-semibold">{{ asset.currency }} {{ (fundamentals.market_cap if fundamentals else none)|compact_number }}</span>
             </div>
             <div class="tn-help-row tn-keystat">
-                <span class="text-muted2 flex items-center">Rango 52 semanas {{ help_tip(key_stat_help.fifty_two_week_range, 'el rango de 52 semanas') }}</span>
+                <span class="text-muted2 flex items-center"><span data-i18n="company.week_range">Rango 52 semanas</span> {{ help_tip(key_stat_help.fifty_two_week_range, 'el rango de 52 semanas') }}</span>
                 <span class="num">
                     {% if fundamentals and fundamentals.fifty_two_week_low and fundamentals.fifty_two_week_high %}
                     {{ fundamentals.fifty_two_week_low|ratio }} – {{ fundamentals.fifty_two_week_high|ratio }}
@@ -100,23 +100,23 @@
                 </span>
             </div>
             <div class="tn-help-row tn-keystat">
-                <span class="text-muted2 flex items-center">Volumen prom. {{ help_tip(key_stat_help.average_volume, 'el volumen promedio') }}</span>
+                <span class="text-muted2 flex items-center"><span data-i18n="company.avg_volume">Volumen prom.</span> {{ help_tip(key_stat_help.average_volume, 'el volumen promedio') }}</span>
                 <span class="num">{{ (fundamentals.average_volume if fundamentals else none)|compact_number }}</span>
             </div>
             <div class="tn-help-row tn-keystat">
-                <span class="text-muted2 flex items-center">Beta {{ help_tip(key_stat_help.beta, 'Beta') }}</span>
+                <span class="text-muted2 flex items-center"><span data-i18n="company.beta">Beta</span> {{ help_tip(key_stat_help.beta, 'Beta') }}</span>
                 <span class="num">{{ (fundamentals.beta if fundamentals else none)|ratio }}</span>
             </div>
             <div class="tn-help-row tn-keystat">
-                <span class="text-muted2 flex items-center">LPA (ttm) {{ help_tip(key_stat_help.eps, 'el LPA') }}</span>
+                <span class="text-muted2 flex items-center"><span data-i18n="company.eps_ttm">LPA (ttm)</span> {{ help_tip(key_stat_help.eps, 'el LPA') }}</span>
                 <span class="num">{{ (fundamentals.eps if fundamentals else none)|ratio }}</span>
             </div>
             <div class="tn-keystat">
-                <span class="text-muted2">Próximo resultado</span>
+                <span class="text-muted2" data-i18n="company.next_earnings">Próximo resultado</span>
                 <span class="num">{% if next_earnings %}{{ next_earnings.event_date|date_es }}{% else %}—{% endif %}</span>
             </div>
             <div class="tn-keystat tn-keystat-last">
-                <span class="text-muted2">Sitio web</span>
+                <span class="text-muted2" data-i18n="company.website_label">Sitio web</span>
                 {% if asset.website %}
                 <a href="{{ asset.website }}" target="_blank" rel="noopener noreferrer" class="font-semibold">{{ asset.website|domain }} ↗</a>
                 {% else %}
@@ -131,9 +131,9 @@
 <div class="card p-5 mb-4 tn-score-card">
     <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
         <div>
-            <div class="text-[15px] font-semibold">Score de calidad</div>
+            <div class="text-[15px] font-semibold" data-i18n="company.quality_score_heading">Score de calidad</div>
             <p class="text-[12px] text-muted mt-1">
-                Comparación fundamental con reglas para {{ insight.sector }}. No constituye una recomendación.
+                <span data-i18n="company.score_desc_prefix">Comparación fundamental con reglas para</span> {{ insight.sector }}. <span data-i18n="company.score_desc_suffix">No constituye una recomendación.</span>
             </p>
         </div>
         <div class="flex items-center gap-3">
@@ -143,22 +143,23 @@
             </div>
             <div>
                 <div class="font-semibold text-[13px]">{{ insight.label }}</div>
-                <div class="text-[11.5px] text-muted">Cobertura {{ insight.coverage }}%</div>
+                <div class="text-[11.5px] text-muted"><span data-i18n="company.coverage_prefix">Cobertura</span> {{ insight.coverage }}%</div>
             </div>
         </div>
     </div>
+    {% set score_cat_i18n = {'Valuación': 'company.group_valuation', 'Rentabilidad': 'company.group_profitability', 'Solidez': 'company.group_debt', 'Dividendos': 'company.group_dividends'} %}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
         {% for component in insight.components %}
         <div class="tn-score-component">
             <div class="flex justify-between gap-2 items-center">
-                <span class="lbl">{{ component.label }}</span>
+                <span class="lbl" data-i18n="{{ score_cat_i18n.get(component.label, '') }}">{{ component.label }}</span>
                 <span class="num font-semibold">{{ component.score if component.score is not none else '—' }}</span>
             </div>
             <div class="tn-score-track mt-2">
                 <span style="width: {{ component.score or 0 }}%"></span>
             </div>
             <div class="text-[10.5px] text-faint mt-1.5">
-                Peso {{ component.weight }}% · {{ component.available }}/{{ component.total }} indicadores
+                <span data-i18n="company.weight_prefix">Peso</span> {{ component.weight }}% · {{ component.available }}/{{ component.total }} <span data-i18n="company.indicators_suffix">indicadores</span>
             </div>
             <div class="text-[10.5px] text-muted mt-1">{{ component.explanation }}</div>
         </div>
@@ -169,22 +170,23 @@
 <!-- Fundamental indicators -->
 <div class="card p-5 mb-4">
     <div class="flex flex-wrap gap-2 justify-between items-center mb-4">
-        <div class="text-[15px] font-semibold">Indicadores fundamentales</div>
+        <div class="text-[15px] font-semibold" data-i18n="company.fundamentals_heading">Indicadores fundamentales</div>
         {% if fundamentals %}
-        <span class="text-[12px] text-muted">Snapshot del {{ fundamentals.as_of_date|date_es }}</span>
+        <span class="text-[12px] text-muted"><span data-i18n="company.snapshot_prefix">Snapshot del</span> {{ fundamentals.as_of_date|date_es }}</span>
         {% endif %}
     </div>
+    {% set group_i18n = {'Valuación': 'company.group_valuation', 'Rentabilidad': 'company.group_profitability', 'Solidez': 'company.group_debt', 'Crecimiento': 'company.group_growth', 'Dividendos': 'company.group_dividends'} %}
     <div class="tn-ind-groups">
         {% for group_name, rows in indicator_groups %}
         <div class="tn-ind-group">
-            <div class="lbl mb-2.5 text-maple">{{ group_name }}</div>
+            <div class="lbl mb-2.5 text-maple" data-i18n="{{ group_i18n.get(group_name, '') }}">{{ group_name }}</div>
             <div class="grid grid-cols-2 gap-2">
                 {% for key, label, kind, help_text in rows %}
                 {% set value = fundamentals|attr(key) if fundamentals else none %}
                 {% set signal = insight.indicators.get(key) %}
                 <div class="ind">
                     <span class="lbl tn-ind-label">
-                        {{ label }}{{ help_tip(help_text, label) }}
+                        {% if key == 'revenue_cagr' %}<span data-i18n="company.ind_revenue_cagr">CAGR ing.</span> {{ label.split(' ')[-1] }}{% else %}<span data-i18n="company.ind_{{ key }}">{{ label }}</span>{% endif %}{{ help_tip(help_text, label) }}
                         {% if signal %}
                         <span class="tn-signal tn-signal-{{ signal.status }}" title="{{ signal.label }}: {{ signal.explanation }}" aria-label="{{ signal.label }}"></span>
                         {% endif %}
@@ -206,15 +208,15 @@
 <!-- Dividends -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5 mb-5">
     <div class="card p-5">
-        <div class="text-sm font-semibold mb-3">Historial de dividendos</div>
+        <div class="text-sm font-semibold mb-3" data-i18n="company.dividend_history_heading">Historial de dividendos</div>
         {% if dividends %}
         <div class="overflow-x-auto">
             <table class="tn-card-table">
                 <thead>
                     <tr>
-                        <th>Ex-date</th>
-                        <th>Pay date</th>
-                        <th>Monto</th>
+                        <th data-i18n="company.col_ex_date">Ex-date</th>
+                        <th data-i18n="company.col_pay_date">Pay date</th>
+                        <th data-i18n="company.col_amount">Monto</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -229,18 +231,18 @@
             </table>
         </div>
         {% else %}
-        <div class="text-center py-8 text-[13px] text-faint">Sin historial de dividendos registrado.</div>
+        <div class="text-center py-8 text-[13px] text-faint" data-i18n="company.no_dividend_history">Sin historial de dividendos registrado.</div>
         {% endif %}
     </div>
 
     <div class="card p-5">
-        <div class="text-sm font-semibold mb-3">Dividendos por año</div>
+        <div class="text-sm font-semibold mb-3" data-i18n="company.dividends_by_year_heading">Dividendos por año</div>
         {% if dividend_years %}
         <div class="h-56">
             <canvas id="dividendsByYearChart"></canvas>
         </div>
         {% else %}
-        <div class="flex items-center justify-center h-56 text-[13px] text-faint">Sin datos suficientes para el gráfico.</div>
+        <div class="flex items-center justify-center h-56 text-[13px] text-faint" data-i18n="company.no_chart_data">Sin datos suficientes para el gráfico.</div>
         {% endif %}
     </div>
 </div>
@@ -248,10 +250,10 @@
 <!-- Hechos relevantes -->
 <div class="card p-5 mb-5">
     <div class="flex items-center justify-between mb-3">
-        <div class="text-sm font-semibold">Hechos relevantes</div>
+        <div class="text-sm font-semibold" data-i18n="company.material_events_heading">Hechos relevantes</div>
         {% if next_earnings %}
         <div class="text-[12px] text-muted2">
-            Próximos resultados: <span class="num font-semibold text-ink">{{ next_earnings.event_date|date_es }}</span>
+            <span data-i18n="company.next_earnings_label">Próximos resultados:</span> <span class="num font-semibold text-ink">{{ next_earnings.event_date|date_es }}</span>
         </div>
         {% endif %}
     </div>
@@ -262,17 +264,17 @@
         <div class="flex items-center gap-3 text-[13px]">
             <span class="num text-[11.5px] text-faint w-20 shrink-0">{{ filing.event_date }}</span>
             <span class="flex-1">{{ filing.summary or filing.title }}</span>
-            <a href="{{ filing.url }}" target="_blank" rel="noopener" class="font-semibold text-[12.5px] shrink-0">Ver en EDGAR ↗</a>
+            <a href="{{ filing.url }}" target="_blank" rel="noopener" class="font-semibold text-[12.5px] shrink-0" data-i18n="company.view_on_edgar">Ver en EDGAR ↗</a>
         </div>
         {% endfor %}
     </div>
     {% else %}
     <div class="text-[13px] text-faint">
         {% if asset.currency == 'CAD' %}
-        SEDAR+ no tiene API pública, así que los filings canadienses no se ingestan.
-        <a href="{{ sedar_search_url }}" target="_blank" rel="noopener" class="font-semibold">Buscar {{ asset.name }} en SEDAR+ ↗</a>
+        <span data-i18n="company.sedar_notice">SEDAR+ no tiene API pública, así que los filings canadienses no se ingestan.</span>
+        <a href="{{ sedar_search_url }}" target="_blank" rel="noopener" class="font-semibold"><span data-i18n="company.sedar_search_prefix">Buscar</span> {{ asset.name }} <span data-i18n="company.sedar_search_suffix">en SEDAR+ ↗</span></a>
         {% else %}
-        Sin filings registrados todavía.
+        <span data-i18n="company.no_filings">Sin filings registrados todavía.</span>
         {% endif %}
     </div>
     {% endif %}
@@ -280,7 +282,7 @@
 
 <!-- Noticias -->
 <div class="card p-5 mb-5">
-    <div class="text-sm font-semibold mb-3">Noticias</div>
+    <div class="text-sm font-semibold mb-3" data-i18n="company.news_heading">Noticias</div>
     {% if news %}
     <div class="flex flex-col gap-3">
         {% for item in news %}
@@ -296,38 +298,38 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="text-[13px] text-faint">Sin noticias registradas todavía para {{ asset.symbol }}.</div>
+    <div class="text-[13px] text-faint"><span data-i18n="company.no_news_prefix">Sin noticias registradas todavía para</span> {{ asset.symbol }}.</div>
     {% endif %}
 </div>
 
 <!-- Comunidad -->
 <div class="card p-5 mb-5">
     <div class="flex items-center justify-between gap-3 mb-3">
-        <div class="text-sm font-semibold">Comunidad</div>
-        <a href="{{ url_for('community.community_page') }}" class="text-[12.5px] text-muted2 hover:text-ink">Ver todo el feed →</a>
+        <div class="text-sm font-semibold" data-i18n="company.community_heading">Comunidad</div>
+        <a href="{{ url_for('community.community_page') }}" class="text-[12.5px] text-muted2 hover:text-ink" data-i18n="company.view_full_feed">Ver todo el feed →</a>
     </div>
     {# Loaded after the page paints: the company view is already heavy, and a
        discussion feed is never the reason someone opened it. #}
     <div hx-get="{{ url_for('community.asset_feed', asset_id=asset.id) }}"
          hx-trigger="load" hx-swap="innerHTML">
-        <div class="text-[13px] text-faint">Cargando publicaciones sobre {{ asset.symbol }}…</div>
+        <div class="text-[13px] text-faint"><span data-i18n="company.loading_posts_prefix">Cargando publicaciones sobre</span> {{ asset.symbol }}…</div>
     </div>
 </div>
 
 <!-- Description -->
 <div class="card p-5 mb-5">
-    <div class="text-sm font-semibold mb-3">Sobre {{ asset.name }}</div>
+    <div class="text-sm font-semibold mb-3"><span data-i18n="company.about_prefix">Sobre</span> {{ asset.name }}</div>
     {% if asset.description %}
     <p class="text-[13.5px] text-muted2 leading-relaxed">{{ asset.description }}</p>
     {% else %}
-    <p class="text-[13.5px] text-faint">No hay descripción disponible todavía.</p>
+    <p class="text-[13.5px] text-faint" data-i18n="company.no_description">No hay descripción disponible todavía.</p>
     {% endif %}
 </div>
 
 <!-- ADD_TO_PORTFOLIO MODAL -->
 <div class="tn-modal" id="ADD_TO_PORTFOLIO">
     <div class="tn-modal-box">
-        <h3 class="font-semibold text-base mb-4">Nueva orden — {{ asset.symbol }}</h3>
+        <h3 class="font-semibold text-base mb-4"><span data-i18n="company.new_order_prefix">Nueva orden —</span> {{ asset.symbol }}</h3>
 
         <form method="POST" action="/api/stock">
             {{ form.hidden_tag() }}
@@ -357,9 +359,9 @@
             </div>
 
             <div class="flex justify-between gap-2">
-                <button type="submit" name="action" value="BUY" class="btn" style="background:#1a7f4e;border-color:#1a7f4e;color:#fff">Comprar</button>
-                <button type="submit" name="action" value="SELL" class="btn" style="background:#c23934;border-color:#c23934;color:#fff">Vender</button>
-                <a href="#" class="btn">Cancelar</a>
+                <button type="submit" name="action" value="BUY" class="btn" style="background:#1a7f4e;border-color:#1a7f4e;color:#fff" data-i18n="company.buy">Comprar</button>
+                <button type="submit" name="action" value="SELL" class="btn" style="background:#c23934;border-color:#c23934;color:#fff" data-i18n="company.sell">Vender</button>
+                <a href="#" class="btn" data-i18n="company.cancel">Cancelar</a>
             </div>
         </form>
     </div>

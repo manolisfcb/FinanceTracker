@@ -8,7 +8,7 @@
                     {% for key, label in columns %}
                     <th class="{{ 'l' if key in ('symbol', 'sector') }} {{ 'tn-edge-l' if loop.first }} {{ 'tn-edge-r' if loop.last }}">
                         <a href="{{ sort_links[key] }}" class="{{ 'text-ink' if sort == key else 'text-muted' }} hover:text-ink whitespace-nowrap">
-                            {{ label }}{% if sort == key %} {{ '↑' if dir == 'asc' else '↓' }}{% endif %}
+                            <span data-i18n="stocks.col_{{ key }}">{{ label }}</span>{% if sort == key %} {{ '↑' if dir == 'asc' else '↓' }}{% endif %}
                         </a>
                     </th>
                     {% endfor %}
@@ -53,7 +53,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="{{ columns|length }}" class="l text-center text-faint py-10">
+                    <td colspan="{{ columns|length }}" class="l text-center text-faint py-10" data-i18n="stocks.empty_state">
                         No hay empresas que coincidan con estos filtros.
                     </td>
                 </tr>

@@ -6,22 +6,22 @@
 {% block content %}
 <div class="flex flex-wrap items-end justify-between gap-4 mb-5">
     <div>
-        <div class="lbl text-maple mb-1">Herramientas</div>
-        <h1 class="font-serif-display text-3xl text-ink mb-1">Análisis de acciones por grandes inversores</h1>
+        <div class="lbl text-maple mb-1" data-i18n="valuemethods.eyebrow">Herramientas</div>
+        <h1 class="font-serif-display text-3xl text-ink mb-1" data-i18n="valuemethods.title">Análisis de acciones por grandes inversores</h1>
         <p class="text-[13px] text-muted max-w-3xl">
-            Rankings reproducibles con los últimos fundamentos disponibles, comparados dentro de cada sector{% if last_update %} · actualizado {{ last_update|date_es }}{% endif %}.
+            <span data-i18n="valuemethods.subtitle">Rankings reproducibles con los últimos fundamentos disponibles, comparados dentro de cada sector</span>{% if last_update %} · actualizado {{ last_update|date_es }}{% endif %}.
         </p>
     </div>
-    <div class="text-[11.5px] text-muted border border-border rounded-lg bg-white px-3 py-2">
+    <div class="text-[11.5px] text-muted border border-border rounded-lg bg-white px-3 py-2" data-i18n="valuemethods.disclaimer_badge">
         Uso educativo · no constituye recomendación de inversión
     </div>
 </div>
 
-<nav class="grid grid-cols-2 md:grid-cols-5 gap-2.5 mb-5" aria-label="Métodos de valuación">
+<nav class="grid grid-cols-2 md:grid-cols-5 gap-2.5 mb-5" aria-label="Métodos de valuación" data-i18n-aria-label="valuemethods.nav_aria_label">
     {% for slug, method in methods.items() %}
     <a href="{{ method_urls[slug] }}"
        class="card px-4 py-3.5 transition-colors {{ 'border-maple bg-[#fffaf8]' if slug == method_slug else 'hover:border-[#d6d1c6]' }}">
-        <div class="text-[11px] font-semibold uppercase tracking-wider {{ 'text-maple' if slug == method_slug else 'text-muted' }}">
+        <div class="text-[11px] font-semibold uppercase tracking-wider {{ 'text-maple' if slug == method_slug else 'text-muted' }}" data-i18n="{{ 'valuemethods.fair_price_label' if method.has_fair_value else 'valuemethods.score_label' }}">
             {{ 'Precio justo' if method.has_fair_value else 'Puntuación' }}
         </div>
         <div class="text-[14px] font-semibold text-ink mt-1">{{ method.short_name }}</div>
@@ -33,13 +33,13 @@
     <div class="grid lg:grid-cols-[1.45fr_1fr]">
         <div class="p-6 lg:p-7">
             <div class="lbl text-maple mb-2">{{ active_method.eyebrow }}</div>
-            <h2 class="font-serif-display text-[28px] leading-tight mb-3">Ranking según {{ active_method.name }}</h2>
+            <h2 class="font-serif-display text-[28px] leading-tight mb-3"><span data-i18n="valuemethods.ranking_heading">Ranking según</span> {{ active_method.name }}</h2>
             <p class="text-[14px] leading-6 text-muted2 mb-5">{{ active_method.summary }}</p>
 
-            <h3 class="text-[13px] font-semibold mb-2">En qué se basa</h3>
+            <h3 class="text-[13px] font-semibold mb-2" data-i18n="valuemethods.basis_heading">En qué se basa</h3>
             <p class="text-[13px] leading-5 text-muted2 mb-5">{{ active_method.basis }}</p>
 
-            <h3 class="text-[13px] font-semibold mb-2">Cómo se calcula</h3>
+            <h3 class="text-[13px] font-semibold mb-2" data-i18n="valuemethods.calculation_heading">Cómo se calcula</h3>
             <ol class="space-y-2 text-[13px] leading-5 text-muted2">
                 {% for step in active_method.calculation %}
                 <li class="flex gap-2.5"><span class="num text-maple font-semibold">{{ loop.index }}.</span><span>{{ step }}</span></li>
@@ -47,9 +47,9 @@
             </ol>
         </div>
         <aside class="bg-[#fbfaf8] border-t lg:border-t-0 lg:border-l border-border p-6 lg:p-7">
-            <h3 class="text-[13px] font-semibold mb-2">Para qué sirve</h3>
+            <h3 class="text-[13px] font-semibold mb-2" data-i18n="valuemethods.useful_for_heading">Para qué sirve</h3>
             <p class="text-[13px] leading-5 text-muted2 mb-5">{{ active_method.useful_for }}</p>
-            <h3 class="text-[13px] font-semibold mb-2">Antes de interpretar el ranking</h3>
+            <h3 class="text-[13px] font-semibold mb-2" data-i18n="valuemethods.caveats_heading">Antes de interpretar el ranking</h3>
             <ul class="space-y-2.5 text-[12.5px] leading-5 text-muted2">
                 {% for caveat in active_method.caveats %}
                 <li class="flex gap-2.5">
@@ -64,26 +64,26 @@
 
 <form method="get" class="card px-[18px] py-3.5 mb-5 flex items-center gap-2.5 flex-wrap">
     <input type="hidden" name="method" value="{{ method_slug }}">
-    <label for="sector" class="text-[12px] font-semibold text-muted">Sector</label>
+    <label for="sector" class="text-[12px] font-semibold text-muted" data-i18n="valuemethods.sector_label">Sector</label>
     <select id="sector" name="sector" class="sel" onchange="this.form.submit()">
-        <option value="">Todos los sectores</option>
+        <option value="" data-i18n="valuemethods.all_sectors">Todos los sectores</option>
         {% for sector in sectors %}<option value="{{ sector }}" {{ 'selected' if sector == selected_sector }}>{{ sector }}</option>{% endfor %}
     </select>
-    <label for="exchange" class="text-[12px] font-semibold text-muted ml-1">Mercado</label>
+    <label for="exchange" class="text-[12px] font-semibold text-muted ml-1" data-i18n="valuemethods.exchange_label">Mercado</label>
     <select id="exchange" name="exchange" class="sel" onchange="this.form.submit()">
-        <option value="">Todos</option>
+        <option value="" data-i18n="valuemethods.all_exchanges">Todos</option>
         {% for exchange in exchanges %}<option value="{{ exchange }}" {{ 'selected' if exchange == selected_exchange }}>{{ exchange }}</option>{% endfor %}
     </select>
     <div class="ml-auto text-[12px] text-muted">
-        <span class="font-semibold text-ink">{{ eligible_count|quantity }}</span> empresas con datos suficientes
+        <span class="font-semibold text-ink">{{ eligible_count|quantity }}</span> <span data-i18n="valuemethods.eligible_companies_suffix">empresas con datos suficientes</span>
     </div>
 </form>
 
 {% if leaders and not selected_sector %}
 <section class="mb-6">
     <div class="flex items-baseline justify-between gap-3 mb-3">
-        <h2 class="font-serif-display text-2xl">Líderes por sector</h2>
-        <span class="text-[11.5px] text-muted">Mejor posición relativa en cada sector</span>
+        <h2 class="font-serif-display text-2xl" data-i18n="valuemethods.leaders_heading">Líderes por sector</h2>
+        <span class="text-[11.5px] text-muted" data-i18n="valuemethods.leaders_subheading">Mejor posición relativa en cada sector</span>
     </div>
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {% for row in leaders %}
@@ -107,27 +107,27 @@
 
 <section>
     <div class="flex items-baseline justify-between gap-3 mb-3">
-        <h2 class="font-serif-display text-2xl">{{ selected_sector or 'Ranking detallado por sector' }}</h2>
-        <span class="text-[11.5px] text-muted">Hasta 10 resultados por sector</span>
+        <h2 class="font-serif-display text-2xl" {% if not selected_sector %}data-i18n="valuemethods.detailed_ranking_heading"{% endif %}>{{ selected_sector or 'Ranking detallado por sector' }}</h2>
+        <span class="text-[11.5px] text-muted" data-i18n="valuemethods.up_to_10_results">Hasta 10 resultados por sector</span>
     </div>
 
     {% for group in sector_groups %}
     <div id="sector-{{ loop.index }}" class="card overflow-hidden mb-4 scroll-mt-20">
         <div class="px-5 py-3.5 border-b border-border flex items-center justify-between">
             <h3 class="text-[14px] font-semibold">{{ group.sector }}</h3>
-            <span class="text-[11px] text-muted">{{ group.rows|length }} elegibles</span>
+            <span class="text-[11px] text-muted">{{ group.rows|length }} <span data-i18n="valuemethods.eligible_suffix">elegibles</span></span>
         </div>
         <div class="overflow-x-auto">
             <table class="tn-positions">
                 <thead>
                     <tr>
                         <th class="l tn-edge-l">#</th>
-                        <th class="l">Activo</th>
-                        <th>Precio actual</th>
-                        {% if active_method.has_fair_value %}<th>Precio calculado</th>{% endif %}
+                        <th class="l" data-i18n="valuemethods.th_asset">Activo</th>
+                        <th data-i18n="valuemethods.th_current_price">Precio actual</th>
+                        {% if active_method.has_fair_value %}<th data-i18n="valuemethods.th_calculated_price">Precio calculado</th>{% endif %}
                         <th>{{ active_method.result_label }}</th>
-                        <th>{{ 'Earnings yield' if method_slug == 'greenblatt' else 'ROE / ROIC' if method_slug == 'buffett' else group.rows[0].metric_a[0] }}</th>
-                        <th class="tn-edge-r">{{ 'Retorno capital' if method_slug == 'greenblatt' else group.rows[0].metric_b[0] }}</th>
+                        <th {% if method_slug == 'greenblatt' %}data-i18n="valuemethods.th_earnings_yield"{% elif method_slug == 'buffett' %}data-i18n="valuemethods.th_roe_roic"{% endif %}>{{ 'Earnings yield' if method_slug == 'greenblatt' else 'ROE / ROIC' if method_slug == 'buffett' else group.rows[0].metric_a[0] }}</th>
+                        <th class="tn-edge-r" {% if method_slug == 'greenblatt' %}data-i18n="valuemethods.th_capital_return"{% endif %}>{{ 'Retorno capital' if method_slug == 'greenblatt' else group.rows[0].metric_b[0] }}</th>
                     </tr>
                 </thead>
                 <tbody class="num">
@@ -165,13 +165,13 @@
     </div>
     {% else %}
     <div class="card text-center py-12 px-6">
-        <div class="font-serif-display text-2xl mb-2">Aún no hay empresas elegibles</div>
-        <p class="text-[13px] text-muted max-w-lg mx-auto">Este método necesita indicadores positivos y completos. El próximo refresco de fundamentos puede incorporar nuevos resultados.</p>
+        <div class="font-serif-display text-2xl mb-2" data-i18n="valuemethods.empty_title">Aún no hay empresas elegibles</div>
+        <p class="text-[13px] text-muted max-w-lg mx-auto" data-i18n="valuemethods.empty_desc">Este método necesita indicadores positivos y completos. El próximo refresco de fundamentos puede incorporar nuevos resultados.</p>
     </div>
     {% endfor %}
 </section>
 
-<div class="mt-5 text-[11.5px] leading-5 text-muted border-t border-border pt-4">
+<div class="mt-5 text-[11.5px] leading-5 text-muted border-t border-border pt-4" data-i18n="valuemethods.disclaimer">
     Los cálculos usan el último snapshot almacenado y pueden mezclar monedas entre compañías; cada precio calculado permanece en la moneda del activo. Los rankings son filtros educativos, no predicciones ni asesoramiento financiero.
 </div>
 {% endblock %}

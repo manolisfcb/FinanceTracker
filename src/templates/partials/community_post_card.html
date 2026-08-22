@@ -6,9 +6,9 @@
     <div class="flex items-center gap-2.5 mb-2.5">
         {{ avatar(post.author.username, 32) }}
         <span class="text-[13px] font-semibold">{{ post.author.username }}</span>
-        <span class="text-[11.5px] text-faint">· {{ post.created_at|relative_time_es }}{% if post.updated_at %} · editado{% endif %} ·</span>
+        <span class="text-[11.5px] text-faint">· {{ post.created_at|relative_time_es }}{% if post.updated_at %} · <span data-i18n="community.edited_suffix">editado</span>{% endif %} ·</span>
         <a href="{{ url_for('community.community_page', category=post.category.value) }}"
-           class="cat {{ category_styles[post.category] }}">{{ categories[post.category] }}</a>
+           class="cat {{ category_styles[post.category] }}" data-i18n="community.category_{{ post.category.value|lower }}">{{ categories[post.category] }}</a>
     </div>
 
     <a href="{{ url_for('community.post_page', post_id=post.id) }}"

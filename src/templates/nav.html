@@ -47,14 +47,20 @@
                             </div>
                             <div class="py-2 border-b border-border">
                                 <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted" data-i18n="nav.section_personal_finance">Control de gastos</div>
-                                <a href="{{ url_for('personal_finance.transactions') }}"
-                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint in ['personal_finance.transactions', 'personal_finance.add_transactions', 'personal_finance.edit_transactions', 'personal_finance.upload_transactions'] else 'text-ink' }}" data-i18n="nav.transactions">
-                                    Transacciones
-                                </a>
-                                <a href="{{ url_for('personal_finance.transactions_charts') }}"
-                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'personal_finance.transactions_charts' else 'text-ink' }}" data-i18n="nav.charts">
-                                    Gráficos
-                                </a>
+                                <div class="flex items-center justify-between gap-3 px-4 py-2 text-sm text-muted2 cursor-not-allowed select-none" aria-disabled="true">
+                                    <span data-i18n="nav.transactions">Transacciones</span>
+                                    <span class="flex items-center gap-1 shrink-0">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+                                        <span class="text-[10px] font-semibold uppercase tracking-wider" data-i18n="nav.coming_soon">Próximamente</span>
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between gap-3 px-4 py-2 text-sm text-muted2 cursor-not-allowed select-none" aria-disabled="true">
+                                    <span data-i18n="nav.charts">Gráficos</span>
+                                    <span class="flex items-center gap-1 shrink-0">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+                                        <span class="text-[10px] font-semibold uppercase tracking-wider" data-i18n="nav.coming_soon">Próximamente</span>
+                                    </span>
+                                </div>
                             </div>
                             <div class="py-2 border-b border-border">
                                 <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted" data-i18n="nav.section_activity">Actividad</div>

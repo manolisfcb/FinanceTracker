@@ -7,29 +7,29 @@
 {% block content %}
 {% include 'partials/flash_messages.html' %}
 
-<h1 class="font-serif-display text-3xl text-ink mb-6">Importar órdenes</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-6" data-i18n="orders.import_title">Importar órdenes</h1>
 
 <div class="card p-6 max-w-lg">
     <form method="POST" enctype="multipart/form-data" class="space-y-4">
         {{ form.hidden_tag() }}
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.broker.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.import_field_broker">{{ form.broker.label.text }}</label>
             {{ form.broker(class="tn-input") }}
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.account.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.import_field_account">{{ form.account.label.text }}</label>
             {{ form.account(class="tn-input") }}
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.file.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.import_field_file">{{ form.file.label.text }}</label>
             {{ form.file(class="tn-input") }}
-            <span class="text-[11.5px] text-faint">Los parsers son best-effort — si las columnas no coinciden con tu export, avisá para ajustar el formato.</span>
+            <span class="text-[11.5px] text-faint" data-i18n="orders.import_help_file">Los parsers son best-effort — si las columnas no coinciden con tu export, avisá para ajustar el formato.</span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Analizar archivo</button>
+        <button type="submit" class="btn btn-primary" data-i18n="orders.import_submit">Analizar archivo</button>
     </form>
 </div>
 {% endblock %}

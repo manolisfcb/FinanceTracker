@@ -8,16 +8,16 @@
 {% include 'partials/flash_messages.html' %}
 
 <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
-    <h1 class="font-serif-display text-3xl text-ink">Órdenes</h1>
+    <h1 class="font-serif-display text-3xl text-ink" data-i18n="orders.title">Órdenes</h1>
     <div class="flex gap-2.5">
-        <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Importar CSV</a>
-        <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">Nueva orden</a>
+        <a href="{{ url_for('portfolio.import_orders') }}" class="btn" data-i18n="orders.import_csv">Importar CSV</a>
+        <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary" data-i18n="orders.new_order">Nueva orden</a>
     </div>
 </div>
 
 <div class="flex items-center gap-2 mb-4 text-[13px]">
-    <span class="text-muted2">Cuenta:</span>
-    <a href="{{ url_for('portfolio.list_orders') }}" class="btn {{ 'btn-primary' if not selected_account_id }}">Todas</a>
+    <span class="text-muted2" data-i18n="orders.filter_account_label">Cuenta:</span>
+    <a href="{{ url_for('portfolio.list_orders') }}" class="btn {{ 'btn-primary' if not selected_account_id }}" data-i18n="orders.filter_all">Todas</a>
     {% for account in accounts %}
         <a href="{{ url_for('portfolio.list_orders', account_id=account.id) }}" class="btn {{ 'btn-primary' if selected_account_id == account.id }}">{{ account.name }}</a>
     {% endfor %}
@@ -28,15 +28,15 @@
         <table class="tn-card-table">
             <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>Activo</th>
-                    <th>Cuenta</th>
-                    <th>Tipo</th>
-                    <th>Cant.</th>
-                    <th>Precio</th>
-                    <th>Comisiones</th>
-                    <th>Moneda</th>
-                    <th>Broker</th>
+                    <th data-i18n="orders.col_date">Fecha</th>
+                    <th data-i18n="orders.col_asset">Activo</th>
+                    <th data-i18n="orders.col_account">Cuenta</th>
+                    <th data-i18n="orders.col_type">Tipo</th>
+                    <th data-i18n="orders.col_qty">Cant.</th>
+                    <th data-i18n="orders.col_price">Precio</th>
+                    <th data-i18n="orders.col_fees">Comisiones</th>
+                    <th data-i18n="orders.col_currency">Moneda</th>
+                    <th data-i18n="orders.col_broker">Broker</th>
                     <th></th>
                 </tr>
             </thead>
@@ -55,17 +55,17 @@
                         <td>{{ order.broker or '—' }}</td>
                         <td class="whitespace-nowrap">
                             <a href="{{ url_for('portfolio.edit_order', id=order.id) }}"
-                               class="text-muted2 hover:text-ink mr-3" title="Editar">Editar</a>
+                               class="text-muted2 hover:text-ink mr-3" title="Editar" data-i18n="orders.edit" data-i18n-title="orders.edit">Editar</a>
                             <a hx-delete="{{ url_for('portfolio.delete_order', id=order.id) }}"
                                hx-confirm="¿Seguro que quieres eliminar esta orden?"
                                hx-on="afterRequest: window.location.reload()"
-                               class="cursor-pointer text-muted2 hover:text-neg" title="Eliminar">Eliminar</a>
+                               class="cursor-pointer text-muted2 hover:text-neg" title="Eliminar" data-i18n="orders.delete" data-i18n-title="orders.delete" data-i18n-hx-confirm="orders.confirm_delete_order">Eliminar</a>
                         </td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="10" class="text-center text-faint py-6">Todavía no hay órdenes registradas.</td>
+                        <td colspan="10" class="text-center text-faint py-6" data-i18n="orders.empty_state">Todavía no hay órdenes registradas.</td>
                     </tr>
                 {% endif %}
             </tbody>

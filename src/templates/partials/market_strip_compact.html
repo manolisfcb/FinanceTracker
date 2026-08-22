@@ -14,6 +14,6 @@
     </span>
     {% endfor %}
     {% if market_usdcad %}<span>USD/CAD {{ market_usdcad.value|fx }}</span>{% endif %}
-    {% if market_boc_rate %}<span>Tasa BoC {{ market_boc_rate.value|ratio }}%</span>{% endif %}
+    {% if market_boc_rate %}<span><span data-i18n="common.boc_rate">Tasa BoC</span> {{ market_boc_rate.value|ratio }}%</span>{% endif %}
 </div>
 {% endif %}

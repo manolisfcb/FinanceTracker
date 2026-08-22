@@ -9,12 +9,12 @@
 
 <div class="flex items-end justify-between mb-5">
     <div>
-        <h1 class="font-serif-display text-3xl text-ink mb-1">Inbox</h1>
-        <div class="text-[13px] text-muted">Hechos relevantes de las empresas de tu portafolio</div>
+        <h1 class="font-serif-display text-3xl text-ink mb-1" data-i18n="inboxpage.title">Inbox</h1>
+        <div class="text-[13px] text-muted" data-i18n="inboxpage.subtitle">Hechos relevantes de las empresas de tu portafolio</div>
     </div>
     <button class="btn"
             hx-post="{{ url_for('inbox.mark_all_read') }}"
-            hx-on="afterRequest: window.location.reload()">Marcar todo como leído</button>
+            hx-on="afterRequest: window.location.reload()" data-i18n="inboxpage.mark_all_read">Marcar todo como leído</button>
 </div>
 
 <div id="inbox-panel">

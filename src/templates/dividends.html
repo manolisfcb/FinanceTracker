@@ -8,35 +8,35 @@
 {% include 'partials/flash_messages.html' %}
 
 <div class="mb-5">
-    <h1 class="font-serif-display text-3xl text-ink mb-1">Dividendos</h1>
-    <div class="text-[13px] text-muted">Ingresos pasivos de tu portafolio, en CAD</div>
+    <h1 class="font-serif-display text-3xl text-ink mb-1" data-i18n="dividendspage.title">Dividendos</h1>
+    <div class="text-[13px] text-muted" data-i18n="dividendspage.subtitle">Ingresos pasivos de tu portafolio, en CAD</div>
 </div>
 
 {% if warnings %}
 <div class="tn-alert tn-alert-info mb-5">
-    <span>{{ warnings|length }} advertencia(s) en el cálculo de dividendos — {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
+    <span>{{ warnings|length }} <span data-i18n="dividendspage.warnings_text">advertencia(s) en el cálculo de dividendos —</span> {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
 </div>
 {% endif %}
 
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-4">
     <div class="card p-4">
-        <div class="lbl mb-2">Recibidos 12m</div>
+        <div class="lbl mb-2" data-i18n="dividendspage.kpi_received_12m">Recibidos 12m</div>
         <div class="num text-xl font-semibold">C$ {{ kpis.received_12m_cad|currency }}</div>
         {% if kpis.change_vs_previous_percent is not none %}
         <div class="num text-[12px] mt-1.5 {{ 'pos' if kpis.change_vs_previous_percent >= 0 else 'neg' }}">
-            {{ '+' if kpis.change_vs_previous_percent >= 0 }}{{ kpis.change_vs_previous_percent|ratio }}% vs. año anterior
+            {{ '+' if kpis.change_vs_previous_percent >= 0 }}{{ kpis.change_vs_previous_percent|ratio }}% <span data-i18n="dividendspage.vs_previous_year">vs. año anterior</span>
         </div>
         {% else %}
-        <div class="text-[12px] text-muted mt-1.5">sin histórico previo</div>
+        <div class="text-[12px] text-muted mt-1.5" data-i18n="dividendspage.no_previous_history">sin histórico previo</div>
         {% endif %}
     </div>
     <div class="card p-4">
-        <div class="lbl mb-2">Promedio mensual</div>
+        <div class="lbl mb-2" data-i18n="dividendspage.kpi_monthly_average">Promedio mensual</div>
         <div class="num text-xl font-semibold">C$ {{ kpis.monthly_average_cad|currency }}</div>
-        <div class="text-[12px] text-muted mt-1.5">últimos 12 meses</div>
+        <div class="text-[12px] text-muted mt-1.5" data-i18n="dividendspage.last_12_months">últimos 12 meses</div>
     </div>
     <div class="card p-4">
-        <div class="lbl mb-2">Próximo pago</div>
+        <div class="lbl mb-2" data-i18n="dividendspage.kpi_next_payment">Próximo pago</div>
         {% if kpis.next_payment %}
         <div class="num text-xl font-semibold">
             {% if kpis.next_payment.estimated_cad is not none %}C$ {{ kpis.next_payment.estimated_cad|currency }}{% else %}—{% endif %}
@@ -44,24 +44,24 @@
         <div class="text-[12px] text-muted mt-1.5">{{ kpis.next_payment.symbol }} · {{ kpis.next_payment.event_date|date_es }}</div>
         {% else %}
         <div class="num text-xl font-semibold">—</div>
-        <div class="text-[12px] text-muted mt-1.5">sin ex-dates anunciadas</div>
+        <div class="text-[12px] text-muted mt-1.5" data-i18n="dividendspage.no_ex_dates_announced">sin ex-dates anunciadas</div>
         {% endif %}
     </div>
     <div class="card p-4">
-        <div class="lbl mb-2">Proyección 12m</div>
+        <div class="lbl mb-2" data-i18n="dividendspage.kpi_projection_12m">Proyección 12m</div>
         <div class="num text-xl font-semibold">C$ {{ kpis.projection_12m_cad|currency }}</div>
-        <div class="text-[12px] text-muted mt-1.5">al ritmo actual de pagos</div>
+        <div class="text-[12px] text-muted mt-1.5" data-i18n="dividendspage.at_current_pace">al ritmo actual de pagos</div>
     </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-4">
     <div class="card p-5 md:col-span-2">
-        <div class="text-sm font-semibold mb-3">Recibidos por mes</div>
+        <div class="text-sm font-semibold mb-3" data-i18n="dividendspage.chart_received_by_month">Recibidos por mes</div>
         <canvas id="monthlyDividendsChart" height="80"></canvas>
     </div>
 
     <div class="card p-5">
-        <div class="text-sm font-semibold mb-3">Calendario próximo</div>
+        <div class="text-sm font-semibold mb-3" data-i18n="dividendspage.upcoming_calendar">Calendario próximo</div>
         {% if calendar %}
         <div class="flex flex-col gap-3">
             {% for entry in calendar %}
@@ -71,9 +71,9 @@
                     <div class="num text-base font-semibold">{{ '%02d'|format(entry.event_date.day) }}</div>
                 </div>
                 <div class="flex-1 text-[12.5px]">
-                    <span class="font-semibold">{{ entry.symbol }}</span> ex-dividend
+                    <span class="font-semibold">{{ entry.symbol }}</span> <span data-i18n="dividendspage.ex_dividend_label">ex-dividend</span>
                     <div class="text-muted text-[11.5px]">
-                        {% if entry.amount_per_share %}{{ entry.currency }} {{ entry.amount_per_share|currency }}/acción · {% endif %}{{ entry.quantity|quantity }} acciones
+                        {% if entry.amount_per_share %}{{ entry.currency }} {{ entry.amount_per_share|currency }}<span data-i18n="dividendspage.per_share_suffix">/acción</span> · {% endif %}{{ entry.quantity|quantity }} <span data-i18n="dividendspage.shares_suffix">acciones</span>
                     </div>
                 </div>
                 <span class="num text-[13px] font-semibold">
@@ -83,15 +83,15 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-[13px] text-faint py-4">Todavía no hay ex-dates anunciadas para tus posiciones.</div>
+        <div class="text-[13px] text-faint py-4" data-i18n="dividendspage.no_calendar_entries">Todavía no hay ex-dates anunciadas para tus posiciones.</div>
         {% endif %}
     </div>
 </div>
 
 {% if suggestions %}
 <div class="card p-5 mb-4">
-    <div class="text-sm font-semibold mb-1">Dividendos sugeridos</div>
-    <div class="text-[12px] text-muted mb-3">
+    <div class="text-sm font-semibold mb-1" data-i18n="dividendspage.suggested_heading">Dividendos sugeridos</div>
+    <div class="text-[12px] text-muted mb-3" data-i18n="dividendspage.suggested_description">
         Calculados desde el histórico de pagos y tus posiciones a la ex-date. Confirmá los que
         recibiste de verdad para que dejen de ser estimados.
     </div>
@@ -99,10 +99,10 @@
         <table class="tn-card-table">
             <thead>
                 <tr>
-                    <th>Fecha de pago</th>
-                    <th>Activo</th>
-                    <th>Acciones</th>
-                    <th>Monto</th>
+                    <th data-i18n="dividendspage.th_pay_date">Fecha de pago</th>
+                    <th data-i18n="dividendspage.th_asset">Activo</th>
+                    <th data-i18n="dividendspage.th_shares">Acciones</th>
+                    <th data-i18n="dividendspage.th_amount">Monto</th>
                     <th></th>
                 </tr>
             </thead>
@@ -117,18 +117,18 @@
 {% endif %}
 
 <div class="card overflow-hidden">
-    <div class="px-5 pt-4 pb-1 text-sm font-semibold">Por posición</div>
+    <div class="px-5 pt-4 pb-1 text-sm font-semibold" data-i18n="dividendspage.by_position_heading">Por posición</div>
     <div class="overflow-x-auto">
         <table class="tn-card-table">
             <thead>
                 <tr>
-                    <th>Activo</th>
-                    <th>Yield actual</th>
-                    <th>Yield on cost</th>
-                    <th>Recibido 12m</th>
-                    <th>Recibido total</th>
-                    <th>Frecuencia</th>
-                    <th>% del ingreso</th>
+                    <th data-i18n="dividendspage.th_asset">Activo</th>
+                    <th data-i18n="dividendspage.th_current_yield">Yield actual</th>
+                    <th data-i18n="dividendspage.th_yield_on_cost">Yield on cost</th>
+                    <th data-i18n="dividendspage.th_received_12m">Recibido 12m</th>
+                    <th data-i18n="dividendspage.th_received_total">Recibido total</th>
+                    <th data-i18n="dividendspage.th_frequency">Frecuencia</th>
+                    <th data-i18n="dividendspage.th_income_share">% del ingreso</th>
                 </tr>
             </thead>
             <tbody>
@@ -151,7 +151,7 @@
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="7" class="text-center text-faint py-6">
+                        <td colspan="7" class="text-center text-faint py-6" data-i18n="dividendspage.no_positions">
                             Todavía no hay posiciones con dividendos. Registrá órdenes y esperá al próximo refresh.
                         </td>
                     </tr>

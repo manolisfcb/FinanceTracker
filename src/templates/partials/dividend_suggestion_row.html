@@ -11,11 +11,11 @@
             <button class="btn btn-primary"
                     hx-post="{{ url_for('dividends.confirm_dividend', dividend_id=row.id) }}"
                     hx-target="#suggestion-{{ row.id }}"
-                    hx-swap="outerHTML">Confirmar</button>
+                    hx-swap="outerHTML" data-i18n="dividendspage.confirm_btn">Confirmar</button>
             <button class="btn"
                     hx-post="{{ url_for('dividends.dismiss_dividend', dividend_id=row.id) }}"
                     hx-target="#suggestion-{{ row.id }}"
-                    hx-swap="outerHTML">Descartar</button>
+                    hx-swap="outerHTML" data-i18n="dividendspage.dismiss_btn">Descartar</button>
         </div>
     </td>
 </tr>

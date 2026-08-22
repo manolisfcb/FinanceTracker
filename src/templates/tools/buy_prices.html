@@ -7,75 +7,75 @@
 {% block content %}
 <div class="flex flex-wrap items-end justify-between gap-4 mb-5">
     <div>
-        <div class="lbl text-maple mb-1">Herramientas</div>
-        <h1 class="font-serif-display text-3xl text-ink mb-1">Precios máximos de compra</h1>
+        <div class="lbl text-maple mb-1" data-i18n="buyprices.eyebrow">Herramientas</div>
+        <h1 class="font-serif-display text-3xl text-ink mb-1" data-i18n="buyprices.title">Precios máximos de compra</h1>
         <p class="text-[13px] text-muted max-w-3xl">
-            Precios calculados según Graham, Bazin y Lynch, junto con la puntuación Buffett/Munger{% if last_update %} · snapshot {{ last_update|date_es }}{% endif %}.
+            <span data-i18n="buyprices.subtitle">Precios calculados según Graham, Bazin y Lynch, junto con la puntuación Buffett/Munger</span>{% if last_update %} · snapshot {{ last_update|date_es }}{% endif %}.
         </p>
     </div>
     <div class="flex items-center gap-2.5">
         <div class="tn-seg">
             <a href="{{ view_urls.table }}" class="{{ 'tn-seg-on' if view == 'table' }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"></path><path d="M3 6h.01M3 12h.01M3 18h.01"></path></svg>
-                Tabla
+                <span data-i18n="buyprices.view_table">Tabla</span>
             </a>
             <a href="{{ view_urls.cards }}" class="{{ 'tn-seg-on' if view == 'cards' }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
-                Tarjetas
+                <span data-i18n="buyprices.view_cards">Tarjetas</span>
             </a>
         </div>
-        <a href="{{ url_for('tools.value_methods') }}" class="btn">Ver metodología</a>
+        <a href="{{ url_for('tools.value_methods') }}" class="btn" data-i18n="buyprices.view_methodology">Ver metodología</a>
     </div>
 </div>
 
 <section class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-5">
     <div class="card p-4">
         <div class="text-[12px] font-semibold text-ink">Graham</div>
-        <p class="text-[11.5px] leading-5 text-muted mt-1">Beneficio y valor patrimonial por acción.</p>
+        <p class="text-[11.5px] leading-5 text-muted mt-1" data-i18n="buyprices.graham_desc">Beneficio y valor patrimonial por acción.</p>
     </div>
     <div class="card p-4">
         <div class="text-[12px] font-semibold text-ink">Bazin</div>
-        <p class="text-[11.5px] leading-5 text-muted mt-1">Dividendo anual y rendimiento mínimo del 6%.</p>
+        <p class="text-[11.5px] leading-5 text-muted mt-1" data-i18n="buyprices.bazin_desc">Dividendo anual y rendimiento mínimo del 6%.</p>
     </div>
     <div class="card p-4">
         <div class="text-[12px] font-semibold text-ink">Lynch</div>
-        <p class="text-[11.5px] leading-5 text-muted mt-1">Beneficio por acción frente a crecimiento y yield.</p>
+        <p class="text-[11.5px] leading-5 text-muted mt-1" data-i18n="buyprices.lynch_desc">Beneficio por acción frente a crecimiento y yield.</p>
     </div>
     <div class="card p-4">
         <div class="text-[12px] font-semibold text-ink">Buffett/Munger</div>
-        <p class="text-[11.5px] leading-5 text-muted mt-1">Calidad y valuación en escala 0–100; verde desde {{ buffett_good_score|ratio }}.</p>
+        <p class="text-[11.5px] leading-5 text-muted mt-1"><span data-i18n="buyprices.buffett_desc">Calidad y valuación en escala 0–100; verde desde</span> {{ buffett_good_score|ratio }}.</p>
     </div>
 </section>
 
 <form method="get" class="card px-[18px] py-3.5 mb-5 flex items-center gap-2.5 flex-wrap">
     <input type="hidden" name="view" value="{{ view }}">
-    <label for="buy-price-search" class="sr-only">Buscar empresa</label>
-    <input id="buy-price-search" name="q" value="{{ search }}" class="inp min-w-[220px]" placeholder="Ticker o empresa">
-    <label for="buy-price-method" class="text-[12px] font-semibold text-muted">Método</label>
+    <label for="buy-price-search" class="sr-only" data-i18n="buyprices.search_label">Buscar empresa</label>
+    <input id="buy-price-search" name="q" value="{{ search }}" class="inp min-w-[220px]" placeholder="Ticker o empresa" data-i18n-placeholder="buyprices.search_placeholder">
+    <label for="buy-price-method" class="text-[12px] font-semibold text-muted" data-i18n="buyprices.method_label">Método</label>
     <select id="buy-price-method" name="method" class="sel" onchange="this.form.submit()">
         {% for slug, label in methods.items() %}<option value="{{ slug }}" {{ 'selected' if slug == selected_method }}>{{ label }}</option>{% endfor %}
     </select>
-    <label for="buy-price-status" class="text-[12px] font-semibold text-muted">Filtro</label>
+    <label for="buy-price-status" class="text-[12px] font-semibold text-muted" data-i18n="buyprices.filter_label">Filtro</label>
     <select id="buy-price-status" name="status" class="sel" onchange="this.form.submit()">
         {% for value, label in status_options %}<option value="{{ value }}" {{ 'selected' if value == selected_status }}>{{ label }}</option>{% endfor %}
     </select>
-    <label for="buy-price-order" class="text-[12px] font-semibold text-muted">Orden</label>
+    <label for="buy-price-order" class="text-[12px] font-semibold text-muted" data-i18n="buyprices.order_label">Orden</label>
     <select id="buy-price-order" name="order" class="sel" onchange="this.form.submit()">
         {% for value, label in order_options %}<option value="{{ value }}" {{ 'selected' if value == selected_order }}>{{ label }}</option>{% endfor %}
     </select>
-    <label for="buy-price-sector" class="text-[12px] font-semibold text-muted">Sector</label>
+    <label for="buy-price-sector" class="text-[12px] font-semibold text-muted" data-i18n="buyprices.sector_label">Sector</label>
     <select id="buy-price-sector" name="sector" class="sel" onchange="this.form.submit()">
-        <option value="">Todos los sectores</option>
+        <option value="" data-i18n="buyprices.all_sectors">Todos los sectores</option>
         {% for sector in sectors %}<option value="{{ sector }}" {{ 'selected' if sector == selected_sector }}>{{ sector }}</option>{% endfor %}
     </select>
-    <label for="buy-price-exchange" class="text-[12px] font-semibold text-muted">Mercado</label>
+    <label for="buy-price-exchange" class="text-[12px] font-semibold text-muted" data-i18n="buyprices.exchange_label">Mercado</label>
     <select id="buy-price-exchange" name="exchange" class="sel" onchange="this.form.submit()">
-        <option value="">Todos</option>
+        <option value="" data-i18n="buyprices.all_exchanges">Todos</option>
         {% for exchange in exchanges %}<option value="{{ exchange }}" {{ 'selected' if exchange == selected_exchange }}>{{ exchange }}</option>{% endfor %}
     </select>
-    <button type="submit" class="btn">Buscar</button>
-    {% if search or selected_sector or selected_exchange %}<a href="{{ reset_url }}" class="text-[12px] text-maple hover:underline">Limpiar empresa/mercado</a>{% endif %}
-    <div class="ml-auto text-[12px] text-muted"><span class="font-semibold text-ink">{{ pagination.total|quantity }}</span> acciones</div>
+    <button type="submit" class="btn" data-i18n="buyprices.search_button">Buscar</button>
+    {% if search or selected_sector or selected_exchange %}<a href="{{ reset_url }}" class="text-[12px] text-maple hover:underline" data-i18n="buyprices.clear_filters">Limpiar empresa/mercado</a>{% endif %}
+    <div class="ml-auto text-[12px] text-muted"><span class="font-semibold text-ink">{{ pagination.total|quantity }}</span> <span data-i18n="buyprices.stocks_suffix">acciones</span></div>
 </form>
 
 {% if rows %}
@@ -99,13 +99,13 @@
 
         <div class="flex items-baseline justify-between gap-3 mb-3.5">
             <div>
-                <div class="lbl mb-1">Precio actual</div>
+                <div class="lbl mb-1" data-i18n="buyprices.current_price_label">Precio actual</div>
                 <span class="num text-[19px] font-semibold">
                     {% if row.fundamentals and row.fundamentals.price is not none %}{{ row.asset.currency|currency_symbol }}{{ row.fundamentals.price|ratio }}{% else %}—{% endif %}
                 </span>
             </div>
             <span class="text-[10.5px] font-semibold rounded-full px-2 py-1 {{ 'bg-[#fff1ed] text-maple' if selected_method != 'buffett' and row.margins[selected_method] is not none and row.margins[selected_method] >= 0 else 'bg-[#f3f1ec] text-muted2' }}">
-                Ordenado por {{ selected_method_label }}
+                <span data-i18n="buyprices.sorted_by">Ordenado por</span> {{ selected_method_label }}
             </span>
         </div>
 
@@ -118,9 +118,9 @@
                 <span class="num text-sm font-semibold">{% if value is not none %}{{ row.asset.currency|currency_symbol }}{{ value|ratio }}{% else %}—{% endif %}</span>
                 {% if margin is not none %}
                 <span class="num text-[10.5px] {{ 'pos' if margin >= 0 else 'neg' }}">
-                    {{ margin|percent if margin >= 0 else margin|abs|percent }} {{ 'descuento' if margin >= 0 else 'sobre techo' }}
+                    {{ margin|percent if margin >= 0 else margin|abs|percent }} <span data-i18n="{{ 'buyprices.discount' if margin >= 0 else 'buyprices.above_ceiling' }}">{{ 'descuento' if margin >= 0 else 'sobre techo' }}</span>
                 </span>
-                {% else %}<span class="text-[10.5px] text-faint">Sin margen calculable</span>{% endif %}
+                {% else %}<span class="text-[10.5px] text-faint" data-i18n="buyprices.no_margin">Sin margen calculable</span>{% endif %}
             </div>
             {% endfor %}
             <div class="stat {{ 'border-maple bg-[#fffaf8]' if selected_method == 'buffett' }}">
@@ -128,7 +128,7 @@
                 <span class="num text-sm font-semibold {{ 'pos' if row.buffett_is_good }}">
                     {% if row.buffett_score is not none %}{{ row.buffett_score|ratio }}/100{% else %}—{% endif %}
                 </span>
-                {% if row.buffett_score is not none %}<span class="text-[10.5px] {{ 'pos' if row.buffett_is_good else 'text-muted' }}">{{ 'Sobre el umbral' if row.buffett_is_good else 'Bajo el umbral de 70' }}</span>{% else %}<span class="text-[10.5px] text-faint">Sin puntuación</span>{% endif %}
+                {% if row.buffett_score is not none %}<span class="text-[10.5px] {{ 'pos' if row.buffett_is_good else 'text-muted' }}" data-i18n="{{ 'buyprices.above_threshold' if row.buffett_is_good else 'buyprices.below_threshold' }}">{{ 'Sobre el umbral' if row.buffett_is_good else 'Bajo el umbral de 70' }}</span>{% else %}<span class="text-[10.5px] text-faint" data-i18n="buyprices.no_score">Sin puntuación</span>{% endif %}
             </div>
         </div>
     </article>
@@ -141,14 +141,14 @@
         <table class="tn-positions">
             <thead>
                 <tr>
-                    <th class="l tn-edge-l">Activo</th>
-                    <th class="l">Sector</th>
-                    <th>Precio actual</th>
-                    <th class="{{ 'text-maple' if selected_method == 'graham' }}">Precio Graham</th>
-                    <th class="{{ 'text-maple' if selected_method == 'bazin' }}">Precio Bazin</th>
-                    <th class="{{ 'text-maple' if selected_method == 'lynch' }}">Precio Lynch</th>
-                    <th class="{{ 'text-maple' if selected_method == 'buffett' }}">Puntuación Buffett</th>
-                    <th class="tn-edge-r">Dentro del precio</th>
+                    <th class="l tn-edge-l" data-i18n="buyprices.th_asset">Activo</th>
+                    <th class="l" data-i18n="buyprices.th_sector">Sector</th>
+                    <th data-i18n="buyprices.current_price_label">Precio actual</th>
+                    <th class="{{ 'text-maple' if selected_method == 'graham' }}" data-i18n="buyprices.th_price_graham">Precio Graham</th>
+                    <th class="{{ 'text-maple' if selected_method == 'bazin' }}" data-i18n="buyprices.th_price_bazin">Precio Bazin</th>
+                    <th class="{{ 'text-maple' if selected_method == 'lynch' }}" data-i18n="buyprices.th_price_lynch">Precio Lynch</th>
+                    <th class="{{ 'text-maple' if selected_method == 'buffett' }}" data-i18n="buyprices.th_score_buffett">Puntuación Buffett</th>
+                    <th class="tn-edge-r" data-i18n="buyprices.th_within_price">Dentro del precio</th>
                 </tr>
             </thead>
             <tbody class="num">
@@ -164,7 +164,7 @@
                             </div>
                         </div>
                     </td>
-                    <td class="l font-sans text-[12px] text-muted2">{{ row.asset.sector or 'Sin sector' }}</td>
+                    <td class="l font-sans text-[12px] text-muted2" {% if not row.asset.sector %}data-i18n="buyprices.no_sector"{% endif %}>{{ row.asset.sector or 'Sin sector' }}</td>
                     <td>
                         {% if row.fundamentals and row.fundamentals.price is not none %}{{ row.asset.currency|currency_symbol }}{{ row.fundamentals.price|ratio }}{% else %}<span class="text-faint">—</span>{% endif %}
                     </td>
@@ -173,7 +173,7 @@
                     {% set margin = row.margins[slug] %}
                     <td class="font-semibold {{ 'bg-[#fffaf8]' if selected_method == slug }} {{ 'pos' if margin is not none and margin >= 0 }}">
                         {% if value is not none %}{{ row.asset.currency|currency_symbol }}{{ value|ratio }}{% else %}<span class="text-faint">—</span>{% endif %}
-                        {% if margin is not none %}<div class="font-sans text-[10px] mt-0.5 {{ 'pos' if margin >= 0 else 'neg' }}">{{ margin|percent if margin >= 0 else margin|abs|percent }} {{ 'descuento' if margin >= 0 else 'sobre techo' }}</div>{% endif %}
+                        {% if margin is not none %}<div class="font-sans text-[10px] mt-0.5 {{ 'pos' if margin >= 0 else 'neg' }}">{{ margin|percent if margin >= 0 else margin|abs|percent }} <span data-i18n="{{ 'buyprices.discount' if margin >= 0 else 'buyprices.above_ceiling' }}">{{ 'descuento' if margin >= 0 else 'sobre techo' }}</span></div>{% endif %}
                     </td>
                     {% endfor %}
                     <td class="font-semibold {{ 'bg-[#fffaf8]' if selected_method == 'buffett' }} {{ 'pos' if row.buffett_is_good }}">
@@ -183,7 +183,7 @@
                         {% if row.available_count %}
                         <span class="font-semibold {{ 'pos' if row.within_price_count else 'text-muted' }}">{{ row.within_price_count }}/{{ row.available_count }}</span>
                         {% else %}
-                        <span class="text-faint">Sin datos</span>
+                        <span class="text-faint" data-i18n="buyprices.no_data">Sin datos</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -196,12 +196,12 @@
 {% endif %}
 {% else %}
 <div class="card text-center py-12 px-6">
-    <div class="font-serif-display text-2xl mb-2">No encontramos acciones</div>
-    <p class="text-[13px] text-muted">Prueba otro método, filtro, ticker, mercado o sector.</p>
+    <div class="font-serif-display text-2xl mb-2" data-i18n="buyprices.empty_title">No encontramos acciones</div>
+    <p class="text-[13px] text-muted" data-i18n="buyprices.empty_desc">Prueba otro método, filtro, ticker, mercado o sector.</p>
 </div>
 {% endif %}
 
 <p class="text-[11.5px] leading-5 text-muted mt-4">
-    El margen de seguridad mide la distancia frente al precio calculado: positivo significa descuento y negativo indica cuánto cotiza sobre el techo. “Dentro del precio” cuenta los métodos de precio favorables. Buffett/Munger aparece en verde desde {{ buffett_good_score|ratio }}/100, un umbral interno de TrueNorth y no una regla publicada por los inversores. Uso educativo; no constituye recomendación de compra.
+    <span data-i18n="buyprices.disclaimer_part1">El margen de seguridad mide la distancia frente al precio calculado: positivo significa descuento y negativo indica cuánto cotiza sobre el techo. “Dentro del precio” cuenta los métodos de precio favorables. Buffett/Munger aparece en verde desde</span> {{ buffett_good_score|ratio }}<span data-i18n="buyprices.disclaimer_part2">/100, un umbral interno de TrueNorth y no una regla publicada por los inversores. Uso educativo; no constituye recomendación de compra.</span>
 </p>
 {% endblock %}

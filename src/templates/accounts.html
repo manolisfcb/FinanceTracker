@@ -8,8 +8,8 @@
 {% include 'partials/flash_messages.html' %}
 
 <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
-    <h1 class="font-serif-display text-3xl text-ink">Cuentas</h1>
-    <a href="{{ url_for('portfolio.add_account') }}" class="btn btn-primary">Nueva cuenta</a>
+    <h1 class="font-serif-display text-3xl text-ink" data-i18n="accounts.title">Cuentas</h1>
+    <a href="{{ url_for('portfolio.add_account') }}" class="btn btn-primary" data-i18n="accounts.new_account">Nueva cuenta</a>
 </div>
 
 <div class="card p-5">
@@ -17,9 +17,9 @@
         <table class="tn-card-table">
             <thead>
                 <tr>
-                    <th>Nombre</th>
-                    <th>Tipo</th>
-                    <th>Broker</th>
+                    <th data-i18n="accounts.col_name">Nombre</th>
+                    <th data-i18n="accounts.col_type">Tipo</th>
+                    <th data-i18n="accounts.col_broker">Broker</th>
                     <th></th>
                 </tr>
             </thead>
@@ -32,17 +32,17 @@
                         <td>{{ account.broker or '—' }}</td>
                         <td class="whitespace-nowrap">
                             <a href="{{ url_for('portfolio.edit_account', id=account.id) }}"
-                               class="text-muted2 hover:text-ink mr-3" title="Editar">Editar</a>
+                               class="text-muted2 hover:text-ink mr-3" title="Editar" data-i18n="accounts.edit" data-i18n-title="accounts.edit">Editar</a>
                             <a hx-delete="{{ url_for('portfolio.delete_account', id=account.id) }}"
                                hx-confirm="¿Seguro que quieres eliminar esta cuenta?"
                                hx-on="afterRequest: window.location.reload()"
-                               class="cursor-pointer text-muted2 hover:text-neg" title="Eliminar">Eliminar</a>
+                               class="cursor-pointer text-muted2 hover:text-neg" title="Eliminar" data-i18n="accounts.delete" data-i18n-title="accounts.delete" data-i18n-hx-confirm="accounts.confirm_delete_account">Eliminar</a>
                         </td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="4" class="text-center text-faint py-6">Todavía no tenés cuentas. Creá una para empezar a cargar órdenes.</td>
+                        <td colspan="4" class="text-center text-faint py-6" data-i18n="accounts.empty_state">Todavía no tenés cuentas. Creá una para empezar a cargar órdenes.</td>
                     </tr>
                 {% endif %}
             </tbody>

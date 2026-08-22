@@ -6,26 +6,26 @@
 {% block content %}
 <div class="flex flex-wrap items-end justify-between gap-4 mb-5">
     <div>
-        <div class="lbl text-maple mb-1">Insights</div>
-        <h1 class="font-serif-display text-3xl text-ink mb-1">Rankings de acciones</h1>
+        <div class="lbl text-maple mb-1" data-i18n="rankings.eyebrow">Insights</div>
+        <h1 class="font-serif-display text-3xl text-ink mb-1" data-i18n="rankings.title">Rankings de acciones</h1>
         <p class="text-[13px] text-muted max-w-3xl">
-            Tres lecturas del universo canadiense con datos almacenados{% if latest_update %} · snapshot {{ latest_update|date_es }}{% endif %}.
+            <span data-i18n="rankings.subtitle">Tres lecturas del universo canadiense con datos almacenados</span>{% if latest_update %} · snapshot {{ latest_update|date_es }}{% endif %}.
         </p>
     </div>
-    <a href="{{ url_for('tools.comparator') }}" class="btn btn-primary">Abrir comparador</a>
+    <a href="{{ url_for('tools.comparator') }}" class="btn btn-primary" data-i18n="rankings.open_comparator">Abrir comparador</a>
 </div>
 
 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-5">
     <section class="card overflow-hidden">
         <div class="px-5 py-4 border-b border-border bg-[#fbfaf8]">
             <div class="lbl text-maple mb-1">TSX</div>
-            <h2 class="text-[16px] font-semibold">Mayor dividend yield</h2>
-            <p class="text-[11.5px] text-muted mt-1">Yield reportado positivo; un valor alto puede anticipar un recorte.</p>
+            <h2 class="text-[16px] font-semibold" data-i18n="rankings.tsx_yield_heading">Mayor dividend yield</h2>
+            <p class="text-[11.5px] text-muted mt-1" data-i18n="rankings.tsx_yield_desc">Yield reportado positivo; un valor alto puede anticipar un recorte.</p>
         </div>
         {% if yield_ranking %}
         <div class="overflow-x-auto">
             <table class="tn-card-table">
-                <thead><tr><th>#</th><th>Empresa</th><th>Sector</th><th class="text-right">Yield</th><th class="text-right">Payout</th></tr></thead>
+                <thead><tr><th>#</th><th data-i18n="rankings.th_company">Empresa</th><th data-i18n="rankings.th_sector">Sector</th><th class="text-right" data-i18n="rankings.th_yield">Yield</th><th class="text-right" data-i18n="rankings.th_payout">Payout</th></tr></thead>
                 <tbody>
                 {% for row in yield_ranking %}
                     <tr>
@@ -45,20 +45,20 @@
             </table>
         </div>
         {% else %}
-        <div class="py-12 px-5 text-center text-[13px] text-faint">No hay compañías TSX con yield disponible.</div>
+        <div class="py-12 px-5 text-center text-[13px] text-faint" data-i18n="rankings.tsx_yield_empty">No hay compañías TSX con yield disponible.</div>
         {% endif %}
     </section>
 
     <section class="card overflow-hidden">
         <div class="px-5 py-4 border-b border-border bg-[#fbfaf8]">
-            <div class="lbl text-maple mb-1">Constancia</div>
-            <h2 class="text-[16px] font-semibold">Aristócratas canadienses</h2>
-            <p class="text-[11.5px] text-muted mt-1">Al menos cinco aumentos anuales consecutivos, usando años calendario completos.</p>
+            <div class="lbl text-maple mb-1" data-i18n="rankings.consistency_eyebrow">Constancia</div>
+            <h2 class="text-[16px] font-semibold" data-i18n="rankings.aristocrats_heading">Aristócratas canadienses</h2>
+            <p class="text-[11.5px] text-muted mt-1" data-i18n="rankings.aristocrats_desc">Al menos cinco aumentos anuales consecutivos, usando años calendario completos.</p>
         </div>
         {% if aristocrats %}
         <div class="overflow-x-auto">
             <table class="tn-card-table">
-                <thead><tr><th>#</th><th>Empresa</th><th class="text-right">Racha</th><th class="text-right">Dividendo {{ aristocrats[0].latest_year }}</th></tr></thead>
+                <thead><tr><th>#</th><th data-i18n="rankings.th_company">Empresa</th><th class="text-right" data-i18n="rankings.th_streak">Racha</th><th class="text-right"><span data-i18n="rankings.th_dividend">Dividendo</span> {{ aristocrats[0].latest_year }}</th></tr></thead>
                 <tbody>
                 {% for row in aristocrats %}
                     <tr>
@@ -69,7 +69,7 @@
                                 <span><span class="num font-semibold block">{{ row.asset.symbol }}</span><span class="text-[11px] text-muted block">{{ row.asset.name }}</span></span>
                             </a>
                         </td>
-                        <td class="num text-right font-semibold">{{ row.streak }} años</td>
+                        <td class="num text-right font-semibold">{{ row.streak }} <span data-i18n="rankings.years_suffix">años</span></td>
                         <td class="num text-right">{{ row.asset.currency }} {{ row.latest_annual_dividend|ratio }}</td>
                     </tr>
                 {% endfor %}
@@ -78,8 +78,8 @@
         </div>
         {% else %}
         <div class="py-12 px-6 text-center">
-            <div class="font-serif-display text-xl mb-1">Aún no hay una racha verificable</div>
-            <p class="text-[12px] text-muted max-w-md mx-auto">Se necesitan seis años calendario completos para confirmar cinco aumentos consecutivos.</p>
+            <div class="font-serif-display text-xl mb-1" data-i18n="rankings.aristocrats_empty_title">Aún no hay una racha verificable</div>
+            <p class="text-[12px] text-muted max-w-md mx-auto" data-i18n="rankings.aristocrats_empty_desc">Se necesitan seis años calendario completos para confirmar cinco aumentos consecutivos.</p>
         </div>
         {% endif %}
     </section>
@@ -87,9 +87,9 @@
 
 <section class="card overflow-hidden">
     <div class="px-5 py-4 border-b border-border bg-[#fbfaf8]">
-        <div class="lbl text-maple mb-1">Rentabilidad</div>
-        <h2 class="text-[16px] font-semibold">Mejor ROE por sector</h2>
-        <p class="text-[11.5px] text-muted mt-1">Top 5 de retorno sobre patrimonio dentro de cada grupo comparable.</p>
+        <div class="lbl text-maple mb-1" data-i18n="rankings.roe_eyebrow">Rentabilidad</div>
+        <h2 class="text-[16px] font-semibold" data-i18n="rankings.roe_heading">Mejor ROE por sector</h2>
+        <p class="text-[11.5px] text-muted mt-1" data-i18n="rankings.roe_desc">Top 5 de retorno sobre patrimonio dentro de cada grupo comparable.</p>
     </div>
     {% if roe_groups %}
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
@@ -110,9 +110,9 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="py-12 px-5 text-center text-[13px] text-faint">No hay ROE positivo disponible.</div>
+    <div class="py-12 px-5 text-center text-[13px] text-faint" data-i18n="rankings.roe_empty">No hay ROE positivo disponible.</div>
     {% endif %}
 </section>
 
-<p class="text-[11px] text-muted mt-4">Los rankings son cribas educativas basadas en snapshots; no constituyen asesoramiento ni sustituyen revisar la calidad de los datos.</p>
+<p class="text-[11px] text-muted mt-4" data-i18n="rankings.disclaimer">Los rankings son cribas educativas basadas en snapshots; no constituyen asesoramiento ni sustituyen revisar la calidad de los datos.</p>
 {% endblock %}

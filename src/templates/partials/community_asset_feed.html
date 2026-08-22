@@ -4,11 +4,11 @@
         {% include 'partials/community_post_card.html' %}
     {% else %}
     <div class="card p-8 text-center">
-        <div class="text-sm font-semibold text-ink mb-1">Nadie habló de {{ asset.symbol }} todavía</div>
+        <div class="text-sm font-semibold text-ink mb-1"><span data-i18n="community.no_asset_posts_prefix">Nadie habló de</span> {{ asset.symbol }} <span data-i18n="community.no_asset_posts_suffix">todavía</span></div>
         <div class="text-[13px] text-muted mb-4">
-            Mencioná <span class="tick">${{ asset.symbol }}</span> en una publicación y aparecerá acá.
+            <span data-i18n="community.no_asset_posts_text1">Mencioná</span> <span class="tick">${{ asset.symbol }}</span> <span data-i18n="community.no_asset_posts_text2">en una publicación y aparecerá acá.</span>
         </div>
-        <a href="{{ url_for('community.community_page') }}" class="btn">Ir a la comunidad</a>
+        <a href="{{ url_for('community.community_page') }}" class="btn" data-i18n="community.go_to_community_btn">Ir a la comunidad</a>
     </div>
     {% endfor %}
 </div>

@@ -9,9 +9,9 @@
 {% include 'partials/flash_messages.html' %}
 
 <div class="flex items-center gap-1.5 text-[13px] text-muted2 mb-4">
-    <a href="{{ url_for('community.community_page') }}" class="hover:text-ink">Comunidad</a>
+    <a href="{{ url_for('community.community_page') }}" class="hover:text-ink" data-i18n="community.breadcrumb">Comunidad</a>
     <span>/</span>
-    <a href="{{ url_for('community.community_page', category=post.category.value) }}" class="hover:text-ink">{{ categories[post.category] }}</a>
+    <a href="{{ url_for('community.community_page', category=post.category.value) }}" class="hover:text-ink" data-i18n="community.category_{{ post.category.value|lower }}">{{ categories[post.category] }}</a>
 </div>
 
 <div class="max-w-3xl">
@@ -22,24 +22,24 @@
                 <div>
                     <div class="text-[13px] font-semibold">{{ post.author.username }}</div>
                     <div class="text-[11.5px] text-faint">
-                        {{ post.created_at|relative_time_es }}{% if post.updated_at %} · editado{% endif %}
+                        {{ post.created_at|relative_time_es }}{% if post.updated_at %} · <span data-i18n="community.edited_suffix">editado</span>{% endif %}
                     </div>
                 </div>
-                <span class="cat {{ category_styles[post.category] }} ml-1">{{ categories[post.category] }}</span>
+                <span class="cat {{ category_styles[post.category] }} ml-1" data-i18n="community.category_{{ post.category.value|lower }}">{{ categories[post.category] }}</span>
             </div>
 
             <div class="flex items-center gap-2 shrink-0">
                 {% if post.user_id == current_user.id %}
-                <a href="{{ url_for('community.edit_post', post_id=post.id) }}" class="btn">Editar</a>
+                <a href="{{ url_for('community.edit_post', post_id=post.id) }}" class="btn" data-i18n="community.edit_btn">Editar</a>
                 {% endif %}
                 {% if can_moderate %}
                 <form method="POST" action="{{ url_for('community.delete_post', post_id=post.id) }}"
                       onsubmit="return confirm('¿Eliminar esta publicación? Sus comentarios dejarán de ser visibles.');">
-                    <button type="submit" class="btn">Eliminar</button>
+                    <button type="submit" class="btn" data-i18n="community.delete_btn">Eliminar</button>
                 </form>
                 {% else %}
                 <form method="POST" action="{{ url_for('community.report_post', post_id=post.id) }}">
-                    <button type="submit" class="btn" {{ 'disabled' if already_reported }}>
+                    <button type="submit" class="btn" {{ 'disabled' if already_reported }} data-i18n="{{ 'community.reported_btn' if already_reported else 'community.report_btn' }}">
                         {{ 'Reportado' if already_reported else 'Reportar' }}
                     </button>
                 </form>
@@ -66,16 +66,17 @@
 
     <div class="card p-6">
         <div class="text-sm font-semibold mb-4">
-            {{ comments|length }} {{ 'comentario' if comments|length == 1 else 'comentarios' }}
+            {{ comments|length }} <span data-i18n="{{ 'community.comment_singular' if comments|length == 1 else 'community.comment_plural' }}">{{ 'comentario' if comments|length == 1 else 'comentarios' }}</span>
         </div>
 
         <form method="POST" action="{{ url_for('community.create_comment', post_id=post.id) }}"
               class="flex flex-col gap-3 mb-6">
             {{ comment_form.hidden_tag() }}
             <textarea name="{{ comment_form.body.name }}" class="tn-input" rows="3" required
-                      placeholder="Sumá tu punto de vista. Podés mencionar $BCE o $SU."></textarea>
+                      placeholder="Sumá tu punto de vista. Podés mencionar $BCE o $SU."
+                      data-i18n-placeholder="community.comment_placeholder"></textarea>
             <div class="flex justify-end">
-                <button type="submit" class="btn btn-primary">Comentar</button>
+                <button type="submit" class="btn btn-primary" data-i18n="community.comment_btn">Comentar</button>
             </div>
         </form>
 
@@ -87,18 +88,18 @@
                         {{ avatar(item.comment.author.username, 28) }}
                         <span class="text-[13px] font-semibold">{{ item.comment.author.username }}</span>
                         <span class="text-[11.5px] text-faint">
-                            · {{ item.comment.created_at|relative_time_es }}{% if item.comment.updated_at %} · editado{% endif %}
+                            · {{ item.comment.created_at|relative_time_es }}{% if item.comment.updated_at %} · <span data-i18n="community.edited_suffix">editado</span>{% endif %}
                         </span>
                     </div>
                     {% if item.can_moderate %}
                     <div id="comment-actions-{{ item.comment.id }}" class="flex items-center gap-3 text-[12px] shrink-0">
                         {% if item.comment.user_id == current_user.id %}
                         <button type="button" class="text-muted2 hover:text-ink"
-                                onclick="document.getElementById('comment-edit-{{ item.comment.id }}').hidden = false; document.getElementById('comment-actions-{{ item.comment.id }}').hidden = true;">Editar</button>
+                                onclick="document.getElementById('comment-edit-{{ item.comment.id }}').hidden = false; document.getElementById('comment-actions-{{ item.comment.id }}').hidden = true;" data-i18n="community.edit_btn">Editar</button>
                         {% endif %}
                         <form method="POST" action="{{ url_for('community.delete_comment', comment_id=item.comment.id) }}"
                               onsubmit="return confirm('¿Eliminar este comentario?');">
-                            <button type="submit" class="text-muted2 hover:text-neg">Eliminar</button>
+                            <button type="submit" class="text-muted2 hover:text-neg" data-i18n="community.delete_btn">Eliminar</button>
                         </form>
                     </div>
                     {% endif %}
@@ -113,14 +114,14 @@
                     <textarea name="body" class="tn-input" rows="3" required>{{ item.comment.body }}</textarea>
                     <div class="flex justify-end gap-2">
                         <button type="button" class="btn"
-                                onclick="document.getElementById('comment-edit-{{ item.comment.id }}').hidden = true; document.getElementById('comment-actions-{{ item.comment.id }}').hidden = false;">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                                onclick="document.getElementById('comment-edit-{{ item.comment.id }}').hidden = true; document.getElementById('comment-actions-{{ item.comment.id }}').hidden = false;" data-i18n="community.cancel_btn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" data-i18n="community.save_btn">Guardar</button>
                     </div>
                 </form>
                 {% endif %}
             </div>
             {% else %}
-            <div class="text-[13px] text-muted">Todavía no hay comentarios. Empezá la conversación.</div>
+            <div class="text-[13px] text-muted" data-i18n="community.no_comments">Todavía no hay comentarios. Empezá la conversación.</div>
             {% endfor %}
         </div>
     </div>

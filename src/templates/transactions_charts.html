@@ -7,19 +7,19 @@
 {% block content %}
 {% include 'partials/flash_messages.html' %}
 
-<h1 class="font-serif-display text-3xl text-ink mb-6">Gráficos de transacciones</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-6" data-i18n="finance.charts.title">Gráficos de transacciones</h1>
 
 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
     <!-- BLOQUES DE GRAFICAS -->
     <div class="md:col-span-3">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             <div class="card p-5">
-                <div class="text-sm font-semibold mb-3">Ingresos vs Gastos</div>
+                <div class="text-sm font-semibold mb-3" data-i18n="finance.charts.income_vs_expenses">Ingresos vs Gastos</div>
                 <canvas id="incomeExpenseChart"></canvas>
             </div>
 
             <div class="card p-5">
-                <div class="text-sm font-semibold mb-3">Composición por categorías</div>
+                <div class="text-sm font-semibold mb-3" data-i18n="finance.charts.category_composition">Composición por categorías</div>
                 <canvas id="categoryCompositionChart"></canvas>
             </div>
         </div>
@@ -28,20 +28,20 @@
     <!-- FILTROS -->
     <div class="md:col-span-1">
         <div class="card p-5">
-            <div class="lbl mb-3">Filtros</div>
+            <div class="lbl mb-3" data-i18n="finance.filters.heading">Filtros</div>
             <form method="GET" class="space-y-4">
                 <div class="space-y-1.5">
-                    <label for="date" class="text-[13px] text-muted2">Fecha</label>
-                    <input type="date" name="date" id="date" class="tn-input" placeholder="YYYY-MM-DD" />
+                    <label for="date" class="text-[13px] text-muted2" data-i18n="finance.filters.date_label">Fecha</label>
+                    <input type="date" name="date" id="date" class="tn-input" placeholder="YYYY-MM-DD" data-i18n-placeholder="finance.filters.date_placeholder" />
                 </div>
 
                 <div class="space-y-1.5">
-                    <label for="type" class="text-[13px] text-muted2">Tipo</label>
-                    <input type="text" name="type" id="type" class="tn-input" placeholder="income o expense..." />
+                    <label for="type" class="text-[13px] text-muted2" data-i18n="finance.filters.type_label">Tipo</label>
+                    <input type="text" name="type" id="type" class="tn-input" placeholder="income o expense..." data-i18n-placeholder="finance.filters.type_placeholder" />
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-[13px] text-muted2">Categorías</label>
+                    <label class="text-[13px] text-muted2" data-i18n="finance.filters.categories_label">Categorías</label>
                     <div class="space-y-1.5">
                         {% for categ in categories %}
                         <div class="flex items-center gap-2">
@@ -52,7 +52,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-full justify-center">Buscar</button>
+                <button type="submit" class="btn btn-primary w-full justify-center" data-i18n="finance.filters.search_button">Buscar</button>
             </form>
         </div>
     </div>

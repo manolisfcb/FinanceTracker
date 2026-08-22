@@ -7,24 +7,24 @@
 {% block content %}
 {% include 'partials/flash_messages.html' %}
 
-<h1 class="font-serif-display text-3xl text-ink mb-6">{{ 'Editar orden' if editing else 'Nueva orden' }}</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-6" data-i18n="{{ 'orders.edit_title' if editing else 'orders.new_title' }}">{{ 'Editar orden' if editing else 'Nueva orden' }}</h1>
 
 <div class="card p-6 max-w-lg">
     <form method="POST" class="space-y-4">
         {{ form.hidden_tag() }}
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.account.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.field_account">{{ form.account.label.text }}</label>
             {{ form.account(class="tn-input") }}
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.broker.label.text }}</label>
-            {{ form.broker(class="tn-input", placeholder="ej. Wealthsimple") }}
+            <label class="text-[13px] text-muted2" data-i18n="orders.field_broker">{{ form.broker.label.text }}</label>
+            {{ form.broker(class="tn-input", placeholder="ej. Wealthsimple", data_i18n_placeholder="orders.broker_placeholder") }}
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.asset_symbol.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.field_asset">{{ form.asset_symbol.label.text }}</label>
             <div
                 class="tn-combobox"
                 data-asset-autocomplete
@@ -38,68 +38,71 @@
                     role="combobox",
                     aria_autocomplete="list",
                     aria_expanded="false",
-                    aria_controls="asset-suggestions"
+                    aria_controls="asset-suggestions",
+                    data_i18n_placeholder="orders.asset_search_placeholder"
                 ) }}
                 <div
                     id="asset-suggestions"
                     class="tn-combobox-menu"
                     role="listbox"
                     aria-label="Activos sugeridos"
+                    data-i18n-aria-label="orders.asset_suggestions_aria"
                     hidden
                 ></div>
             </div>
-            <p class="text-[11px] text-muted">Escribí un ticker o el nombre de una empresa.</p>
+            <p class="text-[11px] text-muted" data-i18n="orders.asset_help">Escribí un ticker o el nombre de una empresa.</p>
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.type.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.field_type">{{ form.type.label.text }}</label>
             {{ form.type(class="tn-input") }}
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.quantity.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.field_quantity">{{ form.quantity.label.text }}</label>
             {{ form.quantity(
                 class="tn-input",
                 type="number",
                 step="0.00000001",
                 min="0.00000001",
                 placeholder="0.2254",
-                inputmode="decimal"
+                inputmode="decimal",
+                data_i18n_placeholder="orders.quantity_placeholder"
             ) }}
-            <p class="text-[11px] text-muted">
+            <p class="text-[11px] text-muted" data-i18n="orders.quantity_help">
                 Admite acciones fraccionarias, por ejemplo 0.2254.
             </p>
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.price.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.field_price">{{ form.price.label.text }}</label>
             {{ form.price(class="tn-input", type="number", step="0.01") }}
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.fees.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.field_fees">{{ form.fees.label.text }}</label>
             {{ form.fees(class="tn-input", type="number", step="0.01", value="0") }}
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.currency.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.field_currency">{{ form.currency.label.text }}</label>
             {{ form.currency(class="tn-input") }}
-            <p class="text-[11px] text-muted">
+            <p class="text-[11px] text-muted" data-i18n="orders.currency_help">
                 Si el precio está en USD, el portafolio lo convierte y muestra en CAD.
             </p>
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.executed_at.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="orders.field_executed_at">{{ form.executed_at.label.text }}</label>
             {{ form.executed_at(class="tn-input", type="date") }}
         </div>
 
         <div class="flex gap-2.5">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" data-i18n="{{ 'orders.save_edit' if editing else 'orders.save_new' }}">
                 {{ 'Guardar cambios' if editing else 'Guardar orden' }}
             </button>
             {% if editing %}
-            <a href="{{ url_for('portfolio.list_orders') }}" class="btn">Cancelar</a>
+            <a href="{{ url_for('portfolio.list_orders') }}" class="btn" data-i18n="orders.cancel">Cancelar</a>
             {% endif %}
         </div>
     </form>

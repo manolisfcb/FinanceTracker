@@ -3,20 +3,20 @@
 {% block head_title %}Iniciar sesión | TrueNorth Analytics{% endblock %}
 
 {% block auth_form %}
-<h1 class="font-serif-display text-[34px] md:text-[38px] leading-tight">Bienvenido de vuelta</h1>
-<p class="mt-2.5 text-sm text-muted2">Entrá con tu usuario o tu email.</p>
+<h1 class="font-serif-display text-[34px] md:text-[38px] leading-tight" data-i18n="login.welcome_back">Bienvenido de vuelta</h1>
+<p class="mt-2.5 text-sm text-muted2" data-i18n="login.subtitle">Entrá con tu usuario o tu email.</p>
 
 <div class="flex flex-col gap-3.5 mt-7">
 
     {% if google_enabled %}
     <a href="{{ url_for('auth.google_login', next=request.args.get('next')) }}" class="btn btn-auth btn-block">
         {% include 'partials/google_mark.html' %}
-        Continuar con Google
+        <span data-i18n="login.continue_google">Continuar con Google</span>
     </a>
 
     <div class="flex items-center gap-3">
         <span class="flex-1 h-px bg-border block"></span>
-        <span class="text-[11.5px] text-faint">o con tu contraseña</span>
+        <span class="text-[11.5px] text-faint" data-i18n="login.or_with_password">o con tu contraseña</span>
         <span class="flex-1 h-px bg-border block"></span>
     </div>
     {% endif %}
@@ -25,18 +25,18 @@
         {{ form.hidden_tag() }}
 
         <div class="flex flex-col gap-1.5">
-            {{ form.identifier.label(class="lbl") }}
-            {{ form.identifier(class="tn-input") }}
+            {{ form.identifier.label(class="lbl", data_i18n="login.identifier_label") }}
+            {{ form.identifier(class="tn-input", data_i18n_placeholder="login.identifier_placeholder") }}
             {% for error in form.identifier.errors %}
             <span class="text-xs text-neg">{{ error }}</span>
             {% endfor %}
         </div>
 
         <div class="flex flex-col gap-1.5">
-            {{ form.password.label(class="lbl") }}
+            {{ form.password.label(class="lbl", data_i18n="login.password_label") }}
             <div class="tn-password">
                 {{ form.password(class="tn-input", id="login-password") }}
-                <button type="button" class="tn-password-toggle" data-password-toggle="login-password" aria-controls="login-password">Mostrar</button>
+                <button type="button" class="tn-password-toggle" data-password-toggle="login-password" aria-controls="login-password" data-i18n="login.password_toggle_show">Mostrar</button>
             </div>
             {% for error in form.password.errors %}
             <span class="text-xs text-neg">{{ error }}</span>
@@ -45,31 +45,31 @@
 
         <label class="flex items-center gap-2.5 text-[13px] text-muted2 cursor-pointer">
             {{ form.remember(class="tn-checkbox") }}
-            <span>Mantener la sesión iniciada</span>
+            <span data-i18n="login.remember_me">Mantener la sesión iniciada</span>
         </label>
 
-        {{ form.submit(class="btn btn-primary btn-auth btn-block mt-0.5") }}
+        {{ form.submit(class="btn btn-primary btn-auth btn-block mt-0.5", data_i18n_value="login.submit_button") }}
     </form>
 
 </div>
 
 <div class="mt-6 text-center text-[13px] text-muted2">
-    ¿Todavía no tenés cuenta?
-    <a href="{{ url_for('auth.register', next=request.args.get('next')) }}" class="font-semibold">Creá una gratis</a>
+    <span data-i18n="login.no_account_yet">¿Todavía no tenés cuenta?</span>
+    <a href="{{ url_for('auth.register', next=request.args.get('next')) }}" class="font-semibold" data-i18n="login.create_free_account">Creá una gratis</a>
 </div>
 {% endblock auth_form %}
 
 {% block auth_aside %}
 {% include 'partials/market_strip_compact.html' %}
 
-<h2 class="font-serif-display text-[42px] leading-[1.14] tracking-tight text-pretty">
+<h2 class="font-serif-display text-[42px] leading-[1.14] tracking-tight text-pretty" data-i18n="login.aside_heading">
     Tu cartera te está esperando, con los números ya hechos.
 </h2>
 
 <div class="rounded-xl border border-[#33312c] bg-[#232220] p-[22px]">
     <div class="flex items-end justify-between mb-4">
         <div>
-            <div class="lbl">Patrimonio total</div>
+            <div class="lbl" data-i18n="login.aside_total_equity">Patrimonio total</div>
             <div class="num text-[27px] font-semibold tracking-tight mt-1 text-[#faf9f6]">C$ 184,920.55</div>
         </div>
         <div class="text-right">
@@ -79,33 +79,33 @@
     </div>
     <div class="grid grid-cols-3 gap-2.5">
         <div class="rounded-lg border border-[#33312c] px-3 py-2.5">
-            <div class="lbl text-[10px]">Posiciones</div>
+            <div class="lbl text-[10px]" data-i18n="login.aside_positions_label">Posiciones</div>
             <div class="num text-[14.5px] font-semibold mt-1 text-[#f2f0eb]">37</div>
         </div>
         <div class="rounded-lg border border-[#33312c] px-3 py-2.5">
-            <div class="lbl text-[10px]">Cuentas</div>
+            <div class="lbl text-[10px]" data-i18n="login.aside_accounts_label">Cuentas</div>
             <div class="num text-[14.5px] font-semibold mt-1 text-[#f2f0eb]">4</div>
         </div>
         <div class="rounded-lg border border-[#33312c] px-3 py-2.5">
-            <div class="lbl text-[10px]">Div. 12m</div>
+            <div class="lbl text-[10px]" data-i18n="login.aside_dividends_label">Div. 12m</div>
             <div class="num text-[14.5px] font-semibold mt-1 text-[#f2f0eb]">C$ 6,204</div>
         </div>
     </div>
-    <p class="text-[11px] text-muted mt-3">Ejemplo ilustrativo, no son cifras reales.</p>
+    <p class="text-[11px] text-muted mt-3" data-i18n="login.aside_example_disclaimer">Ejemplo ilustrativo, no son cifras reales.</p>
 </div>
 
 <ul class="flex flex-col gap-3 list-none p-0">
     <li class="flex items-center gap-2.5">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5fbf8f" stroke-width="2.4" class="shrink-0" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
-        <span class="text-sm text-[#c9c4b8]">Costo base promedio según la CRA, recalculado en cada orden</span>
+        <span class="text-sm text-[#c9c4b8]" data-i18n="login.aside_bullet_cost_basis">Costo base promedio según la CRA, recalculado en cada orden</span>
     </li>
     <li class="flex items-center gap-2.5">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5fbf8f" stroke-width="2.4" class="shrink-0" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
-        <span class="text-sm text-[#c9c4b8]">RRSP, TFSA, FHSA y no registradas en una sola vista</span>
+        <span class="text-sm text-[#c9c4b8]" data-i18n="login.aside_bullet_accounts">RRSP, TFSA, FHSA y no registradas en una sola vista</span>
     </li>
     <li class="flex items-center gap-2.5">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5fbf8f" stroke-width="2.4" class="shrink-0" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
-        <span class="text-sm text-[#c9c4b8]">Filings, dividendos y noticias solo de lo que tenés</span>
+        <span class="text-sm text-[#c9c4b8]" data-i18n="login.aside_bullet_filings">Filings, dividendos y noticias solo de lo que tenés</span>
     </li>
 </ul>
 {% endblock auth_aside %}

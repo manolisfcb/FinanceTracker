@@ -7,12 +7,12 @@
 {% block content %}
 {% include 'partials/flash_messages.html' %}
 
-<h1 class="font-serif-display text-3xl text-ink mb-6">Importar tus transacciones</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-6" data-i18n="finance.upload.title">Importar tus transacciones</h1>
 
 <div class="card p-6 max-w-lg">
     <form method="POST" enctype="multipart/form-data" class="space-y-4">
         <div class="space-y-1.5">
-            <label for="bank" class="text-[13px] text-muted2">Selecciona tu banco</label>
+            <label for="bank" class="text-[13px] text-muted2" data-i18n="finance.upload.bank_label">Selecciona tu banco</label>
             <select name="bank" id="bank" class="tn-input">
                 <option value="Nu">Nubank</option>
                 <option value="It">Itau*</option>
@@ -23,11 +23,11 @@
         </div>
 
         <div class="space-y-1.5">
-            <label for="file" class="text-[13px] text-muted2">Solo se aceptan archivos CSV</label>
+            <label for="file" class="text-[13px] text-muted2" data-i18n="finance.upload.file_label">Solo se aceptan archivos CSV</label>
             <input type="file" name="file" id="file" class="tn-input" required />
         </div>
 
-        <button type="submit" class="btn btn-primary">Importar</button>
+        <button type="submit" class="btn btn-primary" data-i18n="finance.upload.submit_button">Importar</button>
     </form>
 </div>
 {% endblock %}

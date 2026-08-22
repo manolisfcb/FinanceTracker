@@ -7,9 +7,9 @@
 {% block content %}
 {% include 'partials/flash_messages.html' %}
 
-<h1 class="font-serif-display text-3xl text-ink mb-2">Confirmar importación</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-2" data-i18n="orders.preview_title">Confirmar importación</h1>
 <p class="text-[13px] text-muted mb-6">
-    Se encontraron {{ rows|length }} órdenes. Las filas duplicadas o con símbolo desconocido vienen destildadas y no se importarán.
+    <span data-i18n="orders.preview_summary_prefix">Se encontraron</span> {{ rows|length }} <span data-i18n="orders.preview_summary_suffix">órdenes. Las filas duplicadas o con símbolo desconocido vienen destildadas y no se importarán.</span>
 </p>
 
 <form method="POST" action="{{ url_for('portfolio.confirm_import_orders') }}">
@@ -21,14 +21,14 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Fecha</th>
-                        <th>Símbolo</th>
-                        <th>Tipo</th>
-                        <th>Cant.</th>
-                        <th>Precio</th>
-                        <th>Comisiones</th>
-                        <th>Moneda</th>
-                        <th>Estado</th>
+                        <th data-i18n="orders.preview_col_date">Fecha</th>
+                        <th data-i18n="orders.preview_col_symbol">Símbolo</th>
+                        <th data-i18n="orders.preview_col_type">Tipo</th>
+                        <th data-i18n="orders.preview_col_qty">Cant.</th>
+                        <th data-i18n="orders.preview_col_price">Precio</th>
+                        <th data-i18n="orders.preview_col_fees">Comisiones</th>
+                        <th data-i18n="orders.preview_col_currency">Moneda</th>
+                        <th data-i18n="orders.preview_col_status">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -48,11 +48,11 @@
                         <td>{{ row.currency }}</td>
                         <td>
                             {% if row.is_duplicate %}
-                                <span class="text-faint">Duplicada</span>
+                                <span class="text-faint" data-i18n="orders.preview_status_duplicate">Duplicada</span>
                             {% elif row.is_unknown_symbol %}
-                                <span class="neg">Símbolo desconocido</span>
+                                <span class="neg" data-i18n="orders.preview_status_unknown">Símbolo desconocido</span>
                             {% else %}
-                                <span class="pos">Nueva</span>
+                                <span class="pos" data-i18n="orders.preview_status_new">Nueva</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -63,8 +63,8 @@
     </div>
 
     <div class="flex gap-2.5">
-        <button type="submit" class="btn btn-primary">Confirmar e importar</button>
-        <a href="{{ url_for('portfolio.import_orders') }}" class="btn">Cancelar</a>
+        <button type="submit" class="btn btn-primary" data-i18n="orders.preview_confirm">Confirmar e importar</button>
+        <a href="{{ url_for('portfolio.import_orders') }}" class="btn" data-i18n="orders.cancel">Cancelar</a>
     </div>
 </form>
 {% endblock %}

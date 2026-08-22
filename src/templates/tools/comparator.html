@@ -12,28 +12,28 @@
 {% block content %}
 <div class="flex flex-wrap items-end justify-between gap-4 mb-4">
     <div>
-        <div class="text-[11px] font-semibold text-[#008f83] mb-1">Inicio / Acciones</div>
-        <h1 class="text-[22px] font-bold uppercase tracking-tight text-ink">Comparador de acciones</h1>
+        <div class="text-[11px] font-semibold text-[#008f83] mb-1" data-i18n="comparator.breadcrumb">Inicio / Acciones</div>
+        <h1 class="text-[22px] font-bold uppercase tracking-tight text-ink" data-i18n="comparator.title">Comparador de acciones</h1>
     </div>
-    <a href="{{ url_for('tools.rankings') }}" class="btn">Ver rankings</a>
+    <a href="{{ url_for('tools.rankings') }}" class="btn" data-i18n="comparator.view_rankings">Ver rankings</a>
 </div>
 
 <section class="tn-compare-picker-bar mb-5">
     <div>
-        <div class="text-[13px] font-semibold">Elegí las empresas</div>
-        <div class="text-[11.5px] text-muted mt-0.5">{{ selected_ids|length }}/4 seleccionadas · buscá y agregá en el orden que quieras</div>
+        <div class="text-[13px] font-semibold" data-i18n="comparator.choose_companies">Elegí las empresas</div>
+        <div class="text-[11.5px] text-muted mt-0.5">{{ selected_ids|length }}/4 <span data-i18n="comparator.selected_help">seleccionadas · buscá y agregá en el orden que quieras</span></div>
     </div>
     {% if selected_ids|length < 4 %}
     <div class="tn-combobox w-full sm:w-[390px]" data-asset-autocomplete data-search-url="{{ url_for('portfolio.search_order_assets') }}" data-excluded-asset-ids="{{ selected_ids|join(',') }}" data-comparator-picker>
         <input type="hidden" id="comparisonAssetId">
         <div class="relative">
             <span class="material-symbols-outlined tn-input-icon" aria-hidden="true">search</span>
-            <input id="comparisonAssetSearch" class="tn-input pl-10" placeholder="Agregar ticker o empresa…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="comparisonAssetSuggestions">
+            <input id="comparisonAssetSearch" class="tn-input pl-10" placeholder="Agregar ticker o empresa…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="comparisonAssetSuggestions" data-i18n-placeholder="comparator.add_ticker_placeholder">
         </div>
-        <div id="comparisonAssetSuggestions" class="tn-combobox-menu" role="listbox" aria-label="Activos sugeridos" hidden></div>
+        <div id="comparisonAssetSuggestions" class="tn-combobox-menu" role="listbox" aria-label="Activos sugeridos" hidden data-i18n-aria-label="comparator.suggested_assets_aria"></div>
     </div>
     {% else %}
-    <span class="text-[12px] font-semibold text-[#008f83]">Comparador completo</span>
+    <span class="text-[12px] font-semibold text-[#008f83]" data-i18n="comparator.comparator_full">Comparador completo</span>
     {% endif %}
 </section>
 
@@ -42,12 +42,12 @@
     <div class="tn-compare-board">
         <aside class="tn-compare-rail">
             <div class="tn-compare-rail-head">
-                <span class="text-[12px] font-semibold">Indicadores</span>
-                {% if selected_ids|length >= 2 %}<a href="#rentabilidad-comparada" class="tn-compare-performance-link">Comparar rentabilidad</a>{% endif %}
+                <span class="text-[12px] font-semibold" data-i18n="comparator.indicators_label">Indicadores</span>
+                {% if selected_ids|length >= 2 %}<a href="#rentabilidad-comparada" class="tn-compare-performance-link" data-i18n="comparator.compare_performance">Comparar rentabilidad</a>{% endif %}
             </div>
-            <div class="tn-compare-rank-label">Ranking general</div>
+            <div class="tn-compare-rank-label" data-i18n="comparator.overall_ranking">Ranking general</div>
             {% for group in comparison.groups %}
-            <div class="tn-compare-section-label">Indicadores de {{ group.name }}</div>
+            <div class="tn-compare-section-label"><span data-i18n="comparator.indicators_of">Indicadores de</span> {{ group.name }}</div>
                 {% for metric in group.metrics %}
                 <div class="tn-compare-metric-label">{{ metric.label }}</div>
                 {% endfor %}
@@ -99,7 +99,7 @@
         {% if selected_ids|length < 4 %}
         <button type="button" class="tn-compare-add-column" data-open-asset-picker aria-haspopup="dialog" aria-controls="comparatorAssetDialog">
             <span class="material-symbols-outlined" aria-hidden="true">add</span>
-            <span>Agregar activo<br>al comparador</span>
+            <span><span data-i18n="comparator.add_asset_line1">Agregar activo</span><br><span data-i18n="comparator.add_asset_line2">al comparador</span></span>
         </button>
         {% endif %}
     </div>
@@ -109,32 +109,32 @@
 <section id="rentabilidad-comparada" class="card p-5 mb-5 scroll-mt-20">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
-            <div class="text-[15px] font-semibold">Rentabilidad comparada</div>
-            <div class="text-[11.5px] text-muted mt-0.5">Variación porcentual desde el primer cierre del período</div>
+            <div class="text-[15px] font-semibold" data-i18n="comparator.performance_heading">Rentabilidad comparada</div>
+            <div class="text-[11.5px] text-muted mt-0.5" data-i18n="comparator.performance_subheading">Variación porcentual desde el primer cierre del período</div>
         </div>
-        <div class="tn-compare-ranges" role="group" aria-label="Período del gráfico">
+        <div class="tn-compare-ranges" role="group" aria-label="Período del gráfico" data-i18n-aria-label="comparator.chart_period_aria">
             {% for range_key in ranges %}
             <button type="button" class="tn-compare-range {{ 'is-active' if range_key == '5Y' }}" data-range="{{ range_key }}">{{ range_key.replace('Y', 'A') }}</button>
             {% endfor %}
         </div>
     </div>
     <div class="h-[360px] relative">
-        <div id="compareChartLoading" class="absolute inset-0 flex items-center justify-center text-[13px] text-faint">Cargando series…</div>
-        <div id="compareChartEmpty" class="absolute inset-0 hidden items-center justify-center text-[13px] text-faint">No hay series suficientes para este período.</div>
+        <div id="compareChartLoading" class="absolute inset-0 flex items-center justify-center text-[13px] text-faint" data-i18n="comparator.chart_loading">Cargando series…</div>
+        <div id="compareChartEmpty" class="absolute inset-0 hidden items-center justify-center text-[13px] text-faint" data-i18n="comparator.chart_empty">No hay series suficientes para este período.</div>
         <canvas id="comparisonChart"></canvas>
     </div>
 
     <div class="tn-investment-calculator mt-5">
-        <label for="comparisonInvestment" class="text-[13px] font-medium">Si hubieras invertido</label>
+        <label for="comparisonInvestment" class="text-[13px] font-medium" data-i18n="comparator.if_invested">Si hubieras invertido</label>
         <div class="relative w-40"><span class="absolute left-3 top-2 text-[12px] text-muted">$</span><input id="comparisonInvestment" type="number" min="1" step="100" value="1000" class="tn-input pl-7 num"></div>
-        <span class="text-[13px] text-muted2">al inicio del período, hoy tendrías:</span>
+        <span class="text-[13px] text-muted2" data-i18n="comparator.at_start_today">al inicio del período, hoy tendrías:</span>
     </div>
     <div id="investmentResults" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4"></div>
 </section>
 {% else %}
 <section class="card p-6 mb-5 flex flex-wrap items-center justify-between gap-4">
-    <div><div class="text-[15px] font-semibold">Elegí una empresa más</div><p class="text-[12px] text-muted mt-1">Con dos activos se habilitan el gráfico de rentabilidad y la calculadora.</p></div>
-    <button type="button" class="btn btn-primary" data-open-asset-picker aria-haspopup="dialog" aria-controls="comparatorAssetDialog">Agregar empresa</button>
+    <div><div class="text-[15px] font-semibold" data-i18n="comparator.choose_one_more">Elegí una empresa más</div><p class="text-[12px] text-muted mt-1" data-i18n="comparator.choose_one_more_desc">Con dos activos se habilitan el gráfico de rentabilidad y la calculadora.</p></div>
+    <button type="button" class="btn btn-primary" data-open-asset-picker aria-haspopup="dialog" aria-controls="comparatorAssetDialog" data-i18n="comparator.add_company">Agregar empresa</button>
 </section>
 {% endif %}
 {% endif %}
@@ -142,9 +142,9 @@
 {% if not comparison.columns %}
 <section class="tn-compare-empty card">
     <span class="material-symbols-outlined" aria-hidden="true">compare_arrows</span>
-    <h2 class="font-serif-display text-2xl mt-3">Empezá por la primera empresa</h2>
-    <p class="text-[13px] text-muted mt-2 max-w-md">No elegimos acciones por vos. Usá el buscador para armar una comparación de hasta cuatro empresas.</p>
-    <button type="button" class="btn btn-primary mt-5" data-open-asset-picker aria-haspopup="dialog" aria-controls="comparatorAssetDialog">Seleccionar empresa</button>
+    <h2 class="font-serif-display text-2xl mt-3" data-i18n="comparator.empty_heading">Empezá por la primera empresa</h2>
+    <p class="text-[13px] text-muted mt-2 max-w-md" data-i18n="comparator.empty_desc">No elegimos acciones por vos. Usá el buscador para armar una comparación de hasta cuatro empresas.</p>
+    <button type="button" class="btn btn-primary mt-5" data-open-asset-picker aria-haspopup="dialog" aria-controls="comparatorAssetDialog" data-i18n="comparator.select_company">Seleccionar empresa</button>
 </section>
 {% endif %}
 
@@ -153,30 +153,30 @@
     <div class="tn-asset-picker-panel">
         <div class="tn-asset-picker-heading">
             <div>
-                <div class="tn-asset-picker-kicker">Comparador de acciones</div>
-                <h2 id="comparatorAssetDialogTitle">Agregar empresa</h2>
+                <div class="tn-asset-picker-kicker" data-i18n="comparator.title">Comparador de acciones</div>
+                <h2 id="comparatorAssetDialogTitle" data-i18n="comparator.add_company">Agregar empresa</h2>
             </div>
             <form method="dialog">
-                <button type="submit" class="tn-asset-picker-close" aria-label="Cerrar selector">
+                <button type="submit" class="tn-asset-picker-close" aria-label="Cerrar selector" data-i18n-aria-label="comparator.close_selector_aria">
                     <span class="material-symbols-outlined" aria-hidden="true">close</span>
                 </button>
             </form>
         </div>
-        <p class="tn-asset-picker-copy">Escribí el ticker o el nombre de la empresa que querés sumar.</p>
+        <p class="tn-asset-picker-copy" data-i18n="comparator.dialog_copy">Escribí el ticker o el nombre de la empresa que querés sumar.</p>
 
         <div class="tn-combobox tn-asset-picker-search" data-asset-autocomplete data-search-url="{{ url_for('portfolio.search_order_assets') }}" data-excluded-asset-ids="{{ selected_ids|join(',') }}" data-comparator-picker data-modal-asset-picker>
             <input type="hidden" id="modalComparisonAssetId">
-            <label for="modalComparisonAssetSearch" class="lbl">Ticker o empresa</label>
+            <label for="modalComparisonAssetSearch" class="lbl" data-i18n="comparator.ticker_or_company_label">Ticker o empresa</label>
             <div class="relative mt-1.5">
                 <span class="material-symbols-outlined tn-input-icon" aria-hidden="true">search</span>
-                <input id="modalComparisonAssetSearch" class="tn-input pl-10" placeholder="Ej. RY, Shopify, Enbridge…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="modalComparisonAssetSuggestions">
+                <input id="modalComparisonAssetSearch" class="tn-input pl-10" placeholder="Ej. RY, Shopify, Enbridge…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="modalComparisonAssetSuggestions" data-i18n-placeholder="comparator.ticker_example_placeholder">
             </div>
-            <div id="modalComparisonAssetSuggestions" class="tn-combobox-menu" role="listbox" aria-label="Empresas sugeridas" hidden></div>
+            <div id="modalComparisonAssetSuggestions" class="tn-combobox-menu" role="listbox" aria-label="Empresas sugeridas" hidden data-i18n-aria-label="comparator.suggested_companies_aria"></div>
         </div>
 
         {% if comparison.columns %}
         <div class="tn-asset-picker-current">
-            <span>Ya seleccionadas</span>
+            <span data-i18n="comparator.already_selected">Ya seleccionadas</span>
             <div>
                 {% for column in comparison.columns %}
                 <span class="tn-asset-picker-chip"><strong class="num">{{ column.asset.symbol }}</strong> {{ column.asset.name }}</span>
@@ -186,8 +186,8 @@
         {% endif %}
 
         <div class="tn-asset-picker-footer">
-            <span>Podés comparar hasta cuatro empresas.</span>
-            <form method="dialog"><button type="submit" class="btn">Cancelar</button></form>
+            <span data-i18n="comparator.max_four_note">Podés comparar hasta cuatro empresas.</span>
+            <form method="dialog"><button type="submit" class="btn" data-i18n="comparator.cancel">Cancelar</button></form>
         </div>
     </div>
 </dialog>

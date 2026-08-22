@@ -6,50 +6,50 @@
 
 {% block content %}
 
-<h1 class="font-serif-display text-3xl text-ink mb-6">Agregar transacción</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-6" data-i18n="finance.transaction.add">Agregar transacción</h1>
 
 <div class="card p-6 max-w-lg">
     <form method="POST" hx-post="/transactions/add" hx-swap="outerHTML" class="space-y-4">
 
         <div class="space-y-1.5">
-            <label for="date" class="text-[13px] text-muted2">Fecha</label>
+            <label for="date" class="text-[13px] text-muted2" data-i18n="finance.form.date_label">Fecha</label>
             <input type="date" name="date" id="date" class="tn-input" required />
         </div>
 
         <div class="space-y-1.5">
-            <label for="category" class="text-[13px] text-muted2">Categoría</label>
+            <label for="category" class="text-[13px] text-muted2" data-i18n="finance.form.category_label">Categoría</label>
             <select name="category" id="category" class="tn-input">
-                <option value="Bills">Bills</option>
-                <option value="Food">Food</option>
-                <option value="Clothes">Clothes</option>
-                <option value="Medical">Medical</option>
-                <option value="Housing">Housing</option>
-                <option value="Salary">Salary</option>
-                <option value="Social">Social</option>
-                <option value="Vacation">Vacation</option>
-                <option value="Others">Others</option>
+                <option value="Bills" data-i18n="finance.category.bills">Bills</option>
+                <option value="Food" data-i18n="finance.category.food">Food</option>
+                <option value="Clothes" data-i18n="finance.category.clothes">Clothes</option>
+                <option value="Medical" data-i18n="finance.category.medical">Medical</option>
+                <option value="Housing" data-i18n="finance.category.housing">Housing</option>
+                <option value="Salary" data-i18n="finance.category.salary">Salary</option>
+                <option value="Social" data-i18n="finance.category.social">Social</option>
+                <option value="Vacation" data-i18n="finance.category.vacation">Vacation</option>
+                <option value="Others" data-i18n="finance.category.others">Others</option>
             </select>
         </div>
 
         <div class="space-y-1.5">
-            <label for="type" class="text-[13px] text-muted2">Tipo</label>
+            <label for="type" class="text-[13px] text-muted2" data-i18n="finance.form.type_label">Tipo</label>
             <select name="type" id="type" class="tn-input">
-                <option value="EXPENSE">EXPENSE</option>
-                <option value="INCOME">INCOME</option>
+                <option value="EXPENSE" data-i18n="finance.type.expense">EXPENSE</option>
+                <option value="INCOME" data-i18n="finance.type.income">INCOME</option>
             </select>
         </div>
 
         <div class="space-y-1.5">
-            <label for="amount" class="text-[13px] text-muted2">Monto</label>
-            <input type="number" name="amount" id="amount" class="tn-input" placeholder="Ingresa un monto..." required />
+            <label for="amount" class="text-[13px] text-muted2" data-i18n="finance.form.amount_label">Monto</label>
+            <input type="number" name="amount" id="amount" class="tn-input" placeholder="Ingresa un monto..." data-i18n-placeholder="finance.form.amount_placeholder" required />
         </div>
 
         <div class="space-y-1.5">
-            <label for="description" class="text-[13px] text-muted2">Descripción</label>
-            <textarea name="description" class="tn-input" rows="3" placeholder="Ingresa una descripción"></textarea>
+            <label for="description" class="text-[13px] text-muted2" data-i18n="finance.form.description_label">Descripción</label>
+            <textarea name="description" class="tn-input" rows="3" placeholder="Ingresa una descripción" data-i18n-placeholder="finance.form.description_placeholder"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary">Agregar transacción</button>
+        <button type="submit" class="btn btn-primary" data-i18n="finance.transaction.add">Agregar transacción</button>
     </form>
 </div>
 {% endblock %}

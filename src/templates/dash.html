@@ -10,7 +10,7 @@
 <!-- Header -->
 <div class="flex flex-wrap items-end justify-between gap-4 mb-[22px]">
     <div>
-        <h1 class="font-serif-display text-3xl text-ink mb-1">Dashboard</h1>
+        <h1 class="font-serif-display text-3xl text-ink mb-1" data-i18n="dashboard.title">Dashboard</h1>
         <div class="text-[13px] text-muted">
             {{ today|date_long_es }} · {{ market.label }}{% if usd_cad_rate %} · USD/CAD <span class="num">{{ usd_cad_rate|fx }}</span>{% endif %}
         </div>
@@ -19,43 +19,43 @@
         <form method="POST" action="{{ url_for('portfolio.recalculate_dashboard') }}">
             <button type="submit" class="btn">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4"></path><path d="M21 3v6h-6"></path></svg>
-                Recalcular
+                <span data-i18n="dashboard.recalculate">Recalcular</span>
             </button>
         </form>
         <a href="{{ url_for('portfolio.add_order') }}" class="btn btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
-            Nueva orden
+            <span data-i18n="dashboard.new_order">Nueva orden</span>
         </a>
     </div>
 </div>
 
 {% if warnings %}
 <div class="tn-alert tn-alert-info mb-[18px]">
-    <span>{{ warnings|length }} advertencia(s) en el cálculo del portafolio — {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
+    <span>{{ warnings|length }} <span data-i18n="dashboard.warnings_label">advertencia(s) en el cálculo del portafolio</span> — {{ warnings[0] }}{% if warnings|length > 1 %}, …{% endif %}</span>
 </div>
 {% endif %}
 
 <!-- KPI band -->
 <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3.5 mb-[18px]">
     <div class="card py-4 px-[18px]">
-        <div class="lbl mb-2">Patrimonio</div>
+        <div class="lbl mb-2" data-i18n="dashboard.kpi_patrimony">Patrimonio</div>
         <div class="num text-[23px] font-semibold">C${{ kpis.patrimony_cad|currency }}</div>
         {% if kpis.change_percent is not none %}
         <div class="num text-[12px] mt-[5px] {{ 'pos' if kpis.change_percent >= 0 else 'neg' }}">
             {{ '▲' if kpis.change_percent >= 0 else '▼' }} {{ kpis.change_percent|ratio }}%
-            {{ 'hoy' if kpis.change_is_today else 'desde el último snapshot' }}
+            {% if kpis.change_is_today %}<span data-i18n="dashboard.change_today">hoy</span>{% else %}<span data-i18n="dashboard.change_since_snapshot">desde el último snapshot</span>{% endif %}
         </div>
         {% else %}
-        <div class="text-[12px] text-muted mt-[5px]">sin snapshot previo</div>
+        <div class="text-[12px] text-muted mt-[5px]" data-i18n="dashboard.no_previous_snapshot">sin snapshot previo</div>
         {% endif %}
     </div>
     <div class="card py-4 px-[18px]">
-        <div class="lbl mb-2">Invertido</div>
+        <div class="lbl mb-2" data-i18n="dashboard.kpi_invested">Invertido</div>
         <div class="num text-[23px] font-semibold">C${{ kpis.invested_cad|currency }}</div>
-        <div class="text-[12px] text-muted mt-[5px]">costo promedio</div>
+        <div class="text-[12px] text-muted mt-[5px]" data-i18n="dashboard.avg_cost">costo promedio</div>
     </div>
     <div class="card py-4 px-[18px]">
-        <div class="lbl mb-2">Ganancia total</div>
+        <div class="lbl mb-2" data-i18n="dashboard.kpi_gain">Ganancia total</div>
         <div class="num text-[23px] font-semibold {{ 'pos' if kpis.gain_cad >= 0 else 'neg' }}">
             {{ '+' if kpis.gain_cad >= 0 }}C${{ kpis.gain_cad|currency }}
         </div>
@@ -64,23 +64,23 @@
             {{ '+' if kpis.gain_percent >= 0 }}{{ kpis.gain_percent|ratio }}%
         </div>
         {% else %}
-        <div class="text-[12px] text-muted mt-[5px]">sin costo registrado</div>
+        <div class="text-[12px] text-muted mt-[5px]" data-i18n="dashboard.no_cost_recorded">sin costo registrado</div>
         {% endif %}
     </div>
     <div class="card py-4 px-[18px]">
-        <div class="lbl mb-2">Dividendos 12m</div>
+        <div class="lbl mb-2" data-i18n="dashboard.kpi_dividends_12m">Dividendos 12m</div>
         <div class="num text-[23px] font-semibold">C${{ kpis.dividends_12m_cad|currency }}</div>
         <div class="text-[12px] text-muted mt-[5px]">
-            <span class="num">C${{ kpis.dividends_monthly_average_cad|currency }}</span>/mes prom.
+            <span class="num">C${{ kpis.dividends_monthly_average_cad|currency }}</span><span data-i18n="dashboard.per_month_avg">/mes prom.</span>
         </div>
     </div>
     <div class="card py-4 px-[18px]">
-        <div class="lbl mb-2">Yield on cost</div>
+        <div class="lbl mb-2" data-i18n="dashboard.kpi_yield_on_cost">Yield on cost</div>
         <div class="num text-[23px] font-semibold">
             {% if kpis.yield_on_cost_percent is not none %}{{ kpis.yield_on_cost_percent|ratio }}%{% else %}—{% endif %}
         </div>
         <div class="text-[12px] text-muted mt-[5px]">
-            proyección <span class="num">C${{ kpis.projection_12m_cad|currency }}</span>/12m
+            <span data-i18n="dashboard.projection_prefix">proyección</span> <span class="num">C${{ kpis.projection_12m_cad|currency }}</span><span data-i18n="dashboard.projection_suffix">/12m</span>
         </div>
     </div>
 </div>
@@ -89,11 +89,11 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 mb-[18px] items-start">
     <div class="card py-5 px-[22px] lg:col-span-2">
         <div class="flex justify-between items-center mb-3.5">
-            <div class="text-sm font-semibold">Evolución del patrimonio</div>
+            <div class="text-sm font-semibold" data-i18n="dashboard.equity_evolution">Evolución del patrimonio</div>
             {% if has_equity_history %}
             <div class="flex gap-1.5" id="equityRangeButtons">
                 {% for key, label in [('1M', '1M'), ('6M', '6M'), ('1A', '1A'), ('ALL', 'Todo')] %}
-                <button type="button" class="tn-range equity-range-btn{{ ' tn-range-active' if key == '1M' }}" data-range="{{ key }}">{{ label }}</button>
+                <button type="button" class="tn-range equity-range-btn{{ ' tn-range-active' if key == '1M' }}" data-range="{{ key }}"{% if key == 'ALL' %} data-i18n="dashboard.range_all"{% endif %}>{{ label }}</button>
                 {% endfor %}
             </div>
             {% endif %}
@@ -103,21 +103,21 @@
             <canvas id="equityChart"></canvas>
         </div>
         <div class="flex gap-5 mt-3 text-[12px] text-muted2">
-            <span class="flex items-center gap-1.5"><span class="w-3.5 h-[3px] bg-pos rounded-sm"></span>Patrimonio</span>
-            <span class="flex items-center gap-1.5"><span class="w-3.5 h-0 border-t-2 border-dashed border-[#b3a992]"></span>Aportado</span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-[3px] bg-pos rounded-sm"></span><span data-i18n="dashboard.kpi_patrimony">Patrimonio</span></span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-0 border-t-2 border-dashed border-[#b3a992]"></span><span data-i18n="dashboard.legend_contributed">Aportado</span></span>
         </div>
         {% else %}
         <div class="h-[220px] flex flex-col items-center justify-center text-center gap-2">
-            <p class="text-[13px] text-faint">Todavía no hay snapshots diarios para dibujar la curva.</p>
+            <p class="text-[13px] text-faint" data-i18n="dashboard.no_snapshots_message">Todavía no hay snapshots diarios para dibujar la curva.</p>
             <form method="POST" action="{{ url_for('portfolio.recalculate_dashboard') }}">
-                <button type="submit" class="btn">Tomar el primer snapshot</button>
+                <button type="submit" class="btn" data-i18n="dashboard.take_first_snapshot">Tomar el primer snapshot</button>
             </form>
         </div>
         {% endif %}
     </div>
 
     <div class="card py-5 px-[22px]">
-        <div class="text-sm font-semibold mb-3.5">Alocación por sector</div>
+        <div class="text-sm font-semibold mb-3.5" data-i18n="dashboard.sector_allocation">Alocación por sector</div>
         {% if sectors %}
         <div class="flex items-center gap-5">
             <svg width="140" height="140" viewBox="0 0 140 140" class="shrink-0">
@@ -129,7 +129,7 @@
                     </circle>
                     {% endfor %}
                 </g>
-                <text x="70" y="66" text-anchor="middle" font-size="11" fill="#8a857a" font-family="IBM Plex Sans, sans-serif">Total</text>
+                <text x="70" y="66" text-anchor="middle" font-size="11" fill="#8a857a" font-family="IBM Plex Sans, sans-serif" data-i18n="dashboard.total">Total</text>
                 <text x="70" y="84" text-anchor="middle" font-size="14" font-weight="600" fill="#1c1b18" font-family="IBM Plex Mono, monospace">C${{ sectors|sum(attribute='value_cad')|compact_number }}</text>
             </svg>
             <div class="flex flex-col gap-2 text-[12px] flex-1 min-w-0">
@@ -145,12 +145,12 @@
             </div>
         </div>
         {% else %}
-        <p class="text-[13px] text-faint py-4">Sin posiciones valuadas en CAD para repartir por sector.</p>
+        <p class="text-[13px] text-faint py-4" data-i18n="dashboard.no_sector_positions">Sin posiciones valuadas en CAD para repartir por sector.</p>
         {% endif %}
 
         {% if currencies %}
         <div class="border-t border-[#efede7] mt-4 pt-3.5">
-            <div class="lbl mb-2.5">Por moneda</div>
+            <div class="lbl mb-2.5" data-i18n="dashboard.by_currency">Por moneda</div>
             <div class="flex flex-col gap-2 text-[12px]">
                 {% for row in currencies %}
                 <div class="flex items-center gap-2.5">
@@ -170,7 +170,7 @@
 <!-- Row: contributions + top positions + events -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 items-start">
     <div class="card py-5 px-[22px]">
-        <div class="text-sm font-semibold mb-3.5">Aportes mensuales</div>
+        <div class="text-sm font-semibold mb-3.5" data-i18n="dashboard.monthly_contributions">Aportes mensuales</div>
         <svg width="100%" height="170" viewBox="0 0 340 170" preserveAspectRatio="none">
             {% for bar in contributions.bars %}
             <rect x="{{ bar.x }}" y="{{ bar.y }}" width="{{ bar.width }}" height="{{ bar.height }}" rx="3" fill="{{ bar.color }}">
@@ -185,15 +185,15 @@
         </div>
         {% if contributions.current %}
         <div class="text-[12px] text-muted2 mt-3 first-letter:uppercase">
-            {{ contributions.current.month_name }}: <span class="num font-semibold text-ink">C${{ contributions.current.total_cad|currency }}</span> aportados
+            {{ contributions.current.month_name }}: <span class="num font-semibold text-ink">C${{ contributions.current.total_cad|currency }}</span> <span data-i18n="dashboard.contributed_suffix">aportados</span>
         </div>
         {% endif %}
     </div>
 
     <div class="card py-5 px-[22px]">
         <div class="flex justify-between items-center mb-2">
-            <div class="text-sm font-semibold">Top posiciones</div>
-            <a href="{{ url_for('portfolio.portfolio') }}" class="text-[12px] font-semibold">Ver portafolio →</a>
+            <div class="text-sm font-semibold" data-i18n="dashboard.top_positions">Top posiciones</div>
+            <a href="{{ url_for('portfolio.portfolio') }}" class="text-[12px] font-semibold" data-i18n="dashboard.view_portfolio_link">Ver portafolio →</a>
         </div>
         {% if top_positions %}
         <table class="tn-card-table">
@@ -213,14 +213,14 @@
             </tbody>
         </table>
         {% else %}
-        <p class="text-[13px] text-faint py-4">Todavía no tienes posiciones abiertas.</p>
+        <p class="text-[13px] text-faint py-4" data-i18n="dashboard.no_positions">Todavía no tienes posiciones abiertas.</p>
         {% endif %}
     </div>
 
     <div class="card py-5 px-[22px]">
         <div class="flex justify-between items-center mb-3">
-            <div class="text-sm font-semibold">Próximos eventos</div>
-            <a href="{{ url_for('inbox.inbox_page') }}" class="text-[12px] font-semibold">Inbox →</a>
+            <div class="text-sm font-semibold" data-i18n="dashboard.upcoming_events">Próximos eventos</div>
+            <a href="{{ url_for('inbox.inbox_page') }}" class="text-[12px] font-semibold" data-i18n="dashboard.inbox_link">Inbox →</a>
         </div>
         {% if events %}
         <div class="flex flex-col gap-3">
@@ -242,17 +242,17 @@
                     {% if event.url %}<a href="{{ event.url }}" target="_blank" rel="noopener noreferrer" class="text-ink hover:text-maple">{{ event.title }}</a>{% else %}{{ event.title }}{% endif %}
                     — <span class="num">{{ event.date.day }} {{ event.date|month_abbr_es }}</span>
                     {% if event.amount_per_share %}
-                    · <span class="num">{{ event.currency }} {{ event.amount_per_share|ratio }}</span>/acción
+                    · <span class="num">{{ event.currency }} {{ event.amount_per_share|ratio }}</span><span data-i18n="dashboard.per_share_suffix">/acción</span>
                     {% endif %}
                     {% if event.estimated_cad is not none %}
-                    <div class="text-muted text-[11.5px] mt-0.5">Recibirás ≈ <span class="num">C${{ event.estimated_cad|currency }}</span></div>
+                    <div class="text-muted text-[11.5px] mt-0.5"><span data-i18n="dashboard.you_will_receive">Recibirás ≈</span> <span class="num">C${{ event.estimated_cad|currency }}</span></div>
                     {% endif %}
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-[13px] text-faint py-4">Sin eventos anunciados para tus posiciones.</p>
+        <p class="text-[13px] text-faint py-4" data-i18n="dashboard.no_events">Sin eventos anunciados para tus posiciones.</p>
         {% endif %}
     </div>
 </div>

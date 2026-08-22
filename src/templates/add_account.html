@@ -7,33 +7,33 @@
 {% block content %}
 {% include 'partials/flash_messages.html' %}
 
-<h1 class="font-serif-display text-3xl text-ink mb-6">{{ 'Editar cuenta' if editing else 'Nueva cuenta' }}</h1>
+<h1 class="font-serif-display text-3xl text-ink mb-6" data-i18n="{{ 'accounts.edit_title' if editing else 'accounts.new_title' }}">{{ 'Editar cuenta' if editing else 'Nueva cuenta' }}</h1>
 
 <div class="card p-6 max-w-lg">
     <form method="POST" class="space-y-4">
         {{ form.hidden_tag() }}
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.type.label.text }}</label>
+            <label class="text-[13px] text-muted2" data-i18n="accounts.field_type">{{ form.type.label.text }}</label>
             {{ form.type(class="tn-input") }}
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.name.label.text }}</label>
-            {{ form.name(class="tn-input", placeholder="ej. Questrade Margin") }}
+            <label class="text-[13px] text-muted2" data-i18n="accounts.field_name">{{ form.name.label.text }}</label>
+            {{ form.name(class="tn-input", placeholder="ej. Questrade Margin", data_i18n_placeholder="accounts.name_placeholder") }}
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[13px] text-muted2">{{ form.broker.label.text }}</label>
-            {{ form.broker(class="tn-input", placeholder="ej. Questrade") }}
+            <label class="text-[13px] text-muted2" data-i18n="accounts.field_broker">{{ form.broker.label.text }}</label>
+            {{ form.broker(class="tn-input", placeholder="ej. Questrade", data_i18n_placeholder="accounts.broker_placeholder") }}
         </div>
 
         <div class="flex gap-2.5">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" data-i18n="{{ 'accounts.save_edit' if editing else 'accounts.save_new' }}">
                 {{ 'Guardar cambios' if editing else 'Guardar' }}
             </button>
             {% if editing %}
-            <a href="{{ url_for('portfolio.list_accounts') }}" class="btn">Cancelar</a>
+            <a href="{{ url_for('portfolio.list_accounts') }}" class="btn" data-i18n="accounts.cancel">Cancelar</a>
             {% endif %}
         </div>
     </form>

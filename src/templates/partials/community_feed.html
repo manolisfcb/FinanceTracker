@@ -8,7 +8,7 @@
            hx-target="#community-feed"
            hx-swap="outerHTML"
            hx-push-url="true"
-           class="chip {{ 'chip-on' if selected_sort == key }}">{{ label }}</a>
+           class="chip {{ 'chip-on' if selected_sort == key }}" data-i18n="community.sort_{{ key }}">{{ label }}</a>
         {% endfor %}
     </div>
 
@@ -17,9 +17,9 @@
     {% else %}
     <div class="card p-8 text-center">
         <div class="text-sm font-semibold text-ink mb-1">
-            {% if selected_category %}Todavía no hay publicaciones en {{ categories[selected_category] }}{% else %}Todavía no hay publicaciones{% endif %}
+            {% if selected_category %}<span data-i18n="community.empty_feed_prefix">Todavía no hay publicaciones en</span> {{ categories[selected_category] }}{% else %}<span data-i18n="community.empty_feed_generic">Todavía no hay publicaciones</span>{% endif %}
         </div>
-        <div class="text-[13px] text-muted">Sé el primero en compartir un análisis, una noticia o una duda.</div>
+        <div class="text-[13px] text-muted" data-i18n="community.empty_feed_cta">Sé el primero en compartir un análisis, una noticia o una duda.</div>
     </div>
     {% endfor %}
 </div>

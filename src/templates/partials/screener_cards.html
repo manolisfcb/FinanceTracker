@@ -36,29 +36,29 @@
 
         <div class="grid grid-cols-3 gap-2">
             <div class="stat">
-                <span class="lbl">P/E</span>
+                <span class="lbl" data-i18n="stocks.card_pe">P/E</span>
                 <span class="num text-sm font-semibold">{{ fundamentals.pe|ratio if fundamentals else '—' }}</span>
             </div>
             <div class="stat">
-                <span class="lbl">P/B</span>
+                <span class="lbl" data-i18n="stocks.card_pb">P/B</span>
                 <span class="num text-sm font-semibold">{{ fundamentals.pb|ratio if fundamentals else '—' }}</span>
             </div>
             <div class="stat">
-                <span class="lbl">ROE</span>
+                <span class="lbl" data-i18n="stocks.card_roe">ROE</span>
                 <span class="num text-sm font-semibold {{ 'pos' if fundamentals and fundamentals.roe is not none and fundamentals.roe >= roe_strong }}">
                     {{ fundamentals.roe|percent if fundamentals else '—' }}
                 </span>
             </div>
             <div class="stat">
-                <span class="lbl">D/E</span>
+                <span class="lbl" data-i18n="stocks.card_de">D/E</span>
                 <span class="num text-sm font-semibold">{{ fundamentals.debt_to_equity|ratio if fundamentals else '—' }}</span>
             </div>
             <div class="stat">
-                <span class="lbl">Yield</span>
+                <span class="lbl" data-i18n="stocks.card_yield">Yield</span>
                 <span class="num text-sm font-semibold">{{ fundamentals.dividend_yield|percent if fundamentals else '—' }}</span>
             </div>
             <div class="stat">
-                <span class="lbl">Payout</span>
+                <span class="lbl" data-i18n="stocks.card_payout">Payout</span>
                 <span class="num text-sm font-semibold {{ 'neg' if fundamentals and fundamentals.payout_ratio is not none and fundamentals.payout_ratio > payout_overpaying }}">
                     {{ fundamentals.payout_ratio|percent if fundamentals else '—' }}
                 </span>
@@ -66,7 +66,7 @@
         </div>
 
         <div class="flex justify-between border-t border-[#f0eee8] mt-3.5 pt-3 text-[11.5px]">
-            <span class="text-muted">Market cap</span>
+            <span class="text-muted" data-i18n="stocks.card_market_cap">Market cap</span>
             <span class="num font-semibold">
                 {%- if fundamentals and fundamentals.market_cap is not none -%}
                 {{ asset.currency|currency_symbol }}{{ fundamentals.market_cap|compact_number }}
@@ -78,5 +78,5 @@
 </div>
 {{ screener_pagination(pagination, page_url_prefix, 'pt-4 px-1') }}
 {% else %}
-<div class="card text-center text-faint py-10">No hay empresas que coincidan con estos filtros.</div>
+<div class="card text-center text-faint py-10" data-i18n="stocks.empty_state">No hay empresas que coincidan con estos filtros.</div>
 {% endif %}

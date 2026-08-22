@@ -9,40 +9,40 @@
 
 <div class="max-w-2xl">
     <div class="flex items-center gap-1.5 text-[13px] text-muted2 mb-4">
-        <a href="{{ url_for('community.community_page') }}" class="hover:text-ink">Comunidad</a>
+        <a href="{{ url_for('community.community_page') }}" class="hover:text-ink" data-i18n="community.breadcrumb">Comunidad</a>
         <span>/</span>
         <a href="{{ url_for('community.post_page', post_id=post.id) }}" class="hover:text-ink">{{ post.title }}</a>
     </div>
 
-    <h1 class="font-serif-display text-2xl text-ink mb-4">Editar publicación</h1>
+    <h1 class="font-serif-display text-2xl text-ink mb-4" data-i18n="community.edit_post_title">Editar publicación</h1>
 
     <form method="POST" action="{{ url_for('community.edit_post', post_id=post.id) }}" class="card p-6 flex flex-col gap-4">
         {{ form.hidden_tag() }}
 
         <label class="flex flex-col gap-1.5">
-            <span class="lbl">Título</span>
+            <span class="lbl" data-i18n="community.field_title_label">Título</span>
             <input name="{{ form.title.name }}" class="tn-input" maxlength="160" required
                    value="{{ form.title.data or '' }}" />
         </label>
 
         <label class="flex flex-col gap-1.5">
-            <span class="lbl">Mensaje</span>
+            <span class="lbl" data-i18n="community.field_message_label">Mensaje</span>
             <textarea name="{{ form.body.name }}" class="tn-input" rows="9" required>{{ form.body.data or '' }}</textarea>
-            <span class="text-[11.5px] text-muted">Mencioná una empresa con $TICKER — por ejemplo $RY o $ENB.</span>
+            <span class="text-[11.5px] text-muted" data-i18n="community.mention_helper">Mencioná una empresa con $TICKER — por ejemplo $RY o $ENB.</span>
         </label>
 
         <label class="flex flex-col gap-1.5">
-            <span class="lbl">Categoría</span>
+            <span class="lbl" data-i18n="community.category_label">Categoría</span>
             <select name="{{ form.category.name }}" class="tn-input w-auto">
                 {% for value, label in form.category.choices %}
-                <option value="{{ value }}" {{ 'selected' if form.category.data == value }}>{{ label }}</option>
+                <option value="{{ value }}" {{ 'selected' if form.category.data == value }} data-i18n="community.category_{{ value|lower }}">{{ label }}</option>
                 {% endfor %}
             </select>
         </label>
 
         <div class="flex justify-end gap-2">
-            <a href="{{ url_for('community.post_page', post_id=post.id) }}" class="btn">Cancelar</a>
-            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            <a href="{{ url_for('community.post_page', post_id=post.id) }}" class="btn" data-i18n="community.cancel_btn">Cancelar</a>
+            <button type="submit" class="btn btn-primary" data-i18n="community.save_changes_btn">Guardar cambios</button>
         </div>
     </form>
 </div>

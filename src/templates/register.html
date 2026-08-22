@@ -3,20 +3,20 @@
 {% block head_title %}Crear cuenta | TrueNorth Analytics{% endblock %}
 
 {% block auth_form %}
-<h1 class="font-serif-display text-[34px] md:text-[38px] leading-tight">Creá tu cuenta</h1>
-<p class="mt-2.5 text-sm text-muted2">Tres campos y entrás directo. Sin confirmar nada por email.</p>
+<h1 class="font-serif-display text-[34px] md:text-[38px] leading-tight" data-i18n="register.title">Creá tu cuenta</h1>
+<p class="mt-2.5 text-sm text-muted2" data-i18n="register.subtitle">Tres campos y entrás directo. Sin confirmar nada por email.</p>
 
 <div class="flex flex-col gap-3.5 mt-7">
 
     {% if google_enabled %}
     <a href="{{ url_for('auth.google_login', next=request.args.get('next')) }}" class="btn btn-auth btn-block">
         {% include 'partials/google_mark.html' %}
-        Continuar con Google
+        <span data-i18n="register.continue_google">Continuar con Google</span>
     </a>
 
     <div class="flex items-center gap-3">
         <span class="flex-1 h-px bg-border block"></span>
-        <span class="text-[11.5px] text-faint">o con tu email</span>
+        <span class="text-[11.5px] text-faint" data-i18n="register.or_with_email">o con tu email</span>
         <span class="flex-1 h-px bg-border block"></span>
     </div>
     {% endif %}
@@ -25,19 +25,19 @@
         {{ form.hidden_tag() }}
 
         <div class="flex flex-col gap-1.5">
-            {{ form.username.label(class="lbl") }}
+            {{ form.username.label(class="lbl", data_i18n="register.username_label") }}
             {{ form.username(class="tn-input") }}
             {% if form.username.errors %}
                 {% for error in form.username.errors %}
                 <span class="text-xs text-neg">{{ error }}</span>
                 {% endfor %}
             {% else %}
-            <span class="text-[11.5px] text-faint">Así te ven en la comunidad.</span>
+            <span class="text-[11.5px] text-faint" data-i18n="register.username_help">Así te ven en la comunidad.</span>
             {% endif %}
         </div>
 
         <div class="flex flex-col gap-1.5">
-            {{ form.email.label(class="lbl") }}
+            {{ form.email.label(class="lbl", data_i18n="register.email_label") }}
             {{ form.email(class="tn-input") }}
             {% for error in form.email.errors %}
             <span class="text-xs text-neg">{{ error }}</span>
@@ -45,19 +45,19 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-            {{ form.password.label(class="lbl") }}
+            {{ form.password.label(class="lbl", data_i18n="register.password_label") }}
             <div class="tn-password">
-                {{ form.password(class="tn-input", id="register-password") }}
-                <button type="button" class="tn-password-toggle" data-password-toggle="register-password" aria-controls="register-password">Mostrar</button>
+                {{ form.password(class="tn-input", id="register-password", data_i18n_placeholder="register.password_placeholder") }}
+                <button type="button" class="tn-password-toggle" data-password-toggle="register-password" aria-controls="register-password" data-i18n="register.password_toggle_show">Mostrar</button>
             </div>
             {% for error in form.password.errors %}
             <span class="text-xs text-neg">{{ error }}</span>
             {% endfor %}
         </div>
 
-        {{ form.submit(class="btn btn-primary btn-auth btn-block mt-0.5") }}
+        {{ form.submit(class="btn btn-primary btn-auth btn-block mt-0.5", data_i18n_value="register.submit_button") }}
 
-        <p class="text-[11.5px] leading-relaxed text-faint text-center">
+        <p class="text-[11.5px] leading-relaxed text-faint text-center" data-i18n="register.disclaimer">
             TrueNorth es una herramienta de seguimiento y análisis. No damos asesoramiento
             financiero ni fiscal.
         </p>
@@ -66,15 +66,15 @@
 </div>
 
 <div class="mt-5 text-center text-[13px] text-muted2">
-    ¿Ya tenés cuenta?
-    <a href="{{ url_for('auth.login', next=request.args.get('next')) }}" class="font-semibold">Iniciá sesión</a>
+    <span data-i18n="register.have_account">¿Ya tenés cuenta?</span>
+    <a href="{{ url_for('auth.login', next=request.args.get('next')) }}" class="font-semibold" data-i18n="register.login_link">Iniciá sesión</a>
 </div>
 {% endblock auth_form %}
 
 {% block auth_aside %}
 <div>
-    <span class="tn-eyebrow">Después de crear la cuenta</span>
-    <h2 class="font-serif-display text-[42px] leading-[1.14] tracking-tight mt-3.5 text-pretty">
+    <span class="tn-eyebrow" data-i18n="register.aside_eyebrow">Después de crear la cuenta</span>
+    <h2 class="font-serif-display text-[42px] leading-[1.14] tracking-tight mt-3.5 text-pretty" data-i18n="register.aside_heading">
         Tres pasos y ya tenés tu cartera viva.
     </h2>
 </div>
@@ -83,22 +83,22 @@
     <li class="flex gap-4">
         <span class="num w-[30px] h-[30px] shrink-0 rounded-full border border-[#4a4842] flex items-center justify-center text-[13px] font-semibold text-[#c9c4b8]">1</span>
         <div>
-            <div class="text-[15px] font-semibold text-[#faf9f6]">Agregá tus cuentas</div>
-            <p class="mt-1 text-[13.5px] leading-relaxed text-muted">RRSP, TFSA, FHSA o no registrada, con el broker donde estén.</p>
+            <div class="text-[15px] font-semibold text-[#faf9f6]" data-i18n="register.step1_title">Agregá tus cuentas</div>
+            <p class="mt-1 text-[13.5px] leading-relaxed text-muted" data-i18n="register.step1_desc">RRSP, TFSA, FHSA o no registrada, con el broker donde estén.</p>
         </div>
     </li>
     <li class="flex gap-4">
         <span class="num w-[30px] h-[30px] shrink-0 rounded-full border border-[#4a4842] flex items-center justify-center text-[13px] font-semibold text-[#c9c4b8]">2</span>
         <div>
-            <div class="text-[15px] font-semibold text-[#faf9f6]">Importá o cargá tus órdenes</div>
-            <p class="mt-1 text-[13.5px] leading-relaxed text-muted">Un archivo de Questrade, Wealthsimple o IBKR — o una compra a mano.</p>
+            <div class="text-[15px] font-semibold text-[#faf9f6]" data-i18n="register.step2_title">Importá o cargá tus órdenes</div>
+            <p class="mt-1 text-[13.5px] leading-relaxed text-muted" data-i18n="register.step2_desc">Un archivo de Questrade, Wealthsimple o IBKR — o una compra a mano.</p>
         </div>
     </li>
     <li class="flex gap-4">
         <span class="num w-[30px] h-[30px] shrink-0 rounded-full border border-[#4a4842] flex items-center justify-center text-[13px] font-semibold text-[#c9c4b8]">3</span>
         <div>
-            <div class="text-[15px] font-semibold text-[#faf9f6]">Mirá el dashboard</div>
-            <p class="mt-1 text-[13.5px] leading-relaxed text-muted">Patrimonio, costo base, dividendos y hechos relevantes, ya calculados.</p>
+            <div class="text-[15px] font-semibold text-[#faf9f6]" data-i18n="register.step3_title">Mirá el dashboard</div>
+            <p class="mt-1 text-[13.5px] leading-relaxed text-muted" data-i18n="register.step3_desc">Patrimonio, costo base, dividendos y hechos relevantes, ya calculados.</p>
         </div>
     </li>
 </ol>

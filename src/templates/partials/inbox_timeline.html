@@ -11,7 +11,8 @@
             hx-get="{{ url_for('inbox.inbox_page', kind=kind.value if kind else None) }}"
             hx-target="#inbox-panel"
             hx-swap="innerHTML"
-            hx-push-url="true">{{ label }}</button>
+            hx-push-url="true"
+            data-i18n="inboxpage.filter_{{ kind.value|lower if kind else 'all' }}">{{ label }}</button>
     {% endfor %}
 </div>
 
@@ -32,7 +33,7 @@
                         <a href="{{ url_for('stocks.get_stock_detail', exchange=event.asset.exchange, symbol=event.asset.symbol) }}">{{ event.asset.symbol }} · {{ event.asset.name }}</a>
                         {% else %}{{ event.title }}{% endif %}
                     </span>
-                    <span class="text-[10px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 {{ style[0] }} {{ style[1] }}">{{ style[2] }}</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 {{ style[0] }} {{ style[1] }}" data-i18n="inboxpage.kind_{{ event.kind.value|lower }}">{{ style[2] }}</span>
                 </div>
                 <div class="text-[13px] leading-relaxed {{ 'text-muted' if event.read else 'text-[#4a463d]' }}">
                     {% if event.kind.value == 'NEWS' %}
@@ -42,7 +43,7 @@
                         {{ event.summary or event.title }}
                     {% endif %}
                     {% if event.url %}
-                    <a href="{{ event.url }}" target="_blank" rel="noopener" class="font-semibold">{{ 'Ver en EDGAR ↗' if event.source == 'EDGAR' else 'Leer ↗' }}</a>
+                    <a href="{{ event.url }}" target="_blank" rel="noopener" class="font-semibold" data-i18n="{{ 'inboxpage.view_on_edgar' if event.source == 'EDGAR' else 'inboxpage.read_link' }}">{{ 'Ver en EDGAR ↗' if event.source == 'EDGAR' else 'Leer ↗' }}</a>
                     {% endif %}
                 </div>
             </div>
@@ -51,7 +52,7 @@
                 {% if not event.read %}
                 <button class="text-[11.5px] text-muted2 hover:text-ink"
                         hx-post="{{ url_for('inbox.mark_read', event_id=event.id) }}"
-                        hx-on="afterRequest: window.location.reload()">Marcar leído</button>
+                        hx-on="afterRequest: window.location.reload()" data-i18n="inboxpage.mark_read_btn">Marcar leído</button>
                 {% endif %}
             </div>
         </div>
@@ -59,7 +60,7 @@
     </div>
     {% endfor %}
 {% else %}
-<div class="card p-8 text-center text-faint text-[13px]">
+<div class="card p-8 text-center text-faint text-[13px]" data-i18n="inboxpage.empty_state">
     No hay hechos relevantes todavía. Aparecen acá cuando las empresas de tu portafolio publican
     filings, resultados o anuncios de dividendo.
 </div>

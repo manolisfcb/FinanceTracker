@@ -8,25 +8,25 @@
     <!-- Header -->
     <div class="flex flex-wrap items-end justify-between gap-4 mb-5">
         <div>
-            <h1 class="font-serif-display text-3xl text-ink mb-1">Acciones</h1>
+            <h1 class="font-serif-display text-3xl text-ink mb-1" data-i18n="stocks.heading">Acciones</h1>
             <div class="text-[13px] text-muted">
-                Indicadores fundamentales del universo canadiense y americano{% if last_update %} · actualizado {{ last_update|date_es }}{% endif %}
+                <span data-i18n="stocks.subheading">Indicadores fundamentales del universo canadiense y americano</span>{% if last_update %} · <span data-i18n="stocks.updated_prefix">actualizado</span> {{ last_update|date_es }}{% endif %}
             </div>
         </div>
         <div class="flex items-center gap-2.5">
             <div class="tn-seg">
                 <a href="{{ view_urls['list'] }}" class="{{ 'tn-seg-on' if view == 'list' }}">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"></path><path d="M3 6h.01M3 12h.01M3 18h.01"></path></svg>
-                    Lista
+                    <span data-i18n="stocks.view_list">Lista</span>
                 </a>
                 <a href="{{ view_urls['cards'] }}" class="{{ 'tn-seg-on' if view == 'cards' }}">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
-                    Cards
+                    <span data-i18n="stocks.view_cards">Cards</span>
                 </a>
             </div>
             <a href="{{ export_url }}" class="btn" hx-boost="false">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 21h16"></path></svg>
-                Exportar CSV
+                <span data-i18n="stocks.export_csv">Exportar CSV</span>
             </a>
         </div>
     </div>
@@ -52,7 +52,7 @@
                 <a href="{{ option.url }}" class="{{ 'tn-dropdown-item-on' if option.active }}">{{ option.label }}</a>
                 {% endfor %}
                 {% if dropdown.remove_url %}
-                <a href="{{ dropdown.remove_url }}" class="text-maple border-t border-border mt-1.5 pt-2">Quitar filtro</a>
+                <a href="{{ dropdown.remove_url }}" class="text-maple border-t border-border mt-1.5 pt-2" data-i18n="stocks.remove_filter">Quitar filtro</a>
                 {% endif %}
             </div>
         </details>
@@ -60,7 +60,7 @@
 
         {% if available_filters %}
         <details class="tn-dropdown">
-            <summary class="text-[12px] font-semibold text-maple ml-1 cursor-pointer">+ Agregar filtro</summary>
+            <summary class="text-[12px] font-semibold text-maple ml-1 cursor-pointer" data-i18n="stocks.add_filter">+ Agregar filtro</summary>
             <div class="tn-dropdown-menu tn-dropdown-menu-l">
                 {% for extra in available_filters %}
                 <a href="{{ extra.url }}">{{ extra.title }}</a>
@@ -70,7 +70,7 @@
         {% endif %}
 
         <div class="ml-auto text-[12px] text-muted">
-            {{ total_assets|quantity }} empresas · <span class="font-semibold text-ink">{{ pagination.total|quantity }} coinciden</span>
+            {{ total_assets|quantity }} <span data-i18n="stocks.count_companies">empresas</span> · <span class="font-semibold text-ink">{{ pagination.total|quantity }} <span data-i18n="stocks.count_matching">coinciden</span></span>
         </div>
     </div>
 

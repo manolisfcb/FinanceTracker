@@ -11,7 +11,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-maple">
         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
     </svg>
-    Transacciones
+    <span data-i18n="finance.transactions.title">Transacciones</span>
 </h1>
 
 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
@@ -23,21 +23,21 @@
     <!-- 1 de cuatro columnas para el formulario de filtros -->
     <div class="md:col-span-1">
         <div class="card p-5">
-            <div class="lbl mb-3">Filtros</div>
+            <div class="lbl mb-3" data-i18n="finance.filters.heading">Filtros</div>
             <form hx-get="/transactions" hx-target="#transaction-container" hx-swap="outerHTML" class="space-y-4">
 
                 <div class="space-y-1.5">
-                    <label for="date" class="text-[13px] text-muted2">Fecha</label>
-                    <input type="text" name="date" id="date" class="tn-input" placeholder="YYYY-MM-DD" />
+                    <label for="date" class="text-[13px] text-muted2" data-i18n="finance.filters.date_label">Fecha</label>
+                    <input type="text" name="date" id="date" class="tn-input" placeholder="YYYY-MM-DD" data-i18n-placeholder="finance.filters.date_placeholder" />
                 </div>
 
                 <div class="space-y-1.5">
-                    <label for="type" class="text-[13px] text-muted2">Tipo</label>
-                    <input type="text" name="type" id="type" class="tn-input" placeholder="income o expense..." />
+                    <label for="type" class="text-[13px] text-muted2" data-i18n="finance.filters.type_label">Tipo</label>
+                    <input type="text" name="type" id="type" class="tn-input" placeholder="income o expense..." data-i18n-placeholder="finance.filters.type_placeholder" />
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-[13px] text-muted2">Categorías</label>
+                    <label class="text-[13px] text-muted2" data-i18n="finance.filters.categories_label">Categorías</label>
                     <div class="space-y-1.5">
                         {% for categ in categories %}
                         <div class="flex items-center gap-2">
@@ -48,7 +48,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-full justify-center">Buscar</button>
+                <button type="submit" class="btn btn-primary w-full justify-center" data-i18n="finance.filters.search_button">Buscar</button>
             </form>
         </div>
     </div>
