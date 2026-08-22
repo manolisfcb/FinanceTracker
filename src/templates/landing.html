@@ -75,11 +75,11 @@
                 <span class="tn-eyebrow">TSX · NYSE · NASDAQ</span>
             </div>
 
-            <h1 class="font-serif-display text-[36px] sm:text-5xl lg:text-[57px] leading-[1.06] tracking-tight text-pretty">
+            <h1 class="font-serif-display text-[36px] sm:text-5xl lg:text-[57px] leading-[1.06] tracking-tight text-pretty" data-i18n="hero.title">
                 Tu portafolio, con el análisis que le falta.
             </h1>
 
-            <p class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-muted2 max-w-[510px] text-pretty">
+            <p class="mt-5 text-[15px] md:text-[16.5px] leading-relaxed text-muted2 max-w-[510px] text-pretty" data-i18n="hero.subtitle">
                 Reuní todas tus cuentas de inversión en una sola cartera.
                 TrueNorth calcula el costo base promedio de cada posición, sigue tus
                 dividendos y te da los fundamentales de cada empresa que tenés.
@@ -87,23 +87,23 @@
 
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 mt-7">
                 <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg btn-block sm:w-auto">
-                    Crear cuenta gratis
+                    <span data-i18n="hero.cta_register">Crear cuenta gratis</span>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h13"></path><path d="M12 5l7 7-7 7"></path></svg>
                 </a>
                 {% if google_enabled %}
                 <a href="{{ url_for('auth.google_login') }}" class="btn btn-lg btn-block sm:w-auto">
                     {% include 'partials/google_mark.html' %}
-                    Continuar con Google
+                    <span data-i18n="hero.cta_google">Continuar con Google</span>
                 </a>
                 {% endif %}
             </div>
 
             <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 text-[12.5px] text-faint">
-                <span>Gratis, sin tarjeta</span>
+                <span data-i18n="hero.trust1">Gratis, sin tarjeta</span>
                 <span class="w-[3px] h-[3px] rounded-full bg-[#d9d5cb]"></span>
-                <span>Multi-moneda, con FX diario</span>
+                <span data-i18n="hero.trust2">Multi-moneda, con FX diario</span>
                 <span class="w-[3px] h-[3px] rounded-full bg-[#d9d5cb]"></span>
-                <span>Tus datos son solo tuyos</span>
+                <span data-i18n="hero.trust3">Tus datos son solo tuyos</span>
             </div>
         </div>
 
@@ -112,7 +112,7 @@
             <div class="card p-5 shadow-[0_24px_60px_rgba(28,27,24,.10)]">
                 <div class="flex items-end justify-between mb-4">
                     <div>
-                        <div class="lbl">Patrimonio total</div>
+                        <div class="lbl" data-i18n="card.total_equity">Patrimonio total</div>
                         <div class="num text-[26px] md:text-[30px] font-semibold tracking-tight mt-1">$ 184,920.55</div>
                     </div>
                     <div class="text-right">
@@ -123,40 +123,40 @@
 
                 <div class="grid grid-cols-3 gap-2.5 mb-4">
                     <div class="rounded-lg border border-[#efede7] bg-[#fbfaf8] px-3 py-2.5">
-                        <div class="lbl text-[10.5px]">Aportado</div>
+                        <div class="lbl text-[10.5px]" data-i18n="card.contributed">Aportado</div>
                         <div class="num text-[15px] font-semibold mt-1">$ 163,482</div>
                     </div>
                     <div class="rounded-lg border border-[#efede7] bg-[#fbfaf8] px-3 py-2.5">
-                        <div class="lbl text-[10.5px]">Dividendos 12m</div>
+                        <div class="lbl text-[10.5px]" data-i18n="card.dividends_12m">Dividendos 12m</div>
                         <div class="num text-[15px] font-semibold mt-1">$ 6,204</div>
                     </div>
                     <div class="rounded-lg border border-[#efede7] bg-[#fbfaf8] px-3 py-2.5">
-                        <div class="lbl text-[10.5px]">Yield on cost</div>
+                        <div class="lbl text-[10.5px]" data-i18n="card.yield_on_cost">Yield on cost</div>
                         <div class="num text-[15px] font-semibold mt-1">3.79%</div>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between mb-2.5">
-                    <span class="lbl">Plan por sector</span>
-                    <span class="text-[11.5px] text-faint">real vs. objetivo</span>
+                    <span class="lbl" data-i18n="card.sector_plan">Plan por sector</span>
+                    <span class="text-[11.5px] text-faint" data-i18n="card.real_vs_target">real vs. objetivo</span>
                 </div>
                 <div class="flex flex-col gap-2.5 mb-[18px]">
                     <div class="flex items-center gap-3">
-                        <span class="w-[92px] shrink-0 text-[12.5px] text-muted2">Financiero</span>
+                        <span class="w-[92px] shrink-0 text-[12.5px] text-muted2" data-i18n="card.sector_financial">Financiero</span>
                         <span class="flex-1 h-1.5 rounded bg-[#efede7] relative block">
                             <span class="absolute inset-y-0 left-0 right-[42%] rounded bg-ink block"></span>
                         </span>
                         <span class="num w-[74px] shrink-0 text-right text-xs text-muted2">58% / 50%</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="w-[92px] shrink-0 text-[12.5px] text-muted2">Energía</span>
+                        <span class="w-[92px] shrink-0 text-[12.5px] text-muted2" data-i18n="card.sector_energy">Energía</span>
                         <span class="flex-1 h-1.5 rounded bg-[#efede7] relative block">
                             <span class="absolute inset-y-0 left-0 right-[79%] rounded bg-[#b98a2e] block"></span>
                         </span>
                         <span class="num w-[74px] shrink-0 text-right text-xs text-muted2">21% / 20%</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="w-[92px] shrink-0 text-[12.5px] text-muted2">Tecnología</span>
+                        <span class="w-[92px] shrink-0 text-[12.5px] text-muted2" data-i18n="card.sector_tech">Tecnología</span>
                         <span class="flex-1 h-1.5 rounded bg-[#efede7] relative block">
                             <span class="absolute inset-y-0 left-0 right-[88%] rounded bg-[#4a6b8a] block"></span>
                         </span>
@@ -168,9 +168,9 @@
                     <table class="tn-card-table">
                         <thead>
                             <tr class="bg-[#fbfaf8]">
-                                <th>Activo</th>
-                                <th class="text-right">Costo prom.</th>
-                                <th class="text-right hidden sm:table-cell">Valor</th>
+                                <th data-i18n="card.th_asset">Activo</th>
+                                <th class="text-right" data-i18n="card.th_avg_cost">Costo prom.</th>
+                                <th class="text-right hidden sm:table-cell" data-i18n="card.th_value">Valor</th>
                                 <th class="text-right">P&amp;L</th>
                             </tr>
                         </thead>
@@ -203,7 +203,7 @@
                     </table>
                 </div>
             </div>
-            <p class="text-[11.5px] text-faint mt-2.5 text-center">Ejemplo ilustrativo de un dashboard, no son cifras reales.</p>
+            <p class="text-[11.5px] text-faint mt-2.5 text-center" data-i18n="card.caption">Ejemplo ilustrativo de un dashboard, no son cifras reales.</p>
         </div>
 
     </div>
@@ -212,23 +212,23 @@
 {# ------------------------------------------------------- Broker imports #}
 <section class="border-y border-border bg-white">
     <div class="max-w-screen-xl mx-auto px-6 md:px-9 py-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-9">
-        <span class="text-[13px] text-muted shrink-0">Importá tu historial desde</span>
+        <span class="text-[13px] text-muted shrink-0" data-i18n="brokers.import_from">Importá tu historial desde</span>
         <div class="flex flex-wrap items-center gap-x-8 gap-y-2 flex-1">
             <span class="text-base font-semibold text-muted2 tracking-tight">Questrade</span>
             <span class="text-base font-semibold text-muted2 tracking-tight">Wealthsimple</span>
             <span class="text-base font-semibold text-muted2 tracking-tight">Interactive Brokers</span>
         </div>
-        <span class="text-[13px] text-faint shrink-0">…o cargá cada orden a mano en 20 segundos</span>
+        <span class="text-[13px] text-faint shrink-0" data-i18n="brokers.manual">…o cargá cada orden a mano en 20 segundos</span>
     </div>
 </section>
 
 {# ------------------------------------------------------------- Features #}
 <section class="max-w-screen-xl mx-auto px-6 md:px-9 pt-14 md:pt-16">
     <div class="max-w-[640px] mb-8">
-        <h2 class="font-serif-display text-[30px] md:text-[38px] leading-tight tracking-tight text-pretty">
+        <h2 class="font-serif-display text-[30px] md:text-[38px] leading-tight tracking-tight text-pretty" data-i18n="features.heading">
             Seis cosas que hoy hacés en cinco planillas
         </h2>
-        <p class="mt-3 text-[15px] leading-relaxed text-muted2">
+        <p class="mt-3 text-[15px] leading-relaxed text-muted2" data-i18n="features.subheading">
             Cada una vive acá, con los mismos datos y la misma moneda base.
         </p>
     </div>
@@ -239,48 +239,48 @@
             <div class="w-9 h-9 rounded-[9px] bg-[#f3ece3] flex items-center justify-center mb-3.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b98a2e" stroke-width="2" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M3 12h18"></path></svg>
             </div>
-            <div class="text-[15px] font-semibold mb-1.5">Portafolio consolidado</div>
-            <p class="text-[13.5px] leading-relaxed text-muted2">Todas tus cuentas en una sola cartera, o filtradas de a una. Posiciones, costo, valor de mercado y P&amp;L, siempre en tu moneda base.</p>
+            <div class="text-[15px] font-semibold mb-1.5" data-i18n="features.f1.title">Portafolio consolidado</div>
+            <p class="text-[13.5px] leading-relaxed text-muted2" data-i18n="features.f1.desc">Todas tus cuentas en una sola cartera, o filtradas de a una. Posiciones, costo, valor de mercado y P&amp;L, siempre en tu moneda base.</p>
         </div>
 
         <div class="card p-[22px]">
             <div class="w-9 h-9 rounded-[9px] bg-[#e9efe9] flex items-center justify-center mb-3.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M8 6h8"></path><path d="M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h4"></path></svg>
             </div>
-            <div class="text-[15px] font-semibold mb-1.5">Costo base promedio (ACB)</div>
-            <p class="text-[13.5px] leading-relaxed text-muted2">Costo promedio ponderado recalculado en cada compra, para que la ganancia de capital de una venta no sea una estimación.</p>
+            <div class="text-[15px] font-semibold mb-1.5" data-i18n="features.f2.title">Costo base promedio (ACB)</div>
+            <p class="text-[13.5px] leading-relaxed text-muted2" data-i18n="features.f2.desc">Costo promedio ponderado recalculado en cada compra, para que la ganancia de capital de una venta no sea una estimación.</p>
         </div>
 
         <div class="card p-[22px]">
             <div class="w-9 h-9 rounded-[9px] bg-[#eceef2] flex items-center justify-center mb-3.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4a6b8a" stroke-width="2" aria-hidden="true"><path d="M3 5h18"></path><path d="M6 12h12"></path><path d="M10 19h4"></path></svg>
             </div>
-            <div class="text-[15px] font-semibold mb-1.5">Screener fundamental</div>
-            <p class="text-[13.5px] leading-relaxed text-muted2">P/E, P/B, ROE, margen, deuda y dividend yield de empresas de TSX, NYSE y Nasdaq. Filtrá, ordená y comparalas lado a lado.</p>
+            <div class="text-[15px] font-semibold mb-1.5" data-i18n="features.f3.title">Screener fundamental</div>
+            <p class="text-[13.5px] leading-relaxed text-muted2" data-i18n="features.f3.desc">P/E, P/B, ROE, margen, deuda y dividend yield de empresas de TSX, NYSE y Nasdaq. Filtrá, ordená y comparalas lado a lado.</p>
         </div>
 
         <div class="card p-[22px]">
             <div class="w-9 h-9 rounded-[9px] bg-[#f3ece3] flex items-center justify-center mb-3.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b3372b" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M8 3v4M16 3v4"></path><path d="M8.5 15.5h7"></path></svg>
             </div>
-            <div class="text-[15px] font-semibold mb-1.5">Dividendos, antes y después</div>
-            <p class="text-[13.5px] leading-relaxed text-muted2">Calendario de ex-dates y pagos de lo que tenés, con los proventos ya recibidos confirmados uno por uno.</p>
+            <div class="text-[15px] font-semibold mb-1.5" data-i18n="features.f4.title">Dividendos, antes y después</div>
+            <p class="text-[13.5px] leading-relaxed text-muted2" data-i18n="features.f4.desc">Calendario de ex-dates y pagos de lo que tenés, con los proventos ya recibidos confirmados uno por uno.</p>
         </div>
 
         <div class="card p-[22px]">
             <div class="w-9 h-9 rounded-[9px] bg-[#eceef2] flex items-center justify-center mb-3.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4a6b8a" stroke-width="2" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
             </div>
-            <div class="text-[15px] font-semibold mb-1.5">Hechos relevantes</div>
-            <p class="text-[13.5px] leading-relaxed text-muted2">Filings de SEC EDGAR, resultados y noticias de tus empresas, en un inbox que se lee y se archiva.</p>
+            <div class="text-[15px] font-semibold mb-1.5" data-i18n="features.f5.title">Hechos relevantes</div>
+            <p class="text-[13.5px] leading-relaxed text-muted2" data-i18n="features.f5.desc">Filings de SEC EDGAR, resultados y noticias de tus empresas, en un inbox que se lee y se archiva.</p>
         </div>
 
         <div class="card p-[22px]">
             <div class="w-9 h-9 rounded-[9px] bg-[#e9efe9] flex items-center justify-center mb-3.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2" aria-hidden="true"><path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 20v-2a4 4 0 0 0-3-3.9"></path><path d="M16 3.1a4 4 0 0 1 0 7.8"></path></svg>
             </div>
-            <div class="text-[15px] font-semibold mb-1.5">Comunidad por ticker</div>
-            <p class="text-[13.5px] leading-relaxed text-muted2">Tesis y preguntas de otros inversores. Una mención <span class="tick">$AAPL</span> enlaza directo a la ficha de la empresa.</p>
+            <div class="text-[15px] font-semibold mb-1.5" data-i18n="features.f6.title">Comunidad por ticker</div>
+            <p class="text-[13.5px] leading-relaxed text-muted2"><span data-i18n="features.f6.desc_prefix">Tesis y preguntas de otros inversores. Una mención</span> <span class="tick">$AAPL</span> <span data-i18n="features.f6.desc_suffix">enlaza directo a la ficha de la empresa.</span></p>
         </div>
 
     </div>
@@ -291,31 +291,31 @@
     <div class="flex flex-col lg:flex-row items-center gap-10 lg:gap-[52px]">
         <div class="w-full lg:w-[512px] lg:shrink-0">
             <span class="tn-eyebrow text-maple">Adjusted cost base</span>
-            <h2 class="font-serif-display text-[30px] md:text-[38px] leading-tight tracking-tight mt-3.5 text-pretty">
+            <h2 class="font-serif-display text-[30px] md:text-[38px] leading-tight tracking-tight mt-3.5 text-pretty" data-i18n="acb.heading">
                 Lo que tu broker no te dice cuando vendés
             </h2>
-            <p class="mt-4 text-[15px] leading-relaxed text-muted2">
+            <p class="mt-4 text-[15px] leading-relaxed text-muted2" data-i18n="acb.p1">
                 Muchas jurisdicciones no aceptan FIFO: la ganancia de capital se calcula
                 contra el costo promedio de todas tus compras de ese activo. Si comprás la
                 misma acción en tres momentos y en dos cuentas distintas, ese promedio se
                 mueve cada vez.
             </p>
-            <p class="mt-3.5 text-[15px] leading-relaxed text-muted2">
+            <p class="mt-3.5 text-[15px] leading-relaxed text-muted2" data-i18n="acb.p2">
                 TrueNorth lo recalcula solo, orden por orden, y guarda el número que vas a
                 necesitar para tu declaración de impuestos.
             </p>
             <ul class="flex flex-col gap-2.5 mt-6 list-none p-0">
                 <li class="flex items-start gap-2.5">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2.4" class="shrink-0 mt-0.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
-                    <span class="text-sm">Compras, ventas, splits y órdenes en otra moneda convertidas al FX del día</span>
+                    <span class="text-sm" data-i18n="acb.li1">Compras, ventas, splits y órdenes en otra moneda convertidas al FX del día</span>
                 </li>
                 <li class="flex items-start gap-2.5">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2.4" class="shrink-0 mt-0.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
-                    <span class="text-sm">Un costo promedio por activo, aunque esté repartido en varias cuentas</span>
+                    <span class="text-sm" data-i18n="acb.li2">Un costo promedio por activo, aunque esté repartido en varias cuentas</span>
                 </li>
                 <li class="flex items-start gap-2.5">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a7f4e" stroke-width="2.4" class="shrink-0 mt-0.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
-                    <span class="text-sm">La ganancia realizada de cada venta, ya calculada</span>
+                    <span class="text-sm" data-i18n="acb.li3">La ganancia realizada de cada venta, ya calculada</span>
                 </li>
             </ul>
         </div>
@@ -323,35 +323,35 @@
         <div class="w-full lg:flex-1 lg:min-w-0">
             <div class="card p-[22px] shadow-[0_16px_40px_rgba(28,27,24,.07)]">
                 <div class="flex items-baseline justify-between mb-4">
-                    <span class="text-[14.5px] font-semibold">Historial de AAPL</span>
-                    <span class="num text-xs text-muted">160 unidades</span>
+                    <span class="text-[14.5px] font-semibold" data-i18n="acb.card_title">Historial de AAPL</span>
+                    <span class="num text-xs text-muted" data-i18n="acb.card_units">160 unidades</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="tn-card-table">
                         <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Operación</th>
-                                <th class="text-right">Precio</th>
-                                <th class="text-right">Costo prom.</th>
+                                <th data-i18n="acb.th_date">Fecha</th>
+                                <th data-i18n="acb.th_operation">Operación</th>
+                                <th class="text-right" data-i18n="acb.th_price">Precio</th>
+                                <th class="text-right" data-i18n="acb.th_avg_cost">Costo prom.</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td class="num text-muted2">2024-03-15</td>
-                                <td class="whitespace-nowrap">Compra <span class="num text-muted">100</span></td>
+                                <td class="whitespace-nowrap"><span data-i18n="acb.op_buy">Compra</span> <span class="num text-muted">100</span></td>
                                 <td class="num text-right">132.40</td>
                                 <td class="num text-right font-semibold">132.40</td>
                             </tr>
                             <tr>
                                 <td class="num text-muted2">2024-07-22</td>
-                                <td class="whitespace-nowrap">Compra <span class="num text-muted">60</span></td>
+                                <td class="whitespace-nowrap"><span data-i18n="acb.op_buy">Compra</span> <span class="num text-muted">60</span></td>
                                 <td class="num text-right">148.90</td>
                                 <td class="num text-right font-semibold">138.59</td>
                             </tr>
                             <tr>
                                 <td class="num text-muted2 border-b-0">2025-11-08</td>
-                                <td class="whitespace-nowrap border-b-0">Venta <span class="num text-muted">40</span></td>
+                                <td class="whitespace-nowrap border-b-0"><span data-i18n="acb.op_sell">Venta</span> <span class="num text-muted">40</span></td>
                                 <td class="num text-right border-b-0">171.20</td>
                                 <td class="num text-right font-semibold border-b-0">138.59</td>
                             </tr>
@@ -360,7 +360,7 @@
                 </div>
                 <div class="flex items-center justify-between gap-4 mt-4 px-4 py-3.5 rounded-[9px] bg-[#e9efe9] border border-[#cfe2d3]">
                     <div>
-                        <div class="lbl text-pos">Ganancia de capital realizada</div>
+                        <div class="lbl text-pos" data-i18n="acb.realized_gain_label">Ganancia de capital realizada</div>
                         <div class="num text-xs text-muted2 mt-1">40 × (171.20 − 138.59)</div>
                     </div>
                     <span class="num text-[21px] font-semibold text-pos">$ 1,304.50</span>
@@ -388,9 +388,9 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="tick">$AAPL</span>
-                                <span class="text-[11px] text-faint">SEC EDGAR · hace 2 h</span>
+                                <span class="text-[11px] text-faint" data-i18n="inbox.item1_source">SEC EDGAR · hace 2 h</span>
                             </div>
-                            <div class="text-[13.5px] mt-1.5 leading-snug">Form 10-Q — Resultados del tercer trimestre</div>
+                            <div class="text-[13.5px] mt-1.5 leading-snug" data-i18n="inbox.item1_text">Form 10-Q — Resultados del tercer trimestre</div>
                         </div>
                     </div>
                     <div class="flex gap-3 px-3.5 py-3 border border-[#efede7] rounded-[9px] bg-[#fbfaf8]">
@@ -400,9 +400,9 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="tick">$JNJ</span>
-                                <span class="text-[11px] text-faint">Dividendo · ex-date 15 nov</span>
+                                <span class="text-[11px] text-faint" data-i18n="inbox.item2_source">Dividendo · ex-date 15 nov</span>
                             </div>
-                            <div class="text-[13.5px] mt-1.5 leading-snug">$ 1.19 por acción — te tocan <span class="num font-semibold">$ 358.15</span></div>
+                            <div class="text-[13.5px] mt-1.5 leading-snug">$ 1.19 <span data-i18n="inbox.item2_text">por acción — te tocan</span> <span class="num font-semibold">$ 358.15</span></div>
                         </div>
                     </div>
                     <div class="flex gap-3 px-3.5 py-3 border border-[#efede7] rounded-[9px] bg-[#fbfaf8]">
@@ -412,9 +412,9 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="tick">$MSFT</span>
-                                <span class="text-[11px] text-faint">Noticia · hace 6 h</span>
+                                <span class="text-[11px] text-faint" data-i18n="inbox.item3_source">Noticia · hace 6 h</span>
                             </div>
-                            <div class="text-[13.5px] mt-1.5 leading-snug">Microsoft recorta su guidance de nube para el cuarto trimestre</div>
+                            <div class="text-[13.5px] mt-1.5 leading-snug" data-i18n="inbox.item3_text">Microsoft recorta su guidance de nube para el cuarto trimestre</div>
                         </div>
                     </div>
                 </div>
@@ -422,16 +422,16 @@
         </div>
 
         <div class="w-full lg:w-[512px] lg:shrink-0">
-            <span class="tn-eyebrow text-maple">Seguimiento</span>
-            <h2 class="font-serif-display text-[30px] md:text-[38px] leading-tight tracking-tight mt-3.5 text-pretty">
+            <span class="tn-eyebrow text-maple" data-i18n="inbox.eyebrow">Seguimiento</span>
+            <h2 class="font-serif-display text-[30px] md:text-[38px] leading-tight tracking-tight mt-3.5 text-pretty" data-i18n="inbox.heading">
                 Enterate por tu cartera, no por Twitter
             </h2>
-            <p class="mt-4 text-[15px] leading-relaxed text-muted2">
+            <p class="mt-4 text-[15px] leading-relaxed text-muted2" data-i18n="inbox.p1">
                 TrueNorth mira solamente las empresas que tenés. Cada filing de SEC EDGAR,
                 cada anuncio de dividendo y cada nota relevante llega a un inbox propio, con
                 el ticker adelante y el monto que te toca ya calculado.
             </p>
-            <p class="mt-3.5 text-[15px] leading-relaxed text-muted2">
+            <p class="mt-3.5 text-[15px] leading-relaxed text-muted2" data-i18n="inbox.p2">
                 Sin feed infinito, sin notificaciones de empresas que no te importan.
             </p>
         </div>
@@ -443,24 +443,24 @@
 <section class="max-w-screen-xl mx-auto px-6 md:px-9 pt-16 pb-[76px]">
     <div class="rounded-[14px] bg-ink px-7 py-9 md:px-[60px] md:py-14 flex flex-col lg:flex-row lg:items-center justify-between gap-10 lg:gap-12">
         <div class="max-w-[600px]">
-            <h2 class="font-serif-display text-[31px] md:text-[40px] leading-[1.1] tracking-tight text-[#faf9f6] text-pretty">
+            <h2 class="font-serif-display text-[31px] md:text-[40px] leading-[1.1] tracking-tight text-[#faf9f6] text-pretty" data-i18n="cta.heading">
                 Empezá con una orden. El resto se arma solo.
             </h2>
-            <p class="mt-4 text-[15px] leading-relaxed text-faint">
+            <p class="mt-4 text-[15px] leading-relaxed text-faint" data-i18n="cta.p1">
                 Creás la cuenta, importás tu historial o cargás la primera compra, y ya
                 tenés portafolio, costo base y calendario de dividendos.
             </p>
         </div>
         <div class="flex flex-col gap-2.5 shrink-0 w-full lg:w-[270px]">
-            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg btn-block">Crear cuenta gratis</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg btn-block" data-i18n="hero.cta_register">Crear cuenta gratis</a>
             {% if google_enabled %}
             <a href="{{ url_for('auth.google_login') }}" class="btn btn-lg btn-block btn-onink">
                 {% include 'partials/google_mark.html' %}
-                Continuar con Google
+                <span data-i18n="hero.cta_google">Continuar con Google</span>
             </a>
             {% endif %}
             <span class="text-xs text-muted text-center mt-1">
-                ¿Ya tenés cuenta? <a href="{{ url_for('auth.login') }}" class="text-[#e0dbd0] hover:text-white font-semibold">Iniciá sesión</a>
+                <span data-i18n="cta.have_account">¿Ya tenés cuenta?</span> <a href="{{ url_for('auth.login') }}" class="text-[#e0dbd0] hover:text-white font-semibold" data-i18n="cta.login">Iniciá sesión</a>
             </span>
         </div>
     </div>
@@ -474,24 +474,26 @@
                 <img src="{{ url_for('static', filename='images/brand-mark.svg') }}" width="18" height="18" alt="" aria-hidden="true">
                 <span class="font-serif-display text-lg">TrueNorth Analytics</span>
             </div>
-            <p class="text-[12.5px] leading-relaxed text-faint">
+            <p class="text-[12.5px] leading-relaxed text-faint" data-i18n="footer.tagline">
                 Herramienta de seguimiento y análisis para inversores. No es asesoramiento
                 financiero ni fiscal: los cálculos son una ayuda, no un sustituto de tu contador.
             </p>
         </div>
         <div class="flex gap-14">
             <div class="flex flex-col gap-2">
-                <span class="lbl mb-0.5">Producto</span>
-                <a href="{{ url_for('auth.register') }}" class="text-[13px] text-muted2 hover:text-ink">Portafolio</a>
-                <a href="{{ url_for('auth.register') }}" class="text-[13px] text-muted2 hover:text-ink">Screener</a>
-                <a href="{{ url_for('auth.register') }}" class="text-[13px] text-muted2 hover:text-ink">Dividendos</a>
+                <span class="lbl mb-0.5" data-i18n="footer.col_product">Producto</span>
+                <a href="{{ url_for('auth.register') }}" class="text-[13px] text-muted2 hover:text-ink" data-i18n="footer.link_portfolio">Portafolio</a>
+                <a href="{{ url_for('auth.register') }}" class="text-[13px] text-muted2 hover:text-ink" data-i18n="footer.link_screener">Screener</a>
+                <a href="{{ url_for('auth.register') }}" class="text-[13px] text-muted2 hover:text-ink" data-i18n="footer.link_dividends">Dividendos</a>
             </div>
             <div class="flex flex-col gap-2">
-                <span class="lbl mb-0.5">Cuenta</span>
-                <a href="{{ url_for('auth.register') }}" class="text-[13px] text-muted2 hover:text-ink">Crear cuenta</a>
-                <a href="{{ url_for('auth.login') }}" class="text-[13px] text-muted2 hover:text-ink">Iniciar sesión</a>
+                <span class="lbl mb-0.5" data-i18n="footer.col_account">Cuenta</span>
+                <a href="{{ url_for('auth.register') }}" class="text-[13px] text-muted2 hover:text-ink" data-i18n="footer.link_signup">Crear cuenta</a>
+                <a href="{{ url_for('auth.login') }}" class="text-[13px] text-muted2 hover:text-ink" data-i18n="footer.link_login">Iniciar sesión</a>
             </div>
         </div>
     </div>
 </footer>
+
+<script src="{{ url_for('static', filename='js/landing_i18n.js') }}" defer></script>
 {% endblock body %}

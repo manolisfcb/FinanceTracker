@@ -84,8 +84,15 @@
                     </div>
                 </div>
             {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn border-transparent bg-transparent hover:bg-[#fbfaf8]">Iniciar sesión</a>
-                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Crear cuenta</a>
+                {% if request.endpoint == 'main.home_page' %}
+                <div class="flex items-center gap-0.5 border border-border rounded-lg p-0.5 bg-[#fbfaf8]" role="group" aria-label="Idioma / Language / Idioma">
+                    <button type="button" data-lang-btn="es" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">ES</button>
+                    <button type="button" data-lang-btn="en" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">EN</button>
+                    <button type="button" data-lang-btn="pt" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">PT</button>
+                </div>
+                {% endif %}
+                <a href="{{ url_for('auth.login') }}" class="btn border-transparent bg-transparent hover:bg-[#fbfaf8]" data-i18n="nav.login">Iniciar sesión</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary" data-i18n="nav.register">Crear cuenta</a>
             {% endif %}
         </div>
     </div>
