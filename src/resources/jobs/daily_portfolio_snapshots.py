@@ -5,6 +5,7 @@ from src.models import UserModel
 from src.resources.jobs._common import JobResult, run_job, run_operation
 from src.services.portfolio import write_snapshots
 
+
 JOB_NAME = 'daily_portfolio_snapshots'
 
 
