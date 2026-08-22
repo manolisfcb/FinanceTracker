@@ -1,99 +1,130 @@
 <nav class="sticky top-0 z-50 bg-white border-b border-border">
     <div class="max-w-screen-xl mx-auto px-6 md:px-9 h-[60px] flex items-center justify-between">
-        <div class="flex items-center gap-8 md:gap-11">
-            <a href="{{ url_for('main.home_page') }}" class="flex items-center gap-2 shrink-0" aria-label="TrueNorth Analytics · Inicio">
+        <div class="flex items-center gap-8 lg:gap-11">
+            <a href="{{ url_for('main.home_page') }}" class="flex items-center gap-2 shrink-0" aria-label="TrueNorth Analytics · Inicio" data-i18n-aria-label="nav.home_aria">
                 <img src="{{ url_for('static', filename='images/brand-mark.svg') }}" width="20" height="20" alt="" aria-hidden="true">
-                <span class="font-serif-display text-xl text-ink">TrueNorth</span>
+                <span class="font-serif-display text-xl text-ink whitespace-nowrap">TrueNorth</span>
             </a>
 
             {% if current_user.is_authenticated %}
-            <div class="hidden md:flex items-center gap-6 text-[13.5px] font-medium">
-                <a href="{{ url_for('portfolio.dash_page') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'portfolio.dash_page' }}">Dashboard</a>
-                <a href="{{ url_for('portfolio.portfolio') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'portfolio.portfolio' }}">Portafolio</a>
-                <a href="{{ url_for('portfolio.list_orders') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['portfolio.list_orders', 'portfolio.import_orders', 'portfolio.add_order', 'portfolio.edit_order', 'portfolio.list_accounts', 'portfolio.add_account', 'portfolio.edit_account'] }}">Órdenes</a>
-                <a href="{{ url_for('stocks.get_stocks') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'stocks.get_stocks' }}">Acciones</a>
-                <a href="{{ url_for('dividends.dividends_page') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'dividends.dividends_page' }}">Dividendos</a>
-                <a href="{{ url_for('community.community_page') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['community.community_page', 'community.post_page', 'community.edit_post'] }}">Comunidad</a>
+            <div class="hidden lg:flex items-center gap-6 text-[13.5px] font-medium">
+                <a href="{{ url_for('portfolio.dash_page') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'portfolio.dash_page' }}" data-i18n="nav.dashboard">Dashboard</a>
+                <a href="{{ url_for('portfolio.portfolio') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'portfolio.portfolio' }}" data-i18n="nav.portfolio">Portafolio</a>
+                <a href="{{ url_for('portfolio.list_orders') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['portfolio.list_orders', 'portfolio.import_orders', 'portfolio.add_order', 'portfolio.edit_order', 'portfolio.list_accounts', 'portfolio.add_account', 'portfolio.edit_account'] }}" data-i18n="nav.orders">Órdenes</a>
+                <a href="{{ url_for('stocks.get_stocks') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'stocks.get_stocks' }}" data-i18n="nav.stocks">Acciones</a>
+                <a href="{{ url_for('dividends.dividends_page') }}" class="navlink {{ 'navlink-active' if request.endpoint == 'dividends.dividends_page' }}" data-i18n="nav.dividends">Dividendos</a>
+                <a href="{{ url_for('community.community_page') }}" class="navlink {{ 'navlink-active' if request.endpoint in ['community.community_page', 'community.post_page', 'community.edit_post'] }}" data-i18n="nav.community">Comunidad</a>
             </div>
             {% endif %}
         </div>
 
-        <div class="flex items-center gap-3.5">
+        <div class="flex items-center gap-2 sm:gap-3.5">
+            <div class="hidden sm:flex items-center gap-0.5 border border-border rounded-lg p-0.5 bg-[#fbfaf8] shrink-0" role="group" aria-label="Idioma / Language / Idioma">
+                <button type="button" data-lang-btn="es" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">ES</button>
+                <button type="button" data-lang-btn="en" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">EN</button>
+                <button type="button" data-lang-btn="pt" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">PT</button>
+            </div>
             {% if current_user.is_authenticated %}
                 <form action="{{ url_for('stocks.get_stocks') }}" method="get"
-                      class="hidden lg:flex items-center gap-2 border border-border rounded-lg px-3 py-1.5 w-[220px] text-muted text-[13px] bg-[#fbfaf8] focus-within:border-maple">
+                      class="hidden xl:flex items-center gap-2 border border-border rounded-lg px-3 py-1.5 w-[220px] text-muted text-[13px] bg-[#fbfaf8] focus-within:border-maple">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
                     <input type="search" name="q" value="{{ request.args.get('q', '') if request.endpoint == 'stocks.get_stocks' }}"
                            placeholder="Buscar ticker o empresa…" aria-label="Buscar ticker o empresa"
+                           data-i18n-placeholder="nav.search_placeholder" data-i18n-aria-label="nav.search_placeholder"
                            class="bg-transparent border-0 outline-none w-full text-ink placeholder:text-muted" />
                 </form>
-                <span class="num text-xs font-semibold border border-border rounded-md px-2.5 py-1 bg-[#fbfaf8]">CAD</span>
+                <span class="num text-xs font-semibold border border-border rounded-md px-2.5 py-1 bg-[#fbfaf8] shrink-0">CAD</span>
 
-                <div class="relative group">
-                    <button aria-label="Abrir menú de perfil" class="w-[30px] h-[30px] rounded-full bg-ink text-white flex items-center justify-center text-[13px] font-semibold">
+                <div class="relative group shrink-0">
+                    <button aria-label="Abrir menú de perfil" data-i18n-aria-label="nav.profile_menu_aria" class="w-[30px] h-[30px] rounded-full bg-ink text-white flex items-center justify-center text-[13px] font-semibold">
                         {{ current_user.username[0] | upper }}
                     </button>
                     <div class="hidden group-hover:block group-focus-within:block absolute right-0 top-full pt-2 w-60 z-10">
                         <div class="card shadow-lg overflow-hidden">
                             <div class="px-4 py-3 text-sm border-b border-border">
-                                <div class="text-muted text-xs">Sesión iniciada como</div>
+                                <div class="text-muted text-xs" data-i18n="nav.signed_in_as">Sesión iniciada como</div>
                                 <div class="font-medium truncate">{{ current_user.username }}</div>
                             </div>
                             <div class="py-2 border-b border-border">
-                                <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Control de gastos</div>
+                                <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted" data-i18n="nav.section_personal_finance">Control de gastos</div>
                                 <a href="{{ url_for('personal_finance.transactions') }}"
-                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint in ['personal_finance.transactions', 'personal_finance.add_transactions', 'personal_finance.edit_transactions', 'personal_finance.upload_transactions'] else 'text-ink' }}">
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint in ['personal_finance.transactions', 'personal_finance.add_transactions', 'personal_finance.edit_transactions', 'personal_finance.upload_transactions'] else 'text-ink' }}" data-i18n="nav.transactions">
                                     Transacciones
                                 </a>
                                 <a href="{{ url_for('personal_finance.transactions_charts') }}"
-                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'personal_finance.transactions_charts' else 'text-ink' }}">
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'personal_finance.transactions_charts' else 'text-ink' }}" data-i18n="nav.charts">
                                     Gráficos
                                 </a>
                             </div>
                             <div class="py-2 border-b border-border">
-                                <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Actividad</div>
+                                <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted" data-i18n="nav.section_activity">Actividad</div>
                                 <a href="{{ url_for('inbox.inbox_page') }}"
                                    class="flex items-center justify-between gap-3 px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'inbox.inbox_page' else 'text-ink' }}">
-                                    <span>Inbox</span>
+                                    <span data-i18n="nav.inbox">Inbox</span>
                                     {% if unread_inbox_count %}
                                     <span class="num text-[10px] font-semibold rounded-full bg-maple text-white px-1.5 py-0.5">{{ unread_inbox_count }}</span>
                                     {% endif %}
                                 </a>
                             </div>
                             <div class="py-2 border-b border-border">
-                                <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Herramientas</div>
+                                <div class="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted" data-i18n="nav.section_tools">Herramientas</div>
                                 <a href="{{ url_for('tools.rankings') }}"
-                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.rankings' else 'text-ink' }}">
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.rankings' else 'text-ink' }}" data-i18n="nav.rankings">
                                     Rankings
                                 </a>
                                 <a href="{{ url_for('tools.comparator') }}"
-                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.comparator' else 'text-ink' }}">
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.comparator' else 'text-ink' }}" data-i18n="nav.comparator">
                                     Comparador de acciones
                                 </a>
                                 <a href="{{ url_for('tools.value_methods') }}"
-                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.value_methods' else 'text-ink' }}">
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.value_methods' else 'text-ink' }}" data-i18n="nav.value_methods">
                                     Métodos de valuación
                                 </a>
                                 <a href="{{ url_for('tools.buy_prices') }}"
-                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.buy_prices' else 'text-ink' }}">
+                                   class="block px-4 py-2 text-sm hover:bg-[#fbfaf8] {{ 'text-maple font-medium bg-[#fbfaf8]' if request.endpoint == 'tools.buy_prices' else 'text-ink' }}" data-i18n="nav.buy_prices">
                                     Precios máximos de compra
                                 </a>
                             </div>
-                            <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2.5 text-sm text-ink hover:bg-[#fbfaf8]">Cerrar sesión</a>
+                            <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2.5 text-sm text-ink hover:bg-[#fbfaf8]" data-i18n="nav.logout">Cerrar sesión</a>
                         </div>
                     </div>
                 </div>
+
+                <button type="button" id="tn-nav-toggle" class="lg:hidden shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-lg border border-border text-muted2 hover:bg-[#fbfaf8]"
+                        aria-expanded="false" aria-controls="tn-nav-mobile-menu" aria-label="Abrir menú de navegación" data-i18n-aria-label="nav.mobile_menu_aria">
+                    <svg id="tn-nav-icon-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>
+                    <svg id="tn-nav-icon-close" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+                </button>
             {% else %}
-                {% if request.endpoint == 'main.home_page' %}
-                <div class="flex items-center gap-0.5 border border-border rounded-lg p-0.5 bg-[#fbfaf8]" role="group" aria-label="Idioma / Language / Idioma">
-                    <button type="button" data-lang-btn="es" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">ES</button>
-                    <button type="button" data-lang-btn="en" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">EN</button>
-                    <button type="button" data-lang-btn="pt" class="px-2 py-1 rounded-md text-[11.5px] font-semibold text-muted2">PT</button>
-                </div>
-                {% endif %}
-                <a href="{{ url_for('auth.login') }}" class="btn border-transparent bg-transparent hover:bg-[#fbfaf8]" data-i18n="nav.login">Iniciar sesión</a>
-                <a href="{{ url_for('auth.register') }}" class="btn btn-primary" data-i18n="nav.register">Crear cuenta</a>
+                <a href="{{ url_for('auth.login') }}" class="btn border-transparent bg-transparent hover:bg-[#fbfaf8] shrink-0 whitespace-nowrap" data-i18n="nav.login">Iniciar sesión</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary shrink-0 whitespace-nowrap" data-i18n="nav.register">Crear cuenta</a>
             {% endif %}
         </div>
     </div>
+
+    {% if current_user.is_authenticated %}
+    <div id="tn-nav-mobile-menu" class="hidden lg:hidden border-t border-border bg-white">
+        <div class="max-w-screen-xl mx-auto px-6 py-3 flex flex-col gap-1">
+            <form action="{{ url_for('stocks.get_stocks') }}" method="get"
+                  class="flex items-center gap-2 border border-border rounded-lg px-3 py-2 mb-2 text-muted text-[13px] bg-[#fbfaf8] focus-within:border-maple">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+                <input type="search" name="q" value="{{ request.args.get('q', '') if request.endpoint == 'stocks.get_stocks' }}"
+                       placeholder="Buscar ticker o empresa…" aria-label="Buscar ticker o empresa"
+                       data-i18n-placeholder="nav.search_placeholder" data-i18n-aria-label="nav.search_placeholder"
+                       class="bg-transparent border-0 outline-none w-full text-ink placeholder:text-muted" />
+            </form>
+            <a href="{{ url_for('portfolio.dash_page') }}" class="px-3 py-2.5 rounded-lg text-[14.5px] font-medium {{ 'text-maple bg-[#fbfaf8]' if request.endpoint == 'portfolio.dash_page' else 'text-ink hover:bg-[#fbfaf8]' }}" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="{{ url_for('portfolio.portfolio') }}" class="px-3 py-2.5 rounded-lg text-[14.5px] font-medium {{ 'text-maple bg-[#fbfaf8]' if request.endpoint == 'portfolio.portfolio' else 'text-ink hover:bg-[#fbfaf8]' }}" data-i18n="nav.portfolio">Portafolio</a>
+            <a href="{{ url_for('portfolio.list_orders') }}" class="px-3 py-2.5 rounded-lg text-[14.5px] font-medium {{ 'text-maple bg-[#fbfaf8]' if request.endpoint in ['portfolio.list_orders', 'portfolio.import_orders', 'portfolio.add_order', 'portfolio.edit_order', 'portfolio.list_accounts', 'portfolio.add_account', 'portfolio.edit_account'] else 'text-ink hover:bg-[#fbfaf8]' }}" data-i18n="nav.orders">Órdenes</a>
+            <a href="{{ url_for('stocks.get_stocks') }}" class="px-3 py-2.5 rounded-lg text-[14.5px] font-medium {{ 'text-maple bg-[#fbfaf8]' if request.endpoint == 'stocks.get_stocks' else 'text-ink hover:bg-[#fbfaf8]' }}" data-i18n="nav.stocks">Acciones</a>
+            <a href="{{ url_for('dividends.dividends_page') }}" class="px-3 py-2.5 rounded-lg text-[14.5px] font-medium {{ 'text-maple bg-[#fbfaf8]' if request.endpoint == 'dividends.dividends_page' else 'text-ink hover:bg-[#fbfaf8]' }}" data-i18n="nav.dividends">Dividendos</a>
+            <a href="{{ url_for('community.community_page') }}" class="px-3 py-2.5 rounded-lg text-[14.5px] font-medium {{ 'text-maple bg-[#fbfaf8]' if request.endpoint in ['community.community_page', 'community.post_page', 'community.edit_post'] else 'text-ink hover:bg-[#fbfaf8]' }}" data-i18n="nav.community">Comunidad</a>
+            <div class="sm:hidden flex items-center gap-0.5 border border-border rounded-lg p-0.5 bg-[#fbfaf8] mt-2 w-fit" role="group" aria-label="Idioma / Language / Idioma">
+                <button type="button" data-lang-btn="es" class="px-2.5 py-1.5 rounded-md text-[11.5px] font-semibold text-muted2">ES</button>
+                <button type="button" data-lang-btn="en" class="px-2.5 py-1.5 rounded-md text-[11.5px] font-semibold text-muted2">EN</button>
+                <button type="button" data-lang-btn="pt" class="px-2.5 py-1.5 rounded-md text-[11.5px] font-semibold text-muted2">PT</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </nav>
